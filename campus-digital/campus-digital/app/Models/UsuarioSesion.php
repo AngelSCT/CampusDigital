@@ -2,33 +2,35 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UsuarioSesion extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'usuario_sesion';
-
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
     const DELETED_AT = 'deleted_at';
 
     protected $fillable = [
         'usuario_id',
-        'token_hash',
+        'session_id',
         'ip',
         'user_agent',
-        'dispositivo',
-        'creado_por',
+        'inicia_at',
         'expira_at',
-        'revocado_at',
+        'termina_at',
+        'activa',
+        'meta_json',
     ];
 
     protected $casts = [
+        'inicia_at' => 'datetime',
         'expira_at' => 'datetime',
-        'revocado_at' => 'datetime',
+        'termina_at' => 'datetime',
+        'activa' => 'boolean',
+        'meta_json' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -37,6 +39,11 @@ class UsuarioSesion extends Model
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
+    }
+
+    public function accesos()
+    {
+        return $this->hasMany(AccesoBitacora::class, 'sesion_id');
     }
 
     public function actividades()

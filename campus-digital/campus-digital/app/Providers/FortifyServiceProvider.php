@@ -28,44 +28,48 @@ class FortifyServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {
-        Fortify::createUsersUsing(CreateNewUser::class);
-        Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
-        Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
-        Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+{
+    Fortify::createUsersUsing(CreateNewUser::class);
+    Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
+    Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
+    Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
-        RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+    RateLimiter::for('login', function (Request $request) {
+        $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
-            return Limit::perMinute(5)->by($throttleKey);
-        });
+        return Limit::perMinute(5)->by($throttleKey);
+    });
 
-        RateLimiter::for('two-factor', function (Request $request) {
-            return Limit::perMinute(5)->by($request->session()->get('login.id'));
-        });
+    RateLimiter::for('two-factor', function (Request $request) {
+        return Limit::perMinute(5)->by($request->session()->get('login.id'));
+    });
 
-        // Vistas de Fortify con Inertia
-        Fortify::loginView(function () {
-            return Inertia::render('Auth/Login');
-        });
+    // Vistas personalizadas para Fortify
+    Fortify::loginView(function () {
+        return Inertia::render('Auth/Login');
+    });
 
-        Fortify::registerView(function () {
-            return Inertia::render('Auth/Register');
-        });
+    Fortify::registerView(function () {
+        return Inertia::render('Auth/Register');
+    });
 
-        Fortify::requestPasswordResetLinkView(function () {
-            return Inertia::render('Auth/ForgotPassword');
-        });
+    Fortify::requestPasswordResetLinkView(function () {
+        return Inertia::render('Auth/ForgotPassword');
+    });
 
-        Fortify::resetPasswordView(function ($request) {
-            return Inertia::render('Auth/ResetPassword', [
-                'email' => $request->email,
-                'token' => $request->route('token'),
-            ]);
-        });
+    Fortify::resetPasswordView(function ($request) {
+        return Inertia::render('Auth/ResetPassword', [
+            'email' => $request->email,
+            'token' => $request->route('token'),
+        ]);
+    });
 
-        Fortify::verifyEmailView(function () {
-            return Inertia::render('Auth/VerifyEmail');
-        });
-    }
+    Fortify::verifyEmailView(function () {
+        return Inertia::render('Auth/VerifyEmail');
+    });
+
+    Fortify::confirmPasswordView(function () {
+        return Inertia::render('Auth/ConfirmPassword');
+    });
+}
 }

@@ -2,46 +2,65 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\Usuario;
 use App\Models\AccesoBitacora;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $usuariosActivos = Usuario::whereNull('deleted_at')
-            ->where('bloqueado', false)
-            ->count();
+        $user = $request->user();
+        $user->load('roles');
+        
+        // Dashboard diferenciado por rol
+        if ($user->hasRole('administrador')) {
+            return $this->dashboardAdministrador($user);
+        } elseif ($user->hasRole('proveedor_area')) {
+            return $this->dashboardProveedor($user);
+        } else {
+            return $this->dashboardEstudiante($user);
+        }
+    }
 
-        $usuariosPorRol = DB::table('usuario')
-            ->join('usuario_rol', 'usuario.id', '=', 'usuario_rol.usuario_id')
-            ->join('rol', 'usuario_rol.rol_id', '=', 'rol.id')
-            ->whereNull('usuario.deleted_at')
-            ->whereNull('usuario_rol.deleted_at')
-            ->select('rol.nombre', DB::raw('count(*) as total'))
-            ->groupBy('rol.nombre')
-            ->get();
+    private function dashboardAdministrador($user)
+    {
+        $stats = [
+            'usuarios_activos' => Usuario::where('bloqueado', false)->count(),
+            'usuarios_por_rol' => DB::table('usuario')
+                ->join('usuario_rol', 'usuario.id', '=', 'usuario_rol.usuario_id')
+                ->join('rol', 'usuario_rol.rol_id', '=', 'rol.id')
+                ->select('rol.nombre', DB::raw('count(*) as total'))
+                ->whereNull('usuario.deleted_at')
+                ->groupBy('rol.nombre')
+                ->get(),
+            'actividad_reciente' => AccesoBitacora::orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get(),
+        ];
 
-        $intentosAcceso = AccesoBitacora::select('exito', DB::raw('count(*) as total'))
-            ->where('created_at', '>=', now()->subDays(7))
-            ->groupBy('exito')
-            ->get();
+        $accesos = AccesoBitacora::where('created_at', '>=', now()->subDays(7))->get();
+        $stats['accesos_exitosos'] = $accesos->where('exito', true)->count();
+        $stats['accesos_fallidos'] = $accesos->where('exito', false)->count();
 
-        $actividadReciente = AccesoBitacora::with('usuario')
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
+        return Inertia::render('Dashboard/Admin', [
+            'stats' => $stats,
+        ]);
+    }
 
-        return Inertia::render('Dashboard', [
-            'stats' => [
-                'usuarios_activos' => $usuariosActivos,
-                'usuarios_por_rol' => $usuariosPorRol,
-                'intentos_acceso' => $intentosAcceso,
-                'actividad_reciente' => $actividadReciente,
-            ],
+    private function dashboardProveedor($user)
+    {
+        return Inertia::render('Dashboard/Proveedor', [
+            // Aquí puedes agregar stats del proveedor cuando tengas los módulos
+        ]);
+    }
+
+    private function dashboardEstudiante($user)
+    {
+        return Inertia::render('Dashboard/Estudiante', [
+            // Aquí puedes agregar stats del estudiante cuando tengas los módulos
         ]);
     }
 }

@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Permiso extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'permiso';
-
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
     const DELETED_AT = 'deleted_at';
 
     protected $fillable = [
@@ -31,7 +29,7 @@ class Permiso extends Model
     public function roles()
     {
         return $this->belongsToMany(Rol::class, 'rol_permiso', 'permiso_id', 'rol_id')
-            ->whereNull('rol_permiso.deleted_at')
-            ->withTimestamps();
+            ->withTimestamps()
+            ->wherePivotNull('deleted_at');
     }
 }

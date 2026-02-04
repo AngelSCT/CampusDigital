@@ -13,24 +13,27 @@ return new class extends Migration
             $table->id();
             $table->foreignId('usuario_id')->constrained('usuario')->onUpdate('cascade')->onDelete('restrict');
             
-            $table->text('token_hash')->unique('uq_usuario_sesion__token_hash');
+            $table->string('session_id', 255)->unique();
             $table->ipAddress('ip')->nullable();
             $table->text('user_agent')->default('');
-            $table->string('dispositivo', 120)->default('');
-            $table->string('creado_por', 30)->default('login');
-            $table->timestampTz('expira_at');
-            $table->timestampTz('revocado_at')->nullable();
+            
+            $table->timestampTz('inicia_at')->useCurrent();
+            $table->timestampTz('expira_at')->nullable();
+            $table->timestampTz('termina_at')->nullable();
+            
+            $table->boolean('activa')->default(true);
+            $table->jsonb('meta_json')->default('{}');
             
             $table->timestampTz('created_at')->useCurrent();
             $table->timestampTz('updated_at')->useCurrent();
             $table->timestampTz('deleted_at')->nullable();
-
-            $table->index('usuario_id', 'idx_usuario_sesion__usuario_id');
-            $table->index('expira_at', 'idx_usuario_sesion__expira_at');
-            $table->index('revocado_at', 'idx_usuario_sesion__revocado_at');
         });
 
-        DB::statement('ALTER TABLE usuario_sesion ADD CONSTRAINT ck_usuario_sesion__expira_future CHECK (expira_at > created_at)');
+        Schema::table('usuario_sesion', function (Blueprint $table) {
+            $table->index('usuario_id', 'idx_usuario_sesion__usuario_id');
+            $table->index('session_id', 'idx_usuario_sesion__session_id');
+            $table->index('activa', 'idx_usuario_sesion__activa');
+        });
 
         DB::unprepared('
             CREATE TRIGGER trg_usuario_sesion__set_updated_at

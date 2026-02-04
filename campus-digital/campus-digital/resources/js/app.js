@@ -6,6 +6,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 const appName = import.meta.env.VITE_APP_NAME || 'Campus Digital';
 
 // Helper global para rutas (simple)
+// Helper global para rutas
 window.route = (name, params) => {
     const routes = {
         'login': '/login',
@@ -15,16 +16,54 @@ window.route = (name, params) => {
         'password.email': '/forgot-password',
         'password.reset': '/reset-password',
         'password.update': '/reset-password',
+        'verification.notice': '/email/verify',
         'verification.send': '/email/verification-notification',
         'dashboard': '/dashboard',
+        'perfil.show': '/perfil',
+        'perfil.update': '/perfil/actualizar',
+        'perfil.photo.update': '/perfil/foto',
+        'perfil.photo.delete': '/perfil/foto',
+        'user-password.update': '/user/password',
+        'admin.usuarios.index': '/admin/usuarios',
+        'admin.usuarios.create': '/admin/usuarios/create',
+        'admin.usuarios.store': '/admin/usuarios',
+        'admin.usuarios.edit': '/admin/usuarios/:id/edit',
+        'admin.usuarios.update': '/admin/usuarios/:id',
+        'admin.usuarios.destroy': '/admin/usuarios/:id',
+        'admin.usuarios.toggle-block': '/admin/usuarios/:id/toggle-block',
+        'admin.reportes.usuarios': '/admin/reportes/usuarios',
+        'admin.reportes.accesos': '/admin/reportes/accesos',
+        'admin.reportes.actividad': '/admin/reportes/actividad',
+        'admin.roles.index': '/admin/roles',
+'admin.roles.create': '/admin/roles/create',
+'admin.roles.store': '/admin/roles',
+'admin.roles.edit': '/admin/roles/:id/edit',
+'admin.roles.update': '/admin/roles/:id',
+'admin.roles.destroy': '/admin/roles/:id',
+
+'admin.permisos.index': '/admin/permisos',
+'admin.permisos.create': '/admin/permisos/create',
+'admin.permisos.store': '/admin/permisos',
+'admin.permisos.edit': '/admin/permisos/:id/edit',
+'admin.permisos.update': '/admin/permisos/:id',
+'admin.permisos.destroy': '/admin/permisos/:id',
+
+'admin.bitacora.accesos': '/admin/bitacora/accesos',
+'admin.bitacora.actividad': '/admin/bitacora/actividad',
+'admin.bitacora.export-accesos': '/admin/bitacora/export-accesos',
+'admin.bitacora.export-actividad': '/admin/bitacora/export-actividad',
     };
     
     let url = routes[name] || '/';
     
-    if (params && typeof params === 'object') {
-        Object.keys(params).forEach(key => {
-            url = url.replace(`:${key}`, params[key]);
-        });
+    if (params) {
+        if (typeof params === 'object') {
+            Object.keys(params).forEach(key => {
+                url = url.replace(`:${key}`, params[key]);
+            });
+        } else {
+            url = url.replace(':id', params);
+        }
     }
     
     return url;
