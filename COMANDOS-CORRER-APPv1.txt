@@ -146,6 +146,29 @@ git clone https://github.com/AngelSCT/CampusDigital
 
 
 
+----------------------------------------------------------------------------------------------
+[*]COMANDOS ADICIONALES:
+
+//BAJAR CAMBIOSDEL REPOSITORIO(SIN FUSION):
+git checkout -- campus-digital-app/package-lock.json
+git pull origin main
+
+//SUBIR CAMBIOS:
+git init
+git add .
+git commit -m "TEST COMMIT"
+git push origin main 
+
+NOTA:LA CARPETA DESDE LA QUE SE TIENE QUE HACER CAMBIOS PARA 
+    SUBIR CAMBIOS O BAJAR CAMBIOS DE GIT ES LA RAIZ CampusDigital
+
+
+
+
+
+
+
+
 
 
 
