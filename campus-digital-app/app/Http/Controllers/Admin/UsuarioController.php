@@ -215,10 +215,7 @@ class UsuarioController extends Controller
             'password_hash' => Hash::make($newPassword),
         ]);
 
-        // Aquí podrías enviar un email al usuario con la nueva contraseña
-        // Mail::to($usuario->email)->send(new PasswordResetMail($newPassword));
 
-        // Registrar en bitácora
         \App\Models\ActividadBitacora::create([
             'usuario_id' => auth()->id(),
             'accion' => 'resetear_password',
@@ -251,4 +248,201 @@ class UsuarioController extends Controller
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', 'attachment; filename="usuarios_' . now()->format('Y-m-d') . '.csv"');
     }
+
+public function exportByRole(Request $request)
+{
+    $filename = 'usuarios_por_rol_' . now()->format('Y-m-d_His') . '.csv';
+    
+    $headers = [
+        'Content-Type' => 'text/csv; charset=UTF-8',
+        'Content-Disposition' => "attachment; filename=\"$filename\"",
+        'Pragma' => 'no-cache',
+        'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+        'Expires' => '0'
+    ];
+
+    $callback = function() {
+        $file = fopen('php://output', 'w');
+        
+        fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+        
+        // Obtener todos los roles activos
+        $roles = Rol::where('activo', true)->orderBy('nombre')->get();
+        
+        foreach ($roles as $rol) {
+            // Encabezado del rol
+            fputcsv($file, ["ROL: " . strtoupper($rol->nombre)]);
+            fputcsv($file, ['']); // Línea vacía
+            
+            // Encabezados de columnas
+            fputcsv($file, [
+                'ID',
+                'Nombre Completo',
+                'Email',
+                'Teléfono',
+                'Estado',
+                'Email Verificado',
+                'Fecha de Registro',
+                'Último Acceso'
+            ]);
+            
+            // Obtener usuarios de este rol
+            $usuarios = Usuario::whereHas('roles', function($query) use ($rol) {
+                $query->where('rol.id', $rol->id);
+            })
+            ->orderBy('nombre')
+            ->get();
+            
+            // Datos de usuarios
+            foreach ($usuarios as $usuario) {
+                fputcsv($file, [
+                    $usuario->id,
+                    $usuario->nombre . ' ' . $usuario->apellido,
+                    $usuario->email,
+                    $usuario->telefono ?? 'N/A',
+                    $usuario->bloqueado ? 'Bloqueado' : 'Activo',
+                    $usuario->email_verificado ? 'Sí' : 'No',
+                    $usuario->created_at->format('d/m/Y H:i'),
+                    $usuario->last_login_at ? $usuario->last_login_at->format('d/m/Y H:i') : 'Nunca'
+                ]);
+            }
+            
+            // Resumen del rol
+            fputcsv($file, ['']); // Línea vacía
+            fputcsv($file, ['Total de usuarios en este rol:', count($usuarios)]);
+            fputcsv($file, ['']); // Línea vacía
+            fputcsv($file, ['']); // Separador entre roles
+        }
+        
+        // Resumen general
+        fputcsv($file, ['=== RESUMEN GENERAL ===']);
+        fputcsv($file, ['']); // Línea vacía
+        fputcsv($file, ['Rol', 'Cantidad de Usuarios', 'Activos', 'Bloqueados', 'Email Verificado']);
+        
+        foreach ($roles as $rol) {
+            $totalUsuarios = Usuario::whereHas('roles', function($query) use ($rol) {
+                $query->where('rol.id', $rol->id);
+            })->count();
+            
+            $activos = Usuario::whereHas('roles', function($query) use ($rol) {
+                $query->where('rol.id', $rol->id);
+            })->where('bloqueado', false)->count();
+            
+            $bloqueados = Usuario::whereHas('roles', function($query) use ($rol) {
+                $query->where('rol.id', $rol->id);
+            })->where('bloqueado', true)->count();
+            
+            $verificados = Usuario::whereHas('roles', function($query) use ($rol) {
+                $query->where('rol.id', $rol->id);
+            })->where('email_verificado', true)->count();
+            
+            fputcsv($file, [
+                $rol->nombre,
+                $totalUsuarios,
+                $activos,
+                $bloqueados,
+                $verificados
+            ]);
+        }
+        
+        fputcsv($file, ['']); // Línea vacía
+        fputcsv($file, ['Total general de usuarios:', Usuario::count()]);
+        fputcsv($file, ['Usuarios activos:', Usuario::where('bloqueado', false)->count()]);
+        fputcsv($file, ['Usuarios bloqueados:', Usuario::where('bloqueado', true)->count()]);
+        fputcsv($file, ['Emails verificados:', Usuario::where('email_verificado', true)->count()]);
+        fputcsv($file, ['']); // Línea vacía
+        fputcsv($file, ['Reporte generado el:', now()->format('d/m/Y H:i:s')]);
+        fputcsv($file, ['Generado por:', auth()->user()->nombre . ' ' . auth()->user()->apellido]);
+        
+        fclose($file);
+    };
+
+    // Registrar en bitácora
+    \App\Models\ActividadBitacora::create([
+        'usuario_id' => auth()->id(),
+        'accion' => 'exportar_usuarios_por_rol',
+        'modulo' => 'seguridad',
+        'target_tabla' => 'usuario',
+        'detalle' => 'Exportación de reporte de usuarios agrupados por rol',
+        'ip' => $request->ip(),
+        'user_agent' => $request->userAgent(),
+    ]);
+
+    return response()->stream($callback, 200, $headers);
+}
+
+public function exportPdf(Request $request)
+{
+    $usuarios = Usuario::with('roles')->orderBy('nombre')->get();
+    
+    $pdf = \PDF::loadView('pdf.usuarios', [
+        'usuarios' => $usuarios,
+        'titulo' => 'Lista de Usuarios',
+        'fecha' => now()->format('d/m/Y H:i:s'),
+        'generadoPor' => auth()->user()->nombre . ' ' . auth()->user()->apellido
+    ]);
+
+    \App\Models\ActividadBitacora::create([
+        'usuario_id' => auth()->id(),
+        'accion' => 'exportar_usuarios_pdf',
+        'modulo' => 'seguridad',
+        'target_tabla' => 'usuario',
+        'detalle' => 'Exportación de usuarios en formato PDF',
+        'ip' => $request->ip(),
+        'user_agent' => $request->userAgent(),
+    ]);
+
+    return $pdf->download('usuarios_' . now()->format('Y-m-d_His') . '.pdf');
+}
+
+public function exportByRolePdf(Request $request)
+{
+    $roles = Rol::where('activo', true)->orderBy('nombre')->get();
+    
+    $datosRoles = [];
+    $estadisticas = [
+        'total' => Usuario::count(),
+        'activos' => Usuario::where('bloqueado', false)->count(),
+        'bloqueados' => Usuario::where('bloqueado', true)->count(),
+        'verificados' => Usuario::where('email_verificado', true)->count(),
+    ];
+    
+    foreach ($roles as $rol) {
+        $usuarios = Usuario::whereHas('roles', function($query) use ($rol) {
+            $query->where('rol.id', $rol->id);
+        })->orderBy('nombre')->get();
+        
+        $datosRoles[] = [
+            'rol' => $rol,
+            'usuarios' => $usuarios,
+            'total' => $usuarios->count(),
+            'activos' => $usuarios->where('bloqueado', false)->count(),
+            'bloqueados' => $usuarios->where('bloqueado', true)->count(),
+            'verificados' => $usuarios->where('email_verificado', true)->count(),
+        ];
+    }
+    
+    $pdf = \PDF::loadView('pdf.usuarios-por-rol', [
+        'datosRoles' => $datosRoles,
+        'estadisticas' => $estadisticas,
+        'titulo' => 'Reporte de Usuarios por Rol',
+        'fecha' => now()->format('d/m/Y H:i:s'),
+        'generadoPor' => auth()->user()->nombre . ' ' . auth()->user()->apellido
+    ]);
+
+    $pdf->setPaper('A4', 'portrait');
+
+    // Registrar en bitácora
+    \App\Models\ActividadBitacora::create([
+        'usuario_id' => auth()->id(),
+        'accion' => 'exportar_usuarios_por_rol_pdf',
+        'modulo' => 'seguridad',
+        'target_tabla' => 'usuario',
+        'detalle' => 'Exportación de reporte de usuarios por rol en formato PDF',
+        'ip' => $request->ip(),
+        'user_agent' => $request->userAgent(),
+    ]);
+
+    return $pdf->download('usuarios_por_rol_' . now()->format('Y-m-d_His') . '.pdf');
+}
 }

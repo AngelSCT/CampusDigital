@@ -159,6 +159,9 @@ git add .
 git commit -m "TEST COMMIT"
 git push origin main 
 
+
+git fetch --all
+
 NOTA:LA CARPETA DESDE LA QUE SE TIENE QUE HACER CAMBIOS PARA 
     SUBIR CAMBIOS O BAJAR CAMBIOS DE GIT ES LA RAIZ CampusDigital
 

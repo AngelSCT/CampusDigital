@@ -48,7 +48,7 @@
                         <h2 class="stat-number">{{ stats.accesos_exitosos }}</h2>
                     </div>
                     <a :href="route('admin.bitacora.accesos')" class="stat-link success">
-                        <span>Ver bitácora</span>
+                        <span>Ver bitácora de Accesos</span>
                         <svg class="link-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
@@ -70,7 +70,7 @@
                         <h2 class="stat-number">{{ stats.accesos_fallidos }}</h2>
                     </div>
                     <a :href="route('admin.bitacora.accesos')" class="stat-link error">
-                        <span>Ver bitácora</span>
+                        <span>Ver bitácora de Accesos</span>
                         <svg class="link-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
@@ -107,7 +107,7 @@
                         <svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
-                        <span>Bitácora</span>
+                        <span>Bitácora de Actividad</span>
                     </a>
                 </div>
             </div>

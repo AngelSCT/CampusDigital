@@ -9,13 +9,72 @@
                     </h1>
                     <p class="mt-1 text-sm text-white">Registro de intentos de acceso al sistema</p>
                 </div>
-                <a :href="route('admin.bitacora.export-accesos')" 
-                   class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/30">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Exportar CSV
-                </a>
+                <div class="relative" v-click-away="() => showExportMenu = false">
+                    <button @click="toggleExportMenu" type="button" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/30">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Exportar
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    
+                    <!-- Menú desplegable -->
+                    <div v-if="showExportMenu" class="absolute right-0 mt-2 w-72 rounded-lg shadow-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-blue-500/20 z-10">
+                        <div class="py-1">
+                            <!-- Exportar todos - CSV -->
+                            <a :href="route('admin.bitacora.export-accesos')" class="flex items-center px-4 py-3 text-sm text-white hover:bg-slate-700/50 transition-colors duration-200">
+                                <svg class="w-5 h-5 mr-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <div>
+                                    <div class="font-medium">Todos los accesos (CSV)</div>
+                                    <div class="text-xs text-slate-400">Exportar registro completo</div>
+                                </div>
+                            </a>
+
+                            <!-- Exportar todos - PDF -->
+                            <a :href="route('admin.bitacora.export-accesos-pdf')" class="flex items-center px-4 py-3 text-sm text-white hover:bg-slate-700/50 transition-colors duration-200 border-t border-slate-700">
+                                <svg class="w-5 h-5 mr-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                                <div>
+                                    <div class="font-medium">Todos los accesos (PDF)</div>
+                                    <div class="text-xs text-slate-400">Documento completo</div>
+                                </div>
+                            </a>
+
+                            <!-- Separador -->
+                            <div class="border-t border-slate-700 my-1"></div>
+                            <div class="px-4 py-2">
+                                <p class="text-xs font-semibold text-slate-400 uppercase">Reportes por Período</p>
+                            </div>
+
+                            <!-- Por período - CSV -->
+                            <button @click="showPeriodModal('csv')" type="button" class="w-full flex items-center px-4 py-3 text-sm text-white hover:bg-slate-700/50 transition-colors duration-200">
+                                <svg class="w-5 h-5 mr-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <div class="text-left">
+                                    <div class="font-medium">Accesos por período (CSV)</div>
+                                    <div class="text-xs text-slate-400">Seleccionar fechas</div>
+                                </div>
+                            </button>
+
+                            <!-- Por período - PDF -->
+                            <button @click="showPeriodModal('pdf')" type="button" class="w-full flex items-center px-4 py-3 text-sm text-white hover:bg-slate-700/50 transition-colors duration-200 border-t border-slate-700">
+                                <svg class="w-5 h-5 mr-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <div class="text-left">
+                                    <div class="font-medium">Accesos por período (PDF)</div>
+                                    <div class="text-xs text-slate-400">Reporte detallado</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Filtros -->
@@ -252,6 +311,84 @@
                 </div>
             </div>
         </div>
+        <!-- Modal de Selección de Período -->
+<div v-if="showPeriodModalFlag" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" @click="closePeriodModal">
+    <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 max-w-md w-full mx-4 border border-blue-500/20 shadow-2xl shadow-blue-500/20" @click.stop>
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-white">Seleccionar Período</h3>
+            <button @click="closePeriodModal" class="text-slate-400 hover:text-white transition-colors duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form @submit.prevent="exportByPeriod" class="space-y-4">
+            <!-- Fecha Desde -->
+            <div>
+                <label class="block text-sm font-medium text-white mb-2">Fecha Desde *</label>
+                <input 
+                    v-model="periodForm.fecha_desde" 
+                    type="date"
+                    required
+                    class="w-full px-3 py-2 bg-slate-900 border border-slate-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                />
+            </div>
+
+            <!-- Fecha Hasta -->
+            <div>
+                <label class="block text-sm font-medium text-white mb-2">Fecha Hasta *</label>
+                <input 
+                    v-model="periodForm.fecha_hasta" 
+                    type="date"
+                    required
+                    class="w-full px-3 py-2 bg-slate-900 border border-slate-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                />
+            </div>
+
+            <!-- Filtros opcionales -->
+            <div>
+                <label class="block text-sm font-medium text-white mb-2">Evento (Opcional)</label>
+                <select 
+                    v-model="periodForm.evento"
+                    class="w-full px-3 py-2 bg-slate-900 border border-slate-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                >
+                    <option value="">Todos los eventos</option>
+                    <option v-for="evento in eventos" :key="evento" :value="evento">{{ evento }}</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-white mb-2">Estado (Opcional)</label>
+                <select 
+                    v-model="periodForm.exito"
+                    class="w-full px-3 py-2 bg-slate-900 border border-slate-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                >
+                    <option value="">Todos</option>
+                    <option value="si">Solo exitosos</option>
+                    <option value="no">Solo fallidos</option>
+                </select>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex gap-2 pt-4">
+                <button 
+                    type="button"
+                    @click="closePeriodModal"
+                    class="flex-1 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all duration-200"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    type="submit"
+                    class="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/30"
+                >
+                    Exportar {{ exportType.toUpperCase() }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
     </AuthLayout>
 </template>
 
@@ -276,6 +413,49 @@ const form = reactive({
 
 const showModal = ref(false);
 const selectedAcceso = ref(null);
+const showExportMenu = ref(false);
+const showPeriodModalFlag = ref(false);
+const exportType = ref('csv');
+
+const periodForm = reactive({
+    fecha_desde: '',
+    fecha_hasta: '',
+    evento: '',
+    exito: '',
+});
+
+function toggleExportMenu() {
+    showExportMenu.value = !showExportMenu.value;
+}
+
+function showPeriodModal(type) {
+    exportType.value = type;
+    showPeriodModalFlag.value = true;
+    showExportMenu.value = false;
+}
+
+function closePeriodModal() {
+    showPeriodModalFlag.value = false;
+    periodForm.fecha_desde = '';
+    periodForm.fecha_hasta = '';
+    periodForm.evento = '';
+    periodForm.exito = '';
+}
+
+function exportByPeriod() {
+    const params = new URLSearchParams();
+    params.append('fecha_desde', periodForm.fecha_desde);
+    params.append('fecha_hasta', periodForm.fecha_hasta);
+    if (periodForm.evento) params.append('evento', periodForm.evento);
+    if (periodForm.exito) params.append('exito', periodForm.exito);
+
+    const route = exportType.value === 'csv' 
+        ? 'admin.bitacora.export-accesos-periodo'
+        : 'admin.bitacora.export-accesos-periodo-pdf';
+    
+    window.location.href = window.route(route) + '?' + params.toString();
+    closePeriodModal();
+}
 
 function applyFilters() {
     router.get(route('admin.bitacora.accesos'), form, {

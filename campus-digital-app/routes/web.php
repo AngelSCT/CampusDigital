@@ -41,6 +41,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/{usuario}/toggle-block', [UsuarioController::class, 'toggleBlock'])->name('toggle-block');
             Route::post('/{usuario}/reset-password', [UsuarioController::class, 'resetPassword'])->name('reset-password');
             Route::get('/export', [UsuarioController::class, 'export'])->name('export');
+            Route::get('/export-by-role', [UsuarioController::class, 'exportByRole'])->name('export-by-role');
+            Route::get('/export-pdf', [UsuarioController::class, 'exportPdf'])->name('export-pdf');
+            Route::get('/export-by-role-pdf', [UsuarioController::class, 'exportByRolePdf'])->name('export-by-role-pdf');
         });
 
         // Gestión de roles
@@ -69,6 +72,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/actividad', [BitacoraController::class, 'actividad'])->name('actividad');
             Route::get('/export-accesos', [BitacoraController::class, 'exportAccesos'])->name('export-accesos');
             Route::get('/export-actividad', [BitacoraController::class, 'exportActividad'])->name('export-actividad');
+            Route::get('/export-accesos-pdf', [BitacoraController::class, 'exportAccesosPdf'])->name('export-accesos-pdf');
+            Route::get('/export-accesos-periodo', [BitacoraController::class, 'exportAccesosPeriodo'])->name('export-accesos-periodo');
+            Route::get('/export-accesos-periodo-pdf', [BitacoraController::class, 'exportAccesosPeriodoPdf'])->name('export-accesos-periodo-pdf');
+            Route::get('/export-actividad-pdf', [BitacoraController::class, 'exportActividadPdf'])->name('export-actividad-pdf');
+            Route::get('/export-actividad-periodo', [BitacoraController::class, 'exportActividadPeriodo'])->name('export-actividad-periodo');
+            Route::get('/export-actividad-periodo-pdf', [BitacoraController::class, 'exportActividadPeriodoPdf'])->name('export-actividad-periodo-pdf');
+            Route::get('/export-actividad-modulo', [BitacoraController::class, 'exportActividadModulo'])->name('export-actividad-modulo');
+            Route::get('/export-actividad-modulo-pdf', [BitacoraController::class, 'exportActividadModuloPdf'])->name('export-actividad-modulo-pdf');
         });
 
         // Reportes
