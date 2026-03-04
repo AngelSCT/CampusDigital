@@ -140,4 +140,9 @@ public function roles()
         ->wherePivotNull('deleted_at');
 }
 
+public function tarjeta()
+{
+    return $this->hasOne(TarjetaUniversitaria::class, 'usuario_id');
+}
+
 }

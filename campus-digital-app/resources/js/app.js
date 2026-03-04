@@ -64,6 +64,26 @@ window.route = (name, params) => {
         'admin.bitacora.actividad': '/admin/bitacora/actividad',
         'admin.bitacora.export-accesos': '/admin/bitacora/export-accesos',
         'admin.bitacora.export-actividad': '/admin/bitacora/export-actividad',
+
+
+        // Tarjetas
+        'admin.tarjetas.dashboard': '/admin/tarjetas/dashboard',
+        'admin.tarjetas.index': '/admin/tarjetas',
+        'admin.tarjetas.create': '/admin/tarjetas/create',
+        'admin.tarjetas.store': '/admin/tarjetas',
+        'admin.tarjetas.show': '/admin/tarjetas/:id',
+        'admin.tarjetas.edit': '/admin/tarjetas/:id/edit',
+        'admin.tarjetas.update': '/admin/tarjetas/:id',
+        'admin.tarjetas.destroy': '/admin/tarjetas/:id',
+        'admin.tarjetas.toggle-block': '/admin/tarjetas/:id/toggle-block',
+        'admin.tarjetas.reportes.index': '/admin/tarjetas/reportes/index',
+        'admin.tarjetas.reportes.export-csv': '/admin/tarjetas/reportes/export-csv',
+        'admin.tarjetas.reportes.export-incidentes': '/admin/tarjetas/reportes/export-incidentes',
+
+        // Lector
+        'lector.index': '/lector',
+        'lector.leer': '/lector/leer',
+        'tarjeta.mi-tarjeta': '/mi-tarjeta',
     };
     
     let url = routes[name] || '/';

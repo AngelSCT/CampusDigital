@@ -1,0 +1,180 @@
+BASE URL: http://localhost:8000/api
+
+URLS DE LA API REST DE LA APLICACION (SE PUEDEN PROBAR CON INSOMNIA O POSTMAN)
+
+HEADER 1: X-API-KEY    - 4f8a2b1c9d3e7f6a0b5c8d2e1f4a7b3c6d9e2f5a8b1c4d7e0f3a6b9c2d5e8f1a
+HEADER 2: Accept       - application/json
+
+******************************************************************
+ USUARIOS
+******************************************************************
+GET     http://localhost:8000/api/usuarios
+GET     http://localhost:8000/api/usuarios?search=juan
+GET     http://localhost:8000/api/usuarios?bloqueado=true
+GET     http://localhost:8000/api/usuarios?per_page=5
+GET     http://localhost:8000/api/usuarios/1
+GET     http://localhost:8000/api/usuarios/2
+GET     http://localhost:8000/api/usuarios/3
+POST    http://localhost:8000/api/usuarios
+PUT     http://localhost:8000/api/usuarios/1
+DELETE  http://localhost:8000/api/usuarios/1
+POST    http://localhost:8000/api/usuarios/1/toggle-block
+
+******************************************************************
+ ROLES
+******************************************************************
+GET     http://localhost:8000/api/roles
+GET     http://localhost:8000/api/roles/1
+GET     http://localhost:8000/api/roles/2
+GET     http://localhost:8000/api/roles/3
+POST    http://localhost:8000/api/roles
+PUT     http://localhost:8000/api/roles/1
+DELETE  http://localhost:8000/api/roles/1
+
+******************************************************************
+ PERMISOS
+******************************************************************
+GET     http://localhost:8000/api/permisos
+GET     http://localhost:8000/api/permisos/1
+GET     http://localhost:8000/api/permisos/2
+GET     http://localhost:8000/api/permisos/3
+POST    http://localhost:8000/api/permisos
+PUT     http://localhost:8000/api/permisos/1
+DELETE  http://localhost:8000/api/permisos/1
+
+******************************************************************
+ ROL - PERMISO
+******************************************************************
+GET     http://localhost:8000/api/rol-permisos
+GET     http://localhost:8000/api/rol-permisos?rol_id=1
+GET     http://localhost:8000/api/rol-permisos?rol_id=2
+GET     http://localhost:8000/api/rol-permisos?rol_id=3
+POST    http://localhost:8000/api/rol-permisos
+DELETE  http://localhost:8000/api/rol-permisos/1
+
+******************************************************************
+ USUARIO - ROL
+******************************************************************
+GET     http://localhost:8000/api/usuario-roles
+GET     http://localhost:8000/api/usuario-roles?usuario_id=1
+GET     http://localhost:8000/api/usuario-roles?usuario_id=2
+GET     http://localhost:8000/api/usuario-roles?rol_id=1
+POST    http://localhost:8000/api/usuario-roles
+DELETE  http://localhost:8000/api/usuario-roles/1
+
+******************************************************************
+ PERFILES
+******************************************************************
+GET     http://localhost:8000/api/usuario-perfiles
+GET     http://localhost:8000/api/usuario-perfiles/1
+GET     http://localhost:8000/api/usuario-perfiles/2
+GET     http://localhost:8000/api/usuario-perfiles/3
+PUT     http://localhost:8000/api/usuario-perfiles/1
+
+******************************************************************
+ SESIONES
+******************************************************************
+GET     http://localhost:8000/api/sesiones
+GET     http://localhost:8000/api/sesiones?activa=true
+GET     http://localhost:8000/api/sesiones?activa=false
+GET     http://localhost:8000/api/sesiones?usuario_id=1
+GET     http://localhost:8000/api/sesiones?usuario_id=4
+GET     http://localhost:8000/api/sesiones?desde=2026-02-01&hasta=2026-02-28
+GET     http://localhost:8000/api/sesiones?per_page=5
+GET     http://localhost:8000/api/sesiones/1
+GET     http://localhost:8000/api/sesiones/2
+
+******************************************************************
+ BITÁCORA — ACCESOS
+******************************************************************
+GET     http://localhost:8000/api/bitacora/accesos
+GET     http://localhost:8000/api/bitacora/accesos?evento=login_success
+GET     http://localhost:8000/api/bitacora/accesos?evento=login_failed
+GET     http://localhost:8000/api/bitacora/accesos?evento=logout
+GET     http://localhost:8000/api/bitacora/accesos?evento=registro
+GET     http://localhost:8000/api/bitacora/accesos?exito=true
+GET     http://localhost:8000/api/bitacora/accesos?exito=false
+GET     http://localhost:8000/api/bitacora/accesos?usuario_id=1
+GET     http://localhost:8000/api/bitacora/accesos?usuario_id=4
+GET     http://localhost:8000/api/bitacora/accesos?email=admin@campusdigital.com
+GET     http://localhost:8000/api/bitacora/accesos?desde=2026-02-04&hasta=2026-02-04
+GET     http://localhost:8000/api/bitacora/accesos?per_page=10
+GET     http://localhost:8000/api/bitacora/accesos/1
+GET     http://localhost:8000/api/bitacora/accesos/2
+GET     http://localhost:8000/api/bitacora/accesos/7
+
+******************************************************************
+ BITÁCORA — ACTIVIDAD
+******************************************************************
+GET     http://localhost:8000/api/bitacora/actividad
+GET     http://localhost:8000/api/bitacora/actividad?usuario_id=1
+GET     http://localhost:8000/api/bitacora/actividad?modulo=seguridad
+GET     http://localhost:8000/api/bitacora/actividad?accion=eliminar_usuario
+GET     http://localhost:8000/api/bitacora/actividad?accion=actualizar_usuario
+GET     http://localhost:8000/api/bitacora/actividad?accion=cambiar_estado_usuario
+GET     http://localhost:8000/api/bitacora/actividad?target_tabla=usuario
+GET     http://localhost:8000/api/bitacora/actividad?exito=true
+GET     http://localhost:8000/api/bitacora/actividad?exito=false
+GET     http://localhost:8000/api/bitacora/actividad?desde=2026-02-04&hasta=2026-02-04
+GET     http://localhost:8000/api/bitacora/actividad?per_page=5
+GET     http://localhost:8000/api/bitacora/actividad/1
+GET     http://localhost:8000/api/bitacora/actividad/5
+GET     http://localhost:8000/api/bitacora/actividad/10
+
+******************************************************************
+ BODIES JSON PARA POST / PUT
+******************************************************************
+
+── POST /api/usuarios ──────────────────────
+{
+    "nombre": "Carlos",
+    "apellido": "López",
+    "email": "carlos@test.com",
+    "password": "12345678",
+    "telefono": "5551234567"
+}
+
+── PUT /api/usuarios/{id} ──────────────────
+{
+    "nombre": "Carlos Alberto",
+    "telefono": "5559999999"
+}
+
+── POST /api/roles ─────────────────────────
+{
+    "nombre": "moderador",
+    "descripcion": "Rol de moderación",
+    "activo": true
+}
+
+── PUT /api/roles/{id} ─────────────────────
+{
+    "descripcion": "Descripción actualizada",
+    "activo": false
+}
+
+── POST /api/permisos ──────────────────────
+{
+    "clave": "reporte.read",
+    "descripcion": "Ver reportes",
+    "activo": true
+}
+
+── POST /api/rol-permisos ──────────────────
+{
+    "rol_id": 1,
+    "permiso_id": 2
+}
+
+── POST /api/usuario-roles ─────────────────
+{
+    "usuario_id": 4,
+    "rol_id": 2
+}
+
+── PUT /api/usuario-perfiles/{id} ──────────
+{
+    "fecha_nacimiento": "1995-06-15",
+    "genero": "masculino",
+    "direccion": "Calle Falsa 123"
+}

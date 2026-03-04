@@ -9,6 +9,12 @@ use App\Http\Controllers\Admin\PermisoController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\BitacoraController;
 
+//CONTROLADORES DEL MODULO 1O
+use App\Http\Controllers\Admin\TarjetaController;
+use App\Http\Controllers\Admin\TarjetaDashboardController;
+use App\Http\Controllers\Admin\TarjetaReporteController;
+use App\Http\Controllers\TarjetaLecturaController;
+
 // Ruta principal
 Route::get('/', function () {
     return redirect()->route('login');
@@ -18,6 +24,14 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/mi-tarjeta', [TarjetaController::class, 'miTarjeta'])->name('tarjeta.mi-tarjeta');
+
+    // Lector simulado — para administradores y proveedores
+    Route::middleware(['role:administrador,proveedor_area'])->group(function () {
+        Route::get('/lector', [TarjetaLecturaController::class, 'index'])->name('lector.index');
+        Route::post('/lector/leer', [TarjetaLecturaController::class, 'leer'])->name('lector.leer');
+    });
 
     // Perfil de usuario
     Route::prefix('perfil')->name('perfil.')->group(function () {
@@ -29,6 +43,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Rutas de administración (solo para administradores)
     Route::middleware(['role:administrador'])->prefix('admin')->name('admin.')->group(function () {
+
+
+        // Módulo Tarjetas
+        Route::prefix('tarjetas')->name('tarjetas.')->group(function () {
+
+            // Dashboard del módulo
+            Route::get('/dashboard', [TarjetaDashboardController::class, 'index'])->name('dashboard');
+
+            // CRUD tarjetas
+            Route::get('/',                      [TarjetaController::class, 'index'])->name('index');
+            Route::get('/create',                [TarjetaController::class, 'create'])->name('create');
+            Route::post('/',                     [TarjetaController::class, 'store'])->name('store');
+            Route::get('/{tarjeta}',             [TarjetaController::class, 'show'])->name('show');
+            Route::get('/{tarjeta}/edit',        [TarjetaController::class, 'edit'])->name('edit');
+            Route::put('/{tarjeta}',             [TarjetaController::class, 'update'])->name('update');
+            Route::delete('/{tarjeta}',          [TarjetaController::class, 'destroy'])->name('destroy');
+            Route::post('/{tarjeta}/toggle-block', [TarjetaController::class, 'toggleBlock'])->name('toggle-block');
+
+            // Reportes
+            Route::get('/reportes/index',             [TarjetaReporteController::class, 'index'])->name('reportes.index');
+            Route::get('/reportes/export-csv',        [TarjetaReporteController::class, 'exportCsv'])->name('reportes.export-csv');
+            Route::get('/reportes/export-incidentes', [TarjetaReporteController::class, 'exportIncidentesCsv'])->name('reportes.export-incidentes');
+        });
         
         // Gestión de usuarios
         Route::prefix('usuarios')->name('usuarios.')->group(function () {
@@ -66,7 +103,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/{permiso}', [PermisoController::class, 'destroy'])->name('destroy');
         });
 
-        // Bitácoras
+        // Bitacoras
         Route::prefix('bitacora')->name('bitacora.')->group(function () {
             Route::get('/accesos', [BitacoraController::class, 'accesos'])->name('accesos');
             Route::get('/actividad', [BitacoraController::class, 'actividad'])->name('actividad');
