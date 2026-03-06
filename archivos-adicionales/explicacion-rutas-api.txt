@@ -121,7 +121,7 @@ DELETE http://localhost:8000/api/permisos/1
        ESTA SE DEBE USAR CUANDO QUIERAS QUITAR UN PERMISO QUE YA NO APLICA
 
 ******************************************************************
- ROL ↔ PERMISO  (QUE PERMISOS TIENE CADA ROL)
+ ROL - PERMISO  (QUE PERMISOS TIENE CADA ROL)
 ******************************************************************
 
 GET  http://localhost:8000/api/rol-permisos
@@ -150,7 +150,7 @@ DELETE http://localhost:8000/api/rol-permisos/1
        ESTA SE DEBE USAR CUANDO QUIERAS RESTRINGIR LO QUE PUEDE HACER UN ROL
 
 ******************************************************************
- USUARIO ↔ ROL  (QUE ROLES TIENE CADA USUARIO)
+ USUARIO - ROL  (QUE ROLES TIENE CADA USUARIO)
 ******************************************************************
 
 GET  http://localhost:8000/api/usuario-roles

@@ -84,6 +84,12 @@ window.route = (name, params) => {
         'lector.index': '/lector',
         'lector.leer': '/lector/leer',
         'tarjeta.mi-tarjeta': '/mi-tarjeta',
+
+        //UUID DE INICIO DE SESSION
+        'rfid.login' : '/auth/rfid-login',
+
+        //CONFIG DE PIN DE USUARIO CON UUID
+        'tarjeta.pin.update' : '/tarjeta/pin'
     };
     
     let url = routes[name] || '/';

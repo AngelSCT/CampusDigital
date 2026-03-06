@@ -72,7 +72,7 @@ class TarjetaLecturaController extends Controller
             $tarjetaId = $tarjeta->id;
         }
 
-        // Registrar lectura en bitácora
+        // Registrar lectura en bitacora
         $lectura = TarjetaLectura::create([
             'tarjeta_id'         => $tarjetaId,
             'uid_leido'          => $uid,

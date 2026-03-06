@@ -287,7 +287,7 @@
 </template>
 
 <script setup>
-import AuthLayout from '@/Components/AuthLayout.vue';
+import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { useForm } from '@inertiajs/vue3';
 
 const props = defineProps({

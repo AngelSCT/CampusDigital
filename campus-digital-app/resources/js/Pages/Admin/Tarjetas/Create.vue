@@ -109,6 +109,28 @@
 
                         <p v-if="errors.usuario_id" class="mt-1 text-sm text-red-400">{{ errors.usuario_id }}</p>
                     </div>
+
+                    <!-- PIN -->
+                    <div>
+                        <label for="pin" class="block text-sm font-medium text-white mb-2">
+                            PIN de acceso
+                            <span class="text-slate-400 font-normal">(opcional, 4 dígitos)</span>
+                        </label>
+                        <input
+                            v-model="form.pin"
+                            id="pin"
+                            type="password"
+                            maxlength="4"
+                            inputmode="numeric"
+                            pattern="[0-9]{4}"
+                            placeholder="••••"
+                            class="block w-full rounded-lg bg-slate-700/50 border text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500/30 sm:text-sm transition-all duration-200 px-3 py-2"
+                            :class="errors.pin ? 'border-red-500' : 'border-slate-600 focus:border-cyan-500'"
+                        />
+                        <p class="mt-1 text-xs text-slate-400">Si no se establece, el usuario deberá configurarlo desde su perfil.</p>
+                        <p v-if="errors.pin" class="mt-1 text-sm text-red-400">{{ errors.pin }}</p>
+                    </div>
+
                 </div>
 
                 <!-- Botones -->
@@ -138,7 +160,7 @@ const props = defineProps({
     usuarios: Array,
 });
 
-const form = reactive({ uid: '', usuario_id: null });
+const form = reactive({ uid: '', usuario_id: null, pin: '' });
 const errors = ref({});
 const processing = ref(false);
 const busquedaUsuario = ref('');

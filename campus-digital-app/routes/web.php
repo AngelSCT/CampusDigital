@@ -14,11 +14,18 @@ use App\Http\Controllers\Admin\TarjetaController;
 use App\Http\Controllers\Admin\TarjetaDashboardController;
 use App\Http\Controllers\Admin\TarjetaReporteController;
 use App\Http\Controllers\TarjetaLecturaController;
+use App\Http\Controllers\Auth\RfidLoginController;
+
 
 // Ruta principal
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+// Login por tarjeta RFID (no requiere auth, igual que el login normal)
+Route::post('/auth/rfid-login', [RfidLoginController::class, 'login'])
+    ->middleware('guest')
+    ->name('rfid.login');
 
 // Rutas autenticadas
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -26,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/mi-tarjeta', [TarjetaController::class, 'miTarjeta'])->name('tarjeta.mi-tarjeta');
+    Route::post('/tarjeta/pin', [TarjetaController::class, 'updatePin'])->name('tarjeta.pin.update');
 
     // Lector simulado — para administradores y proveedores
     Route::middleware(['role:administrador,proveedor_area'])->group(function () {

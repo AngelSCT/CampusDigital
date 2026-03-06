@@ -17,6 +17,7 @@ class TarjetaUniversitaria extends Model
         'usuario_id',
         'uid',
         'estado',
+        'pin_hash',      
         'motivo_bloqueo',
         'registrado_por_usuario_id',
         'bloqueado_por_usuario_id',

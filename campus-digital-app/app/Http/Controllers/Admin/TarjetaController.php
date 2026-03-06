@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
 use App\Models\TarjetaUniversitaria;
 use App\Models\Usuario;
@@ -66,7 +67,9 @@ class TarjetaController extends Controller
         $request->validate([
             'usuario_id' => 'required|exists:usuario,id',
             'uid'        => 'required|string|max:64|unique:tarjeta_universitaria,uid',
+            'pin'        => 'nullable|digits:4',  
         ]);
+
 
         // Verificar que el usuario no tenga ya una tarjeta activa
         $existente = TarjetaUniversitaria::where('usuario_id', $request->usuario_id)
@@ -78,10 +81,11 @@ class TarjetaController extends Controller
         }
 
         TarjetaUniversitaria::create([
-            'usuario_id'                 => $request->usuario_id,
-            'uid'                        => strtoupper(trim($request->uid)),
-            'estado'                     => 'activa',
-            'registrado_por_usuario_id'  => Auth::id(),
+            'usuario_id'                => $request->usuario_id,
+            'uid'                       => strtoupper(trim($request->uid)),
+            'estado'                    => 'activa',
+            'pin_hash'                  => $request->filled('pin') ? Hash::make($request->pin) : null,
+            'registrado_por_usuario_id' => Auth::id(),
         ]);
 
         return redirect()->route('admin.tarjetas.index')
@@ -130,11 +134,16 @@ class TarjetaController extends Controller
     {
         $request->validate([
             'uid' => "required|string|max:64|unique:tarjeta_universitaria,uid,{$tarjeta->id}",
+            'pin' => 'nullable|digits:4',  
         ]);
 
-        $tarjeta->update([
-            'uid' => strtoupper(trim($request->uid)),
-        ]);
+        $data = ['uid' => strtoupper(trim($request->uid))];
+
+        if ($request->filled('pin')) {
+            $data['pin_hash'] = Hash::make($request->pin);
+        }
+
+        $tarjeta->update($data);
 
         return redirect()->route('admin.tarjetas.show', $tarjeta)
             ->with('success', 'Tarjeta actualizada.');
@@ -203,4 +212,28 @@ class TarjetaController extends Controller
             'usuario'  => $usuario->only(['id', 'nombre', 'apellido', 'email']),
         ]);
     }
+
+public function updatePin(Request $request)
+{
+    $usuario = Auth::user();
+    $tarjeta = TarjetaUniversitaria::where('usuario_id', $usuario->id)
+        ->whereNull('deleted_at')
+        ->firstOrFail();
+
+    $request->validate([
+        'pin_nuevo'     => 'required|digits:4',
+        'pin_confirmar' => 'required|digits:4|same:pin_nuevo',
+        'pin_actual'    => $tarjeta->pin_hash ? 'required|digits:4' : 'nullable',
+    ]);
+
+    // Verificar PIN actual si ya tenía uno
+    if ($tarjeta->pin_hash && !Hash::check($request->pin_actual, $tarjeta->pin_hash)) {
+        return back()->withErrors(['pin_actual' => 'El PIN actual es incorrecto.']);
+    }
+
+    $tarjeta->update(['pin_hash' => Hash::make($request->pin_nuevo)]);
+
+    return back()->with('success', 'PIN actualizado.');
+}
+
 }

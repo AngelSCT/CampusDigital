@@ -69,6 +69,33 @@
                          class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
                         <p class="text-sm text-yellow-400">⚠️ Estás cambiando el UID. Asegúrate de que corresponde al chip físico correcto.</p>
                     </div>
+
+
+            <!-- PIN -->
+            <div>
+                <label for="pin" class="block text-sm font-medium text-white mb-2">
+                    Nuevo PIN
+                    <span class="text-slate-400 font-normal">(dejar vacío para no cambiar)</span>
+                </label>
+                <input
+                    v-model="form.pin"
+                    id="pin"
+                    type="password"
+                    maxlength="4"
+                    inputmode="numeric"
+                    pattern="[0-9]{4}"
+                    placeholder="••••"
+                    class="block w-full rounded-lg bg-slate-700/50 border text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500/30 sm:text-sm transition-all duration-200 px-3 py-2"
+                    :class="errors.pin ? 'border-red-500' : 'border-slate-600 focus:border-cyan-500'"
+                />
+                <p class="mt-1 text-xs text-slate-400">
+                    <span v-if="tarjeta.pin_hash" class="text-green-400">✓ PIN configurado.</span>
+                    <span v-else class="text-yellow-400">⚠ Sin PIN configurado.</span>
+                    Solo escribe aquí si deseas cambiarlo.
+                </p>
+                <p v-if="errors.pin" class="mt-1 text-sm text-red-400">{{ errors.pin }}</p>
+            </div>
+
                 </div>
 
                 <div class="bg-slate-900/50 px-6 py-4 flex justify-end gap-3 border-t border-slate-700">
@@ -93,7 +120,7 @@ import AuthLayout from '@/Layouts/AuthLayout.vue';
 
 const props = defineProps({ tarjeta: Object });
 
-const form = reactive({ uid: props.tarjeta.uid });
+const form = reactive({ uid: props.tarjeta.uid, pin: '' });
 const errors = ref({});
 const processing = ref(false);
 
@@ -105,7 +132,7 @@ function generarUid() {
 function submit() {
     processing.value = true;
     errors.value = {};
-    router.put(route('admin.tarjetas.update', props.tarjeta.id), { uid: form.uid.toUpperCase().trim() }, {
+    router.put(route('admin.tarjetas.update', props.tarjeta.id), { uid: form.uid.toUpperCase().trim(),pin: form.pin,  }, {
         onError: (err) => { errors.value = err; },
         onFinish: () => { processing.value = false; },
     });
