@@ -63,15 +63,15 @@ git clone https://github.com/AngelSCT/CampusDigital
 
     rm -rf node_modules
     rm package-lock.json
-    composer install
-    npm install
+    composer update
+    npm update
 
 -SI USAS WINDOWS:
 
     Remove-Item node_modules -Recurse -Force
     Remove-Item package-lock.json -Force
-    composer install
-    npm install
+    composer update
+    npm update
 
 ---------------------------------------------------------------------------------------------
 
