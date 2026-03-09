@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\TarjetaDashboardController;
 use App\Http\Controllers\Admin\TarjetaReporteController;
 use App\Http\Controllers\TarjetaLecturaController;
 use App\Http\Controllers\Auth\RfidLoginController;
+use App\Http\Controllers\MiTarjetaController;
 
 
 // Ruta principal
@@ -32,13 +33,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/mi-tarjeta', [TarjetaController::class, 'miTarjeta'])->name('tarjeta.mi-tarjeta');
-    Route::post('/tarjeta/pin', [TarjetaController::class, 'updatePin'])->name('tarjeta.pin.update');
+    Route::middleware(['role:estudiante,proveedor_area,administrador'])
+        ->prefix('mi-tarjeta')
+        ->name('mi-tarjeta.')
+        ->group(function () {
+            Route::get('/',         [MiTarjetaController::class, 'show'])->name('show');
+            Route::post('/escanear',[MiTarjetaController::class, 'simularEscaneo'])->name('escanear');
+            Route::get('/pin',      [MiTarjetaController::class, 'showPin'])->name('pin');
+            Route::post('/pin',     [MiTarjetaController::class, 'updatePin'])->name('pin.store');
+        });
 
     // Lector simulado — para administradores y proveedores
     Route::middleware(['role:administrador,proveedor_area'])->group(function () {
         Route::get('/lector', [TarjetaLecturaController::class, 'index'])->name('lector.index');
         Route::post('/lector/leer', [TarjetaLecturaController::class, 'leer'])->name('lector.leer');
+        Route::post('/lector/confirmar-pedido', [TarjetaLecturaController::class, 'confirmarPedido'])->name('lector.confirmar-pedido');
     });
 
     // Perfil de usuario

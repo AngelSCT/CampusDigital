@@ -83,13 +83,16 @@ window.route = (name, params) => {
         // Lector
         'lector.index': '/lector',
         'lector.leer': '/lector/leer',
-        'tarjeta.mi-tarjeta': '/mi-tarjeta',
-
+        'lector.confirmar-pedido': '/lector/confirmar-pedido',
+   
         //UUID DE INICIO DE SESSION
         'rfid.login' : '/auth/rfid-login',
 
         //CONFIG DE PIN DE USUARIO CON UUID
-        'tarjeta.pin.update' : '/tarjeta/pin'
+        'mi-tarjeta.show': '/mi-tarjeta',
+        'mi-tarjeta.pin.store' : '/mi-tarjeta/pin',
+        'mi-tarjeta.escanear': '/mi-tarjeta/escanear',
+        'mi-tarjeta.pin': '/mi-tarjeta/pin',
     };
     
     let url = routes[name] || '/';

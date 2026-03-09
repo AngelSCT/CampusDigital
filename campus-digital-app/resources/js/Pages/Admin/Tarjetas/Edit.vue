@@ -9,7 +9,7 @@
                     </h1>
                     <p class="mt-1 text-sm text-slate-400 font-mono">{{ tarjeta.uid }}</p>
                 </div>
-                <a :href="route('admin.tarjetas.show', tarjeta.id)"
+                <a :href="route('admin.tarjetas.index', tarjeta.id)"
                    class="inline-flex items-center px-4 py-2 border border-slate-600 rounded-lg text-sm font-medium text-white hover:bg-slate-700/50 transition-all duration-200">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />

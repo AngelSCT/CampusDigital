@@ -23,6 +23,7 @@ class TarjetaLectura extends Model
         'ip',
         'user_agent',
         'operador_usuario_id',
+        'pedido_id',        
         'meta_json',
     ];
 
@@ -32,6 +33,23 @@ class TarjetaLectura extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+    ];
+
+    // Constantes para usar en controladores sin strings hardcodeados
+    const TIPOS = [
+        'acceso',
+        'consumo',
+        'consulta_saldo',
+        'confirmacion_entrega',
+    ];
+
+    const MODULOS = [
+        'cafeteria',
+        'copias',
+        'souvenirs',
+        'biblioteca',
+        'acceso',
+        'otro',
     ];
 
     /* ─── Relaciones ─────────────────────────────────────── */
@@ -44,5 +62,10 @@ class TarjetaLectura extends Model
     public function operador()
     {
         return $this->belongsTo(Usuario::class, 'operador_usuario_id');
+    }
+
+    public function pedido()
+    {
+        return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 }

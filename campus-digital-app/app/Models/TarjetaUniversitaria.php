@@ -17,7 +17,7 @@ class TarjetaUniversitaria extends Model
         'usuario_id',
         'uid',
         'estado',
-        'pin_hash',      
+        'pin_hash',
         'motivo_bloqueo',
         'registrado_por_usuario_id',
         'bloqueado_por_usuario_id',
@@ -53,6 +53,19 @@ class TarjetaUniversitaria extends Model
     public function lecturas()
     {
         return $this->hasMany(TarjetaLectura::class, 'tarjeta_id');
+    }
+
+    // NUEVO: acceso directo al monedero del dueño de la tarjeta
+    public function monedero()
+    {
+        return $this->hasOneThrough(
+            SaldoMonedero::class,
+            Usuario::class,
+            'id',          // FK en usuario
+            'usuario_id',  // FK en saldo_monedero
+            'usuario_id',  // FK local en tarjeta_universitaria
+            'id'           // PK en usuario
+        );
     }
 
     /* ─── Helpers ────────────────────────────────────────── */

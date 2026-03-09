@@ -10,6 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
+// NOTA: Se eliminaron miTarjeta() y updatePin() de este controlador.
+// Ahora viven en App\Http\Controllers\MiTarjetaController.
+// El resto del controlador permanece IDÉNTICO al que tenías.
+
 class TarjetaController extends Controller
 {
     /* ─── INDEX ──────────────────────────────────────────── */
@@ -39,10 +43,10 @@ class TarjetaController extends Controller
             'tarjetas' => $tarjetas,
             'filters'  => $request->only(['search', 'estado']),
             'stats'    => [
-                'total'     => TarjetaUniversitaria::count(),
-                'activas'   => TarjetaUniversitaria::where('estado', 'activa')->count(),
+                'total'      => TarjetaUniversitaria::count(),
+                'activas'    => TarjetaUniversitaria::where('estado', 'activa')->count(),
                 'bloqueadas' => TarjetaUniversitaria::where('estado', 'bloqueada')->count(),
-                'perdidas'  => TarjetaUniversitaria::where('estado', 'perdida')->count(),
+                'perdidas'   => TarjetaUniversitaria::where('estado', 'perdida')->count(),
             ],
         ]);
     }
@@ -67,11 +71,9 @@ class TarjetaController extends Controller
         $request->validate([
             'usuario_id' => 'required|exists:usuario,id',
             'uid'        => 'required|string|max:64|unique:tarjeta_universitaria,uid',
-            'pin'        => 'nullable|digits:4',  
+            'pin'        => 'nullable|digits:4',
         ]);
 
-
-        // Verificar que el usuario no tenga ya una tarjeta activa
         $existente = TarjetaUniversitaria::where('usuario_id', $request->usuario_id)
             ->whereNull('deleted_at')
             ->first();
@@ -134,7 +136,7 @@ class TarjetaController extends Controller
     {
         $request->validate([
             'uid' => "required|string|max:64|unique:tarjeta_universitaria,uid,{$tarjeta->id}",
-            'pin' => 'nullable|digits:4',  
+            'pin' => 'nullable|digits:4',
         ]);
 
         $data = ['uid' => strtoupper(trim($request->uid))];
@@ -165,24 +167,24 @@ class TarjetaController extends Controller
     {
         if ($tarjeta->estaActiva()) {
             $request->validate([
-                'motivo'  => 'required|string|max:255',
-                'estado'  => 'required|in:bloqueada,perdida,cancelada',
+                'motivo' => 'required|string|max:255',
+                'estado' => 'required|in:bloqueada,perdida,cancelada',
             ]);
 
             $tarjeta->update([
-                'estado'                  => $request->estado,
-                'motivo_bloqueo'          => $request->motivo,
+                'estado'                   => $request->estado,
+                'motivo_bloqueo'           => $request->motivo,
                 'bloqueado_por_usuario_id' => Auth::id(),
-                'bloqueado_at'            => now(),
+                'bloqueado_at'             => now(),
             ]);
 
             $mensaje = 'Tarjeta bloqueada exitosamente.';
         } else {
             $tarjeta->update([
-                'estado'                  => 'activa',
-                'motivo_bloqueo'          => null,
+                'estado'                   => 'activa',
+                'motivo_bloqueo'           => null,
                 'bloqueado_por_usuario_id' => null,
-                'bloqueado_at'            => null,
+                'bloqueado_at'             => null,
             ]);
 
             $mensaje = 'Tarjeta reactivada exitosamente.';
@@ -190,50 +192,4 @@ class TarjetaController extends Controller
 
         return back()->with('success', $mensaje);
     }
-
-    /* ─── MI TARJETA (Vista estudiante / usuario autenticado) */
-
-    public function miTarjeta()
-    {
-        $usuario = Auth::user();
-
-        $tarjeta = TarjetaUniversitaria::with(['registradoPor'])
-            ->where('usuario_id', $usuario->id)
-            ->first();
-
-        $lecturas = [];
-        if ($tarjeta) {
-            $lecturas = $tarjeta->lecturas()->latest()->take(10)->get();
-        }
-
-        return Inertia::render('Tarjetas/MiTarjeta', [
-            'tarjeta'  => $tarjeta,
-            'lecturas' => $lecturas,
-            'usuario'  => $usuario->only(['id', 'nombre', 'apellido', 'email']),
-        ]);
-    }
-
-public function updatePin(Request $request)
-{
-    $usuario = Auth::user();
-    $tarjeta = TarjetaUniversitaria::where('usuario_id', $usuario->id)
-        ->whereNull('deleted_at')
-        ->firstOrFail();
-
-    $request->validate([
-        'pin_nuevo'     => 'required|digits:4',
-        'pin_confirmar' => 'required|digits:4|same:pin_nuevo',
-        'pin_actual'    => $tarjeta->pin_hash ? 'required|digits:4' : 'nullable',
-    ]);
-
-    // Verificar PIN actual si ya tenía uno
-    if ($tarjeta->pin_hash && !Hash::check($request->pin_actual, $tarjeta->pin_hash)) {
-        return back()->withErrors(['pin_actual' => 'El PIN actual es incorrecto.']);
-    }
-
-    $tarjeta->update(['pin_hash' => Hash::make($request->pin_nuevo)]);
-
-    return back()->with('success', 'PIN actualizado.');
-}
-
 }
