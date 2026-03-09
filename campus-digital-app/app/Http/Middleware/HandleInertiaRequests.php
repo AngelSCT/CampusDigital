@@ -54,6 +54,7 @@ class HandleInertiaRequests extends Middleware
                 'resultado' => fn () => $request->session()->get('resultado'),
                 'success'   => fn () => $request->session()->get('success'),
                 'error'     => fn () => $request->session()->get('error'),
+                'scan_result' => fn () => $request->session()->get('scan_result'),
             ],
         ]);
     }
