@@ -79,6 +79,11 @@ window.route = (name, params) => {
         'admin.tarjetas.reportes.index': '/admin/tarjetas/reportes/index',
         'admin.tarjetas.reportes.export-csv': '/admin/tarjetas/reportes/export-csv',
         'admin.tarjetas.reportes.export-incidentes': '/admin/tarjetas/reportes/export-incidentes',
+        'admin.tarjetas.reportes.export-lecturas-pdf':  '/admin/tarjetas/reportes/export-lecturas-pdf',
+        'admin.tarjetas.reportes.export-modulo-csv':    '/admin/tarjetas/reportes/export-modulo-csv',
+        'admin.tarjetas.reportes.export-modulo-pdf':    '/admin/tarjetas/reportes/export-modulo-pdf',
+        'admin.tarjetas.reportes.export-incidentes-pdf':'/admin/tarjetas/reportes/export-incidentes-pdf',
+
 
         // Lector
         'lector.index': '/lector',

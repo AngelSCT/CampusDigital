@@ -79,9 +79,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/{tarjeta}/toggle-block', [TarjetaController::class, 'toggleBlock'])->name('toggle-block');
 
             // Reportes
-            Route::get('/reportes/index',             [TarjetaReporteController::class, 'index'])->name('reportes.index');
-            Route::get('/reportes/export-csv',        [TarjetaReporteController::class, 'exportCsv'])->name('reportes.export-csv');
-            Route::get('/reportes/export-incidentes', [TarjetaReporteController::class, 'exportIncidentesCsv'])->name('reportes.export-incidentes');
+            Route::get('/reportes/index',                [TarjetaReporteController::class, 'index'])->name('reportes.index');
+            Route::get('/reportes/export-csv',           [TarjetaReporteController::class, 'exportCsv'])->name('reportes.export-csv');
+            Route::get('/reportes/export-incidentes',    [TarjetaReporteController::class, 'exportIncidentesCsv'])->name('reportes.export-incidentes');
+            Route::get('/reportes/export-lecturas-pdf',  [TarjetaReporteController::class, 'exportLecturasPdf'])->name('reportes.export-lecturas-pdf');
+            Route::get('/reportes/export-modulo-csv',    [TarjetaReporteController::class, 'exportModuloCsv'])->name('reportes.export-modulo-csv');
+            Route::get('/reportes/export-modulo-pdf',    [TarjetaReporteController::class, 'exportModuloPdf'])->name('reportes.export-modulo-pdf');
+            Route::get('/reportes/export-incidentes-pdf',[TarjetaReporteController::class, 'exportIncidentesPdf'])->name('reportes.export-incidentes-pdf');
+        
         });
         
         // Gestión de usuarios

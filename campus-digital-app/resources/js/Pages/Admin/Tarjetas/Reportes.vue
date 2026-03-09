@@ -149,6 +149,24 @@
                            class="px-3 py-1 rounded-lg border border-slate-600 text-sm text-white hover:bg-slate-700/50">Siguiente</a>
                     </div>
                 </div>
+                <!-- ── Exportar Lecturas ── -->
+                <div class="px-6 py-4 border-t border-slate-700 flex flex-wrap gap-3 bg-slate-900/30">
+                    <span class="text-xs text-slate-500 self-center mr-1">Exportar esta tabla:</span>
+                    <a :href="exportUrl"
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-xs font-medium text-white hover:from-green-500 hover:to-emerald-500 shadow-lg shadow-green-500/20 transition-all duration-200">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        CSV — Lecturas
+                    </a>
+                    <a :href="exportPdfUrl('lecturas')"
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-red-600 to-rose-600 rounded-lg text-xs font-medium text-white hover:from-red-500 hover:to-rose-500 shadow-lg shadow-red-500/20 transition-all duration-200">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        PDF — Lecturas
+                    </a>
+                </div>
             </div>
 
             <!-- Tab: Uso por módulo -->
@@ -172,6 +190,24 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <!-- ── Exportar Uso por Módulo ── -->
+                <div class="mt-6 pt-4 border-t border-slate-700 flex flex-wrap gap-3">
+                    <span class="text-xs text-slate-500 self-center mr-1">Exportar esta tabla:</span>
+                    <a :href="exportPdfUrl('modulo', 'csv')"
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg text-xs font-medium text-white hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/20 transition-all duration-200">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        CSV — Módulos
+                    </a>
+                    <a :href="exportPdfUrl('modulo', 'pdf')"
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-red-600 to-rose-600 rounded-lg text-xs font-medium text-white hover:from-red-500 hover:to-rose-500 shadow-lg shadow-red-500/20 transition-all duration-200">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        PDF — Módulos
+                    </a>
                 </div>
             </div>
 
@@ -223,6 +259,24 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- ── Exportar Incidentes ── -->
+                <div class="px-6 py-4 border-t border-red-500/20 flex flex-wrap gap-3 bg-slate-900/30">
+                    <span class="text-xs text-slate-500 self-center mr-1">Exportar esta tabla:</span>
+                    <a :href="route('admin.tarjetas.reportes.export-incidentes')"
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-xs font-medium text-white hover:from-green-500 hover:to-emerald-500 shadow-lg shadow-green-500/20 transition-all duration-200">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        CSV — Incidentes
+                    </a>
+                    <a :href="exportPdfUrl('incidentes', 'pdf')"
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-red-600 to-rose-600 rounded-lg text-xs font-medium text-white hover:from-red-500 hover:to-rose-500 shadow-lg shadow-red-500/20 transition-all duration-200">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        PDF — Incidentes
+                    </a>
+                </div>
             </div>
         </div>
     </AuthLayout>
@@ -244,17 +298,17 @@ const props = defineProps({
 
 const tabActivo = ref('lecturas');
 const tabs = [
-    { id: 'lecturas', label: 'Accesos / Lecturas' },
-    { id: 'modulo',   label: 'Uso por Módulo' },
+    { id: 'lecturas',   label: 'Accesos / Lecturas' },
+    { id: 'modulo',     label: 'Uso por Módulo' },
     { id: 'incidentes', label: 'Incidentes' },
 ];
 
 const filtros = reactive({
-    desde: props.filters?.desde ?? '',
-    hasta: props.filters?.hasta ?? '',
+    desde:  props.filters?.desde  ?? '',
+    hasta:  props.filters?.hasta  ?? '',
     modulo: props.filters?.modulo ?? '',
-    tipo: props.filters?.tipo ?? '',
-    exito: props.filters?.exito ?? '',
+    tipo:   props.filters?.tipo   ?? '',
+    exito:  props.filters?.exito  ?? '',
 });
 
 function aplicarFiltros() {
@@ -266,17 +320,45 @@ function limpiarFiltros() {
     aplicarFiltros();
 }
 
+// CSV de lecturas con los filtros activos
 const exportUrl = computed(() => {
-    const params = new URLSearchParams(Object.fromEntries(Object.entries(filtros).filter(([, v]) => v)));
+    const params = new URLSearchParams(
+        Object.fromEntries(Object.entries(filtros).filter(([, v]) => v))
+    );
     return route('admin.tarjetas.reportes.export-csv') + (params.toString() ? '?' + params.toString() : '');
 });
+
+// Genera la URL de exportación para PDF (o CSV extra) por sección
+// El backend deberá tener rutas como:
+//   GET /admin/tarjetas/reportes/export-lecturas-pdf
+//   GET /admin/tarjetas/reportes/export-modulo-csv
+//   GET /admin/tarjetas/reportes/export-modulo-pdf
+//   GET /admin/tarjetas/reportes/export-incidentes-pdf
+function exportPdfUrl(seccion, formato = 'pdf') {
+    const params = new URLSearchParams(
+        Object.fromEntries(Object.entries(filtros).filter(([, v]) => v))
+    );
+    // Construimos la URL manualmente porque estas rutas aún no están en app.js
+    const base = `/admin/tarjetas/reportes/export-${seccion}-${formato}`;
+    return base + (params.toString() ? '?' + params.toString() : '');
+}
 
 const maxModulo = computed(() => Math.max(...(props.usoModulo?.map(m => m.total) ?? []), 1));
 
 function badgeClass(estado) {
-    const map = { activa: 'bg-green-500/20 text-green-400', bloqueada: 'bg-red-500/20 text-red-400', perdida: 'bg-yellow-500/20 text-yellow-400', cancelada: 'bg-slate-500/20 text-slate-400' };
+    const map = {
+        activa:    'bg-green-500/20 text-green-400',
+        bloqueada: 'bg-red-500/20 text-red-400',
+        perdida:   'bg-yellow-500/20 text-yellow-400',
+        cancelada: 'bg-slate-500/20 text-slate-400',
+    };
     return map[estado] ?? map.cancelada;
 }
-function formatDate(d) { return d ? new Date(d).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'; }
-function formatDateTime(d) { return d ? new Date(d).toLocaleString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '-'; }
+
+function formatDate(d) {
+    return d ? new Date(d).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+}
+function formatDateTime(d) {
+    return d ? new Date(d).toLocaleString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '-';
+}
 </script>
