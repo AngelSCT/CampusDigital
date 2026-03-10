@@ -320,7 +320,6 @@ function limpiarFiltros() {
     aplicarFiltros();
 }
 
-// CSV de lecturas con los filtros activos
 const exportUrl = computed(() => {
     const params = new URLSearchParams(
         Object.fromEntries(Object.entries(filtros).filter(([, v]) => v))
@@ -328,17 +327,11 @@ const exportUrl = computed(() => {
     return route('admin.tarjetas.reportes.export-csv') + (params.toString() ? '?' + params.toString() : '');
 });
 
-// Genera la URL de exportación para PDF (o CSV extra) por sección
-// El backend deberá tener rutas como:
-//   GET /admin/tarjetas/reportes/export-lecturas-pdf
-//   GET /admin/tarjetas/reportes/export-modulo-csv
-//   GET /admin/tarjetas/reportes/export-modulo-pdf
-//   GET /admin/tarjetas/reportes/export-incidentes-pdf
+
 function exportPdfUrl(seccion, formato = 'pdf') {
     const params = new URLSearchParams(
         Object.fromEntries(Object.entries(filtros).filter(([, v]) => v))
     );
-    // Construimos la URL manualmente porque estas rutas aún no están en app.js
     const base = `/admin/tarjetas/reportes/export-${seccion}-${formato}`;
     return base + (params.toString() ? '?' + params.toString() : '');
 }

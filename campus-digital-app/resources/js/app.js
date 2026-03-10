@@ -6,7 +6,7 @@ import clickAway from './directives/clickAway';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Campus Digital';
 
-// Helper global para rutas
+// ROUTEADOR GLOBAL DE LA APLICACION
 window.route = (name, params) => {
     const routes = {
         'login': '/login',
@@ -122,7 +122,6 @@ createInertiaApp({
         const app = createApp({ render: () => h(App, props) })
             .use(plugin);
         
-        // Hacer route() disponible en todos los componentes
         app.config.globalProperties.route = window.route;
         app.directive('click-away', clickAway);
 

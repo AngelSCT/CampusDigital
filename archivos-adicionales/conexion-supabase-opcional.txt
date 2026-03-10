@@ -1,0 +1,24 @@
+//SUSTITUIR EL BLOQUE DE LA BASE DE DATOS DEL .ENV
+
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=campus_digital
+DB_USERNAME=campus_user
+DB_PASSWORD=postgres
+
+//SUSTITUIRLAS POR ESTE BLOQUE PARA LA CONEXION CON SUPABASE:
+
+DB_CONNECTION=pgsql
+DB_HOST=db.xxxxxxxxx.supabase.co
+DB_PORT=5432
+DB_DATABASE=postgres
+DB_USERNAME=postgres
+DB_PASSWORD=tu_password
+DB_SSLMODE=require
+
+//LIMPIAR LA CONFIGURACION
+
+php artisan config:clear
+php artisan cache:clear
+php artisan migrate

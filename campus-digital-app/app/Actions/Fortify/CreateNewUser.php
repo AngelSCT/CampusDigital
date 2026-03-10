@@ -41,13 +41,11 @@ class CreateNewUser implements CreatesNewUsers
             'password_hash' => Hash::make($input['password']),
         ]);
 
-        // Asignar rol de estudiante por defecto
         $rolEstudiante = \App\Models\Rol::where('nombre', 'estudiante')->first();
         if ($rolEstudiante) {
             $usuario->roles()->attach($rolEstudiante->id);
         }
 
-        // Crear perfil básico
         $usuario->perfil()->create([]);
 
         return $usuario;

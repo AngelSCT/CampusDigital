@@ -109,6 +109,20 @@
                         </svg>
                         <span>Bitácora de Actividad</span>
                     </a>
+
+                    <a :href="route('admin.bitacora.accesos')" class="quick-card info">
+                        <svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span>Bitácora de Accesos</span>
+                    </a>
+
+                    <a :href="route('admin.tarjetas.dashboard')" class="quick-card accent">
+                        <svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18M3 14h18M3 18h18" />
+                        </svg>
+                        <span>Tarjetas</span>
+                    </a>
                 </div>
             </div>
 
@@ -470,7 +484,7 @@ function formatDate(date) {
 /* Content Grid */
 .content-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
     gap: 1.5rem;
 }
 
@@ -618,6 +632,26 @@ function formatDate(date) {
     color: #fca5a5;
     border: 1px solid rgba(239, 68, 68, 0.4);
 }
+
+.quick-card.info {
+    border-color: rgba(6, 182, 212, 0.4);
+    background: rgba(6, 182, 212, 0.08);
+}
+.quick-card.info:hover {
+    border-color: #06B6D4;
+    background: rgba(6, 182, 212, 0.25);
+}
+.quick-card.info .quick-icon { color: #22d3ee; }
+
+.quick-card.accent {
+    border-color: rgba(168, 85, 247, 0.4);
+    background: rgba(168, 85, 247, 0.08);
+}
+.quick-card.accent:hover {
+    border-color: #A855F7;
+    background: rgba(168, 85, 247, 0.25);
+}
+.quick-card.accent .quick-icon { color: #c084fc; }
 
 /* Responsive */
 @media (max-width: 1024px) {

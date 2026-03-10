@@ -28,6 +28,10 @@ Route::post('/auth/rfid-login', [RfidLoginController::class, 'login'])
     ->middleware('guest')
     ->name('rfid.login');
 
+Route::get('/lector', [TarjetaLecturaController::class, 'index'])->name('lector.index');
+Route::post('/lector/leer', [TarjetaLecturaController::class, 'leer'])->name('lector.leer');
+Route::post('/lector/confirmar-pedido', [TarjetaLecturaController::class, 'confirmarPedido'])->name('lector.confirmar-pedido');
+
 // Rutas autenticadas
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
@@ -42,13 +46,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/pin',      [MiTarjetaController::class, 'showPin'])->name('pin');
             Route::post('/pin',     [MiTarjetaController::class, 'updatePin'])->name('pin.store');
         });
-
-    // Lector simulado — para administradores y proveedores
-    Route::middleware(['role:administrador,proveedor_area'])->group(function () {
-        Route::get('/lector', [TarjetaLecturaController::class, 'index'])->name('lector.index');
-        Route::post('/lector/leer', [TarjetaLecturaController::class, 'leer'])->name('lector.leer');
-        Route::post('/lector/confirmar-pedido', [TarjetaLecturaController::class, 'confirmarPedido'])->name('lector.confirmar-pedido');
-    });
 
     // Perfil de usuario
     Route::prefix('perfil')->name('perfil.')->group(function () {

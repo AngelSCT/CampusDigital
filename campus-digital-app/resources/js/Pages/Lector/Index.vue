@@ -1,5 +1,5 @@
 <template>
-    <AuthLayout>
+    <PublicLayout>
         <div class="max-w-6xl mx-auto space-y-6">
 
             <!-- Header -->
@@ -257,13 +257,13 @@
 
             </div>
         </div>
-    </AuthLayout>
+    </PublicLayout>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
-import AuthLayout from '@/Layouts/AuthLayout.vue';
+import PublicLayout from '@/Layouts/PublicLayout.vue';
 
 const props = defineProps({
     lecturasRecientes: { type: Array,  default: () => [] },

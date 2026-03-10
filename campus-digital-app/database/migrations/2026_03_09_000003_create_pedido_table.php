@@ -5,9 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
-// NOTA: Esta es la tabla base de pedidos que el Módulo 4.5 (Pedidos y Seguimiento)
-// ampliará con más campos (items, evidencias, QR, etc.).
-// Por ahora tiene lo mínimo para que el Módulo 4.10 (RFID) pueda confirmar entregas.
 
 return new class extends Migration
 {
@@ -21,29 +18,22 @@ return new class extends Migration
                   ->onUpdate('cascade')
                   ->onDelete('restrict');
 
-            // Folio único legible (ej: PED-20260309-0001)
             $table->string('numero_folio', 30)->unique();
 
-            // Estado del pedido
             $table->string('estado', 30)->default('creado');
-            // creado | aceptado | en_proceso | listo | entregado | cancelado
 
-            // En qué área/módulo se procesa
             $table->string('modulo', 50)->default('otro');
-            // cafeteria | copias | souvenirs | biblioteca | otro
 
             $table->decimal('total', 10, 2)->default(0.00);
             $table->text('descripcion')->default('');
             $table->text('notas')->default('');
 
-            // Quién lo atendió (proveedor)
             $table->foreignId('operador_usuario_id')
                   ->nullable()
                   ->constrained('usuario')
                   ->onUpdate('cascade')
                   ->onDelete('set null');
 
-            // Si fue confirmado con tarjeta RFID
             $table->boolean('confirmado_con_tarjeta')->default(false);
             $table->timestamp('confirmado_at')->nullable();
             $table->foreignId('tarjeta_lectura_id')
@@ -52,7 +42,6 @@ return new class extends Migration
                   ->onUpdate('cascade')
                   ->onDelete('set null');
 
-            // Si se cobró del monedero
             $table->boolean('cobrado_de_saldo')->default(false);
             $table->foreignId('saldo_movimiento_id')
                   ->nullable()

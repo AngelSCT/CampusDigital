@@ -22,31 +22,25 @@ return new class extends Migration
                   ->onUpdate('cascade')
                   ->onDelete('restrict');
 
-            // abono = dinero entra | cargo = dinero sale
             $table->string('tipo', 20)->default('cargo');
 
             $table->decimal('monto', 10, 2);
             $table->decimal('saldo_anterior', 10, 2);
             $table->decimal('saldo_nuevo', 10, 2);
 
-            // ¿Desde qué módulo vino este movimiento?
             $table->string('modulo', 50)->default('otro');
-            // cafeteria | copias | souvenirs | biblioteca | recarga | rfid | otro
 
             $table->string('concepto', 255)->default('');
 
-            // Para rastrear a qué pedido u operación está ligado (nullable)
             $table->string('referencia_tabla', 63)->nullable();
             $table->unsignedBigInteger('referencia_id')->nullable();
 
-            // Quién procesó (operador o sistema)
             $table->foreignId('operador_usuario_id')
                   ->nullable()
                   ->constrained('usuario')
                   ->onUpdate('cascade')
                   ->onDelete('set null');
 
-            // Si se realizó con tarjeta RFID
             $table->foreignId('tarjeta_lectura_id')
                   ->nullable()
                   ->constrained('tarjeta_lectura')
@@ -76,7 +70,6 @@ return new class extends Migration
             CHECK (monto > 0)
         ");
 
-        // Índices útiles para reportes
         DB::statement('CREATE INDEX idx_saldo_movimiento__usuario_id ON saldo_movimiento(usuario_id)');
         DB::statement('CREATE INDEX idx_saldo_movimiento__tipo ON saldo_movimiento(tipo)');
         DB::statement('CREATE INDEX idx_saldo_movimiento__modulo ON saldo_movimiento(modulo)');

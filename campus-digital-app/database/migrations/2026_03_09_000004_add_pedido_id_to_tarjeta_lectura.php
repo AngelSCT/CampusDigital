@@ -9,7 +9,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tarjeta_lectura', function (Blueprint $table) {
-            // Liga una lectura a un pedido cuando tipo_lectura = 'confirmacion_entrega'
             $table->foreignId('pedido_id')
                   ->nullable()
                   ->after('operador_usuario_id')

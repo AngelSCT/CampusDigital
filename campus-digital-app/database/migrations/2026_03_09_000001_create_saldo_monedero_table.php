@@ -17,22 +17,18 @@ return new class extends Migration
                   ->onUpdate('cascade')
                   ->onDelete('restrict');
 
-            // Saldo en pesos MXN con 2 decimales
             $table->decimal('saldo_disponible', 10, 2)->default(0.00);
-            $table->decimal('saldo_retenido', 10, 2)->default(0.00); // Para operaciones pendientes
-
+            $table->decimal('saldo_retenido', 10, 2)->default(0.00); 
             $table->timestampsTz();
             $table->softDeletesTz();
         });
 
-        // Trigger updated_at igual que el resto del proyecto
         DB::statement("
             CREATE TRIGGER trg_saldo_monedero__set_updated_at
             BEFORE UPDATE ON saldo_monedero
             FOR EACH ROW EXECUTE FUNCTION set_updated_at()
         ");
 
-        // Constraint: saldo no puede ser negativo
         DB::statement("
             ALTER TABLE saldo_monedero
             ADD CONSTRAINT ck_saldo_monedero__saldo_no_negativo

@@ -57,10 +57,10 @@ class TarjetaLecturaController extends Controller
             'tipo_lectura' => 'required|string|in:' . implode(',', TarjetaLectura::TIPOS),
         ]);
 
-        $uid         = strtoupper(trim($request->uid));
-        $modulo      = $request->modulo;
-        $tipo        = $request->tipo_lectura;
-        $operadorId  = Auth::id();
+        $uid        = strtoupper(trim($request->uid));
+        $modulo     = $request->modulo;
+        $tipo       = $request->tipo_lectura;
+        $operadorId = Auth::id() ?? null;
 
         $tarjeta = TarjetaUniversitaria::where('uid', $uid)
             ->whereNull('deleted_at')
@@ -82,7 +82,7 @@ class TarjetaLecturaController extends Controller
                 'meta_json'           => [],
             ]);
 
-            return back()->with('scan_result', [
+            return redirect()->route('lector.index')->with('scan_result', [
                 'exito'   => false,
                 'mensaje' => 'Tarjeta no registrada en el sistema.',
                 'uid'     => $uid,
@@ -104,7 +104,7 @@ class TarjetaLecturaController extends Controller
                 'meta_json'           => [],
             ]);
 
-            return back()->with('scan_result', [
+            return redirect()->route('lector.index')->with('scan_result', [
                 'exito'   => false,
                 'mensaje' => "Tarjeta {$tarjeta->estado}. " . ($tarjeta->motivo_bloqueo ? "Motivo: {$tarjeta->motivo_bloqueo}" : ''),
                 'uid'     => $uid,
@@ -114,7 +114,7 @@ class TarjetaLecturaController extends Controller
         $usuario = $tarjeta->usuario;
 
         if (!$usuario || $usuario->deleted_at || $usuario->bloqueado) {
-            return back()->with('scan_result', [
+            return redirect()->route('lector.index')->with('scan_result', [
                 'exito'   => false,
                 'mensaje' => 'Usuario no disponible.',
                 'uid'     => $uid,
@@ -131,7 +131,7 @@ class TarjetaLecturaController extends Controller
 
     /* ─── Consulta rápida de saldo ───────────────────────── */
 
-    private function consultarSaldo(Request $request, TarjetaUniversitaria $tarjeta, string $uid, string $modulo, int $operadorId)
+    private function consultarSaldo(Request $request, TarjetaUniversitaria $tarjeta, string $uid, string $modulo, ?int $operadorId)
     {
         $usuario  = $tarjeta->usuario;
         $monedero = SaldoMonedero::obtenerOCrear($usuario->id);
@@ -149,7 +149,7 @@ class TarjetaLecturaController extends Controller
             'meta_json'           => [],
         ]);
 
-        return back()->with('scan_result', [
+        return redirect()->route('lector.index')->with('scan_result', [
             'exito'          => true,
             'tipo'           => 'consulta_saldo',
             'mensaje'        => 'Saldo consultado correctamente.',
@@ -166,7 +166,7 @@ class TarjetaLecturaController extends Controller
 
     /* ─── Muestra pedidos pendientes para confirmar ──────── */
 
-    private function confirmarEntrega(Request $request, TarjetaUniversitaria $tarjeta, string $uid, string $modulo, int $operadorId)
+    private function confirmarEntrega(Request $request, TarjetaUniversitaria $tarjeta, string $uid, string $modulo, ?int $operadorId)
     {
         $usuario = $tarjeta->usuario;
 
@@ -198,7 +198,7 @@ class TarjetaLecturaController extends Controller
             'meta_json'           => [],
         ]);
 
-        return back()->with('scan_result', [
+        return redirect()->route('lector.index')->with('scan_result', [
             'exito'              => true,
             'tipo'               => 'confirmacion_entrega',
             'mensaje'            => count($pedidosPendientes) > 0
@@ -231,14 +231,14 @@ class TarjetaLecturaController extends Controller
         $usuario = $tarjeta->usuario;
 
         if ($pedido->usuario_id !== $usuario->id) {
-            return back()->with('scan_result', [
+            return redirect()->route('lector.index')->with('scan_result', [
                 'exito'   => false,
                 'mensaje' => 'Este pedido no pertenece al titular de la tarjeta.',
             ]);
         }
 
         if (!$pedido->puedeEntregarse()) {
-            return back()->with('scan_result', [
+            return redirect()->route('lector.index')->with('scan_result', [
                 'exito'   => false,
                 'mensaje' => 'El pedido no puede entregarse en su estado actual: ' . $pedido->estado,
             ]);
@@ -254,7 +254,7 @@ class TarjetaLecturaController extends Controller
                         $pedido->total,
                         'Pago pedido ' . $pedido->numero_folio,
                         $pedido->modulo,
-                        Auth::id()
+                        Auth::check() ? Auth::id() : null,
                     );
                     $movimientoId = $movimiento->id;
                 }
@@ -268,30 +268,30 @@ class TarjetaLecturaController extends Controller
                     'detalle'             => 'Entrega confirmada con tarjeta. Pedido: ' . $pedido->numero_folio,
                     'ip'                  => $request->ip(),
                     'user_agent'          => $request->userAgent() ?? '',
-                    'operador_usuario_id' => Auth::id(),
+                    'operador_usuario_id' => Auth::check() ? Auth::id() : null,
                     'pedido_id'           => $pedido->id,
                     'meta_json'           => [],
                 ]);
 
                 $pedido->update([
-                    'estado'                  => 'entregado',
-                    'confirmado_con_tarjeta'  => true,
-                    'confirmado_at'           => now(),
-                    'tarjeta_lectura_id'      => $lectura->id,
-                    'operador_usuario_id'     => Auth::id(),
-                    'cobrado_de_saldo'        => !empty($data['cobrar']),
-                    'saldo_movimiento_id'     => $movimientoId,
+                    'estado'                 => 'entregado',
+                    'confirmado_con_tarjeta' => true,
+                    'confirmado_at'          => now(),
+                    'tarjeta_lectura_id'     => $lectura->id,
+                    'operador_usuario_id'    => Auth::check() ? Auth::id() : null,
+                    'cobrado_de_saldo'       => !empty($data['cobrar']),
+                    'saldo_movimiento_id'    => $movimientoId,
                 ]);
             });
 
-            return back()->with('scan_result', [
+            return redirect()->route('lector.index')->with('scan_result', [
                 'exito'   => true,
                 'tipo'    => 'entrega_confirmada',
                 'mensaje' => 'Pedido ' . $pedido->numero_folio . ' entregado y confirmado con tarjeta.',
             ]);
 
         } catch (\Exception $e) {
-            return back()->with('scan_result', [
+            return redirect()->route('lector.index')->with('scan_result', [
                 'exito'   => false,
                 'mensaje' => $e->getMessage(),
             ]);
@@ -300,7 +300,7 @@ class TarjetaLecturaController extends Controller
 
     /* ─── Acceso / consumo simple ────────────────────────── */
 
-    private function registrarAccesoOConsumo(Request $request, TarjetaUniversitaria $tarjeta, string $uid, string $modulo, string $tipo, int $operadorId)
+    private function registrarAccesoOConsumo(Request $request, TarjetaUniversitaria $tarjeta, string $uid, string $modulo, string $tipo, ?int $operadorId)
     {
         $usuario = $tarjeta->usuario;
 
@@ -317,7 +317,7 @@ class TarjetaLecturaController extends Controller
             'meta_json'           => [],
         ]);
 
-        return back()->with('scan_result', [
+        return redirect()->route('lector.index')->with('scan_result', [
             'exito'   => true,
             'tipo'    => $tipo,
             'mensaje' => 'Lectura exitosa.',
