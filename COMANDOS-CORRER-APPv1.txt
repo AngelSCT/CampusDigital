@@ -162,6 +162,12 @@ git push origin main
 
 git fetch --all
 
+
+COMANDOS PARA PORBAR EL SIMULADOR (ESCUCHA LAS PETICIONES DE HOST EXTERNOS):
+php artisan migrate:fresh --seed
+php artisan serve --host=0.0.0.0 --port=8000 
+npm run dev -- --host 
+
 NOTA:LA CARPETA DESDE LA QUE SE TIENE QUE HACER CAMBIOS PARA 
     SUBIR CAMBIOS O BAJAR CAMBIOS DE GIT ES LA RAIZ CampusDigital
 
