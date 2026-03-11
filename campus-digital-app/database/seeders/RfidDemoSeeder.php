@@ -1,0 +1,278 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use App\Models\SaldoMonedero;
+use App\Models\SaldoMovimiento;
+use App\Models\Pedido;
+use App\Models\TarjetaUniversitaria;
+use App\Models\TarjetaLectura;
+
+
+// AGREAGR PARA LA SIMULACION DE LOS PEDIDOS PARA EL LECTOR 
+// CARPETA DONDE DEBE CREARSE EL ARCHIVO "database/seeders/RfidDemoSeeder.php"
+
+// EJECUTAR EL SIGUIENTE COMANDO PARA CARGAR EL SEDDER EN LA BASE DE DATOS
+//   php artisan db:seed --class=RfidDemoSeeder
+
+
+class RfidDemoSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $this->command->info('seeder RFID/NFC...');
+
+        DB::transaction(function () {
+            $this->crearMonederos();
+            $this->crearPedidosDePrueba();
+            $this->crearHistorialLecturas();
+        });
+
+        $this->command->info('SEEDER DE DEMO.');
+        $this->imprimirResumen();
+    }
+
+
+    private function crearMonederos(): void
+    {
+        $this->command->line('Creando monederos con saldo...');
+
+        $tarjetas = TarjetaUniversitaria::with('usuario')
+            ->whereNull('deleted_at')
+            ->get();
+
+        if ($tarjetas->isEmpty()) {
+            $this->command->warn('No hay tarjetas registradas. Crea tarjetas primero desde el panel admin.');
+            return;
+        }
+
+        foreach ($tarjetas as $tarjeta) {
+            $usuario = $tarjeta->usuario;
+            if (!$usuario) continue;
+
+            $monedero = SaldoMonedero::firstOrCreate(
+                ['usuario_id' => $usuario->id],
+                ['saldo_disponible' => 0, 'saldo_retenido' => 0]
+            );
+
+            if ($monedero->saldo_disponible == 0) {
+                $montoInicial = match(true) {
+                    str_contains(strtolower($usuario->email), 'admin')      => 500.00,
+                    str_contains(strtolower($usuario->email), 'estudiante') => 250.00,
+                    str_contains(strtolower($usuario->email), 'proveedor')  => 100.00,
+                    default => 150.00,
+                };
+
+                $monedero->update(['saldo_disponible' => $montoInicial]);
+
+                SaldoMovimiento::create([
+                    'usuario_id'        => $usuario->id,
+                    'saldo_monedero_id' => $monedero->id,
+                    'tipo'              => 'abono',
+                    'monto'             => $montoInicial,
+                    'saldo_anterior'    => 0,
+                    'saldo_nuevo'       => $montoInicial,
+                    'modulo'            => 'recarga',
+                    'concepto'          => 'Recarga inicial de demo (Seeder)',
+                ]);
+
+                $this->command->line("      ✓ {$usuario->nombre} {$usuario->apellido}: \${$montoInicial}");
+            } else {
+                $this->command->line("      → {$usuario->nombre} {$usuario->apellido}: ya tiene \${$monedero->saldo_disponible} (sin cambios)");
+            }
+        }
+    }
+
+
+    private function crearPedidosDePrueba(): void
+    {
+        $this->command->line('Creando pedidos de prueba...');
+
+        $tarjetaEstudiante = TarjetaUniversitaria::whereHas('usuario', function ($q) {
+            $q->whereHas('roles', fn($r) => $r->where('nombre', 'estudiante'));
+        })->whereNull('deleted_at')->first();
+
+        if (!$tarjetaEstudiante) {
+            $tarjetaEstudiante = TarjetaUniversitaria::where('estado', 'activa')
+                ->whereNull('deleted_at')
+                ->first();
+        }
+
+        if (!$tarjetaEstudiante) {
+            $this->command->warn('No hay tarjetas activas para asignar pedidos.');
+            return;
+        }
+
+        $usuarioId = $tarjetaEstudiante->usuario_id;
+
+        $pedidosDemo = [
+            [
+                'numero_folio' => 'PED-DEMO-0001',
+                'estado'       => 'listo',
+                'modulo'       => 'cafeteria',
+                'total'        => 45.00,
+                'descripcion'  => 'Combo del día: torta + agua + fruta',
+                'notas'        => 'Sin chile',
+            ],
+            [
+                'numero_folio' => 'PED-DEMO-0002',
+                'estado'       => 'listo',
+                'modulo'       => 'copias',
+                'total'        => 18.50,
+                'descripcion'  => '37 copias tamaño carta + engargolado',
+                'notas'        => '',
+            ],
+            [
+                'numero_folio' => 'PED-DEMO-0003',
+                'estado'       => 'en_proceso',
+                'modulo'       => 'cafeteria',
+                'total'        => 32.00,
+                'descripcion'  => 'Desayuno: 2 quesadillas + jugo naranja',
+                'notas'        => '',
+            ],
+            [
+                'numero_folio' => 'PED-DEMO-0004',
+                'estado'       => 'aceptado',
+                'modulo'       => 'souvenirs',
+                'total'        => 120.00,
+                'descripcion'  => 'Playera institucional talla M',
+                'notas'        => 'Color azul marino',
+            ],
+            [
+                'numero_folio' => 'PED-DEMO-0005',
+                'estado'       => 'entregado',
+                'modulo'       => 'cafeteria',
+                'total'        => 25.00,
+                'descripcion'  => 'Café americano + pan dulce',
+                'notas'        => '',
+                'confirmado_con_tarjeta' => true,
+                'confirmado_at'          => now()->subHours(2),
+                'cobrado_de_saldo'       => true,
+            ],
+            [
+                'numero_folio' => 'PED-DEMO-0006',
+                'estado'       => 'cancelado',
+                'modulo'       => 'copias',
+                'total'        => 12.00,
+                'descripcion'  => 'Impresión a color (cancelado por falta de papel)',
+                'notas'        => 'Cancelado por proveedor',
+            ],
+        ];
+
+        foreach ($pedidosDemo as $datos) {
+            if (Pedido::where('numero_folio', $datos['numero_folio'])->exists()) {
+                $this->command->line("      → {$datos['numero_folio']}: ya existe (sin cambios)");
+                continue;
+            }
+
+            Pedido::create(array_merge($datos, [
+                'usuario_id'             => $usuarioId,
+                'confirmado_con_tarjeta' => $datos['confirmado_con_tarjeta'] ?? false,
+                'confirmado_at'          => $datos['confirmado_at'] ?? null,
+                'cobrado_de_saldo'       => $datos['cobrado_de_saldo'] ?? false,
+            ]));
+
+            $this->command->line("/OK. {$datos['numero_folio']} [{$datos['estado']}] - {$datos['modulo']} \${$datos['total']}");
+        }
+    }
+
+    private function crearHistorialLecturas(): void
+    {
+        $this->command->line('Creando historial de lecturas...');
+
+        $tarjetas = TarjetaUniversitaria::whereNull('deleted_at')
+            ->where('estado', 'activa')
+            ->with('usuario')
+            ->get();
+
+        if ($tarjetas->isEmpty()) {
+            $this->command->warn('No hay tarjetas activas.');
+            return;
+        }
+
+        $modulos = ['cafeteria', 'copias', 'souvenirs', 'biblioteca', 'acceso'];
+        $tipos   = ['acceso', 'consumo', 'consulta_saldo', 'confirmacion_entrega'];
+
+        $operadorId = \App\Models\Usuario::whereHas('roles', fn($r) =>
+            $r->where('nombre', 'proveedor_area')
+        )->value('id') ?? \App\Models\Usuario::first()->id;
+
+        $lecturasTotales = 0;
+
+        foreach (range(6, 0) as $diasAtras) {
+            $fecha = now()->subDays($diasAtras);
+
+            $cantidadDia = rand(3, 8);
+
+            for ($i = 0; $i < $cantidadDia; $i++) {
+                $tarjeta = $tarjetas->random();
+                $exito   = rand(1, 10) > 2; 
+                $modulo  = $modulos[array_rand($modulos)];
+                $tipo    = $tipos[array_rand($tipos)];
+
+                if (TarjetaLectura::where('tarjeta_id', $tarjeta->id)
+                    ->whereDate('created_at', $fecha->toDateString())
+                    ->count() >= 5) {
+                    continue;
+                }
+
+                TarjetaLectura::create([
+                    'tarjeta_id'          => $exito ? $tarjeta->id : null,
+                    'uid_leido'           => $exito ? $tarjeta->uid : 'UNKNOWN' . rand(1000, 9999),
+                    'modulo'              => $modulo,
+                    'tipo_lectura'        => $tipo,
+                    'exito'               => $exito,
+                    'detalle'             => $exito
+                        ? "Lectura exitosa en módulo: {$modulo}. Tipo: {$tipo}."
+                        : 'Tarjeta no reconocida o bloqueada.',
+                    'ip'                  => '127.0.0.1',
+                    'user_agent'          => 'Demo Seeder',
+                    'operador_usuario_id' => $operadorId,
+                    'created_at'          => $fecha->copy()->addHours(rand(7, 20))->addMinutes(rand(0, 59)),
+                    'updated_at'          => $fecha->copy()->addHours(rand(7, 20))->addMinutes(rand(0, 59)),
+                ]);
+
+                $lecturasTotales++;
+            }
+        }
+
+        $this->command->line("/OK. {$lecturasTotales} lecturas creadas (últimos 7 días)");
+    }
+
+    private function imprimirResumen(): void
+    {
+        $this->command->newLine();
+        $this->command->line('┌─────────────────────────────────────────────────┐');
+        $this->command->line('│         DATOS DE DEMO RFID — RESUMEN            │');
+        $this->command->line('├─────────────────────────────────────────────────┤');
+
+        $tarjetas = TarjetaUniversitaria::with('usuario')->whereNull('deleted_at')->get();
+        foreach ($tarjetas as $t) {
+            $monedero = SaldoMonedero::where('usuario_id', $t->usuario_id)->first();
+            $saldo    = $monedero ? number_format($monedero->saldo_disponible, 2) : '0.00';
+            $nombre   = $t->usuario ? "{$t->usuario->nombre} {$t->usuario->apellido}" : 'Sin usuario';
+            $this->command->line("│ {$t->uid} → {$nombre} → \${$saldo}");
+        }
+
+        $this->command->line('├─────────────────────────────────────────────────┤');
+
+        $pendientes = Pedido::whereIn('estado', ['listo', 'aceptado', 'en_proceso'])
+            ->where('confirmado_con_tarjeta', false)
+            ->count();
+        $totalPedidos  = Pedido::count();
+        $totalLecturas = TarjetaLectura::count();
+
+        $this->command->line("│ Pedidos totales:    {$totalPedidos}");
+        $this->command->line("│ Pedidos pendientes: {$pendientes} (listos para escanear)");
+        $this->command->line("│ Lecturas totales:   {$totalLecturas}");
+        $this->command->line('├─────────────────────────────────────────────────┤');
+        $this->command->line('│  FLUJOS DEL LECTOR :                            │');
+        $this->command->line('│  1. Login con tarjeta → uid + PIN               │');
+        $this->command->line('│  2. Lector → consulta_saldo → ver $             │');
+        $this->command->line('│  3. Lector → confirmacion_entrega → PED-DEMO-*  │');
+        $this->command->line('└─────────────────────────────────────────────────┘');
+    }
+}

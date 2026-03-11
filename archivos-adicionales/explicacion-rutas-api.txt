@@ -1,7 +1,7 @@
 BASE URL: http://localhost:8000/api
 
-HEADER 1: X-API-KEY    → 4f8a2b1c9d3e7f6a0b5c8d2e1f4a7b3c6d9e2f5a8b1c4d7e0f3a6b9c2d5e8f1a
-HEADER 2: Accept       → application/json
+HEADER 1: X-API-KEY    - 4f8a2b1c9d3e7f6a0b5c8d2e1f4a7b3c6d9e2f5a8b1c4d7e0f3a6b9c2d5e8f1a
+HEADER 2: Accept       - application/json
 
 URLS DE LA API REST DE LA APLICACION (SE PUEDEN PROBAR CON INSOMNIA O POSTMAN)
 
@@ -359,6 +359,318 @@ GET  http://localhost:8000/api/bitacora/actividad/10
      // TRAE EL DETALLE DE LA ACCION CON ID 10
 
 ******************************************************************
+ TARJETAS UNIVERSITARIAS  (MODULO 4.10 - RFID/NFC)
+******************************************************************
+
+GET  http://localhost:8000/api/tarjetas
+     // TRAE TODAS LAS TARJETAS UNIVERSITARIAS REGISTRADAS EN EL SISTEMA
+       ESTA SE DEBE USAR CUANDO QUIERAS VER EL LISTADO COMPLETO DE TARJETAS DEL CAMPUS
+
+GET  http://localhost:8000/api/tarjetas?estado=activa
+     // TRAE SOLO LAS TARJETAS ACTIVAS
+       ESTA SE DEBE USAR CUANDO QUIERAS SABER QUE TARJETAS ESTAN EN USO NORMAL
+
+GET  http://localhost:8000/api/tarjetas?estado=bloqueada
+     // TRAE SOLO LAS TARJETAS BLOQUEADAS
+       ESTA SE DEBE USAR PARA EL DASHBOARD DE TARJETAS SUSPENDIDAS
+
+GET  http://localhost:8000/api/tarjetas?estado=perdida
+     // TRAE SOLO LAS TARJETAS REPORTADAS COMO PERDIDAS
+       ESTA SE DEBE USAR PARA REPORTES DE INCIDENTES Y AUDITORIA
+
+GET  http://localhost:8000/api/tarjetas?estado=cancelada
+     // TRAE SOLO LAS TARJETAS CANCELADAS
+       ESTA SE DEBE USAR PARA EL HISTORIAL DE TARJETAS DADAS DE BAJA
+
+GET  http://localhost:8000/api/tarjetas?usuario_id=1
+     // TRAE LAS TARJETAS ASOCIADAS AL USUARIO CON ID 1
+       ESTA SE DEBE USAR CUANDO QUIERAS SABER QUE TARJETA TIENE UN USUARIO ESPECIFICO
+
+GET  http://localhost:8000/api/tarjetas/uid/A1B2C3D4E5F6
+     // BUSCA UNA TARJETA POR EL UID DEL CHIP RFID/NFC
+       ESTA ES LA RUTA PRINCIPAL QUE LLAMA EL LECTOR AL DETECTAR UNA TARJETA
+       DEVUELVE LA TARJETA CON EL USUARIO Y SU PERFIL ASOCIADO
+       ESTA SE DEBE USAR DESDE EL HARDWARE O SIMULADOR CADA VEZ QUE SE LEE UN CHIP
+
+GET  http://localhost:8000/api/tarjetas/1
+     // TRAE EL DETALLE COMPLETO DE LA TARJETA CON ID 1
+       INCLUYE QUIEN LA REGISTRO, QUIEN LA BLOQUEO Y CUANDO
+
+GET  http://localhost:8000/api/tarjetas/2
+     // TRAE EL DETALLE COMPLETO DE LA TARJETA CON ID 2
+
+POST http://localhost:8000/api/tarjetas
+     // REGISTRA UNA TARJETA NUEVA Y LA ASOCIA A UN USUARIO
+       ESTA SE DEBE USAR CUANDO SE ENTREGUE UNA TARJETA NUEVA A UN ESTUDIANTE
+       REQUIERE BODY JSON: { usuario_id, uid, estado, registrado_por_usuario_id }
+
+PUT  http://localhost:8000/api/tarjetas/1
+     // ACTUALIZA LOS DATOS DE LA TARJETA CON ID 1 (UID, ESTADO, NOTAS)
+       ESTA SE DEBE USAR PARA CORRECCIONES O CAMBIOS ADMINISTRATIVOS
+
+DELETE http://localhost:8000/api/tarjetas/1
+     // ELIMINA (SOFT DELETE) LA TARJETA CON ID 1
+       ESTA SE DEBE USAR SOLO PARA ELIMINAR REGISTROS INCORRECTOS, NO PARA BLOQUEAR
+
+POST http://localhost:8000/api/tarjetas/1/bloquear
+     // BLOQUEA LA TARJETA CON ID 1 Y REGISTRA QUIEN Y POR QUE LA BLOQUEO
+       ESTA SE DEBE USAR CUANDO EL USUARIO REPORTE ROBO, PERDIDA O HAYA UNA INCIDENCIA
+       REQUIERE BODY JSON: { motivo_bloqueo, bloqueado_por_usuario_id }
+
+POST http://localhost:8000/api/tarjetas/1/desbloquear
+     // DESBLOQUEA LA TARJETA CON ID 1 Y LA REGRESA A ESTADO ACTIVA
+       ESTA SE DEBE USAR CUANDO SE RESUELVA LA INCIDENCIA O SE ENTREGUE TARJETA NUEVA
+
+******************************************************************
+ LECTURAS DE TARJETA  (LOG DE CADA USO DE LA TARJETA)
+******************************************************************
+
+GET  http://localhost:8000/api/tarjeta-lecturas
+     // TRAE TODOS LOS REGISTROS DE LECTURAS REALIZADAS EN EL SISTEMA
+       ESTA SE DEBE USAR PARA VER EL HISTORIAL COMPLETO DE USO DE LAS TARJETAS
+
+GET  http://localhost:8000/api/tarjeta-lecturas?tarjeta_id=1
+     // TRAE LAS LECTURAS DE LA TARJETA CON ID 1
+       ESTA SE DEBE USAR PARA AUDITAR TODOS LOS USOS DE UNA TARJETA CONCRETA
+
+GET  http://localhost:8000/api/tarjeta-lecturas?uid_leido=A1B2C3D4
+     // TRAE LAS LECTURAS DONDE SE LEYO ESE UID ESPECIFICO
+       ESTA SE DEBE USAR PARA RASTREAR EL USO DE UN CHIP EN CONCRETO
+
+GET  http://localhost:8000/api/tarjeta-lecturas?modulo=cafeteria
+     // TRAE LAS LECTURAS OCURRIDAS EN LA CAFETERIA
+       ESTA SE DEBE USAR PARA VER CUANTAS VECES SE USO LA TARJETA EN CAFETERIA
+       VALORES POSIBLES: cafeteria, copias, souvenirs, biblioteca, acceso, otro
+
+GET  http://localhost:8000/api/tarjeta-lecturas?modulo=copias
+     // TRAE LAS LECTURAS EN EL MODULO DE COPIAS/IMPRESIONES
+
+GET  http://localhost:8000/api/tarjeta-lecturas?modulo=biblioteca
+     // TRAE LAS LECTURAS EN EL MODULO DE BIBLIOTECA
+
+GET  http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=consumo
+     // TRAE SOLO LAS LECTURAS DE TIPO CONSUMO (CUANDO SE COBRO ALGO)
+       VALORES POSIBLES: acceso, consumo, consulta_saldo, confirmacion_entrega
+
+GET  http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=confirmacion_entrega
+     // TRAE LAS LECTURAS USADAS PARA CONFIRMAR ENTREGA DE UN PEDIDO
+       ESTA SE DEBE USAR DESDE EL MODULO 4.5 PARA LIGAR LECTURA CON ENTREGA
+
+GET  http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=consulta_saldo
+     // TRAE LAS LECTURAS DONDE EL USUARIO CONSULTO SU SALDO CON LA TARJETA
+
+GET  http://localhost:8000/api/tarjeta-lecturas?exito=true
+     // TRAE SOLO LAS LECTURAS EXITOSAS
+       ESTA SE DEBE USAR PARA VER ACCESOS Y CONSUMOS QUE SI PROCEDIERON
+
+GET  http://localhost:8000/api/tarjeta-lecturas?exito=false
+     // TRAE SOLO LAS LECTURAS FALLIDAS (TARJETA BLOQUEADA, UID NO RECONOCIDO, ETC.)
+       ESTA SE DEBE USAR PARA DETECTAR INTENTOS CON TARJETAS INVALIDAS O BLOQUEADAS
+
+GET  http://localhost:8000/api/tarjeta-lecturas?pedido_id=5
+     // TRAE LAS LECTURAS ASOCIADAS AL PEDIDO CON ID 5
+       ESTA SE DEBE USAR DESDE EL MODULO 4.5 PARA VER LA CONFIRMACION DE ENTREGA DE UN PEDIDO
+
+GET  http://localhost:8000/api/tarjeta-lecturas?operador_id=2
+     // TRAE LAS LECTURAS REGISTRADAS POR EL OPERADOR CON ID 2
+       ESTA SE DEBE USAR PARA EL MODULO 4.9 DE PROVEEDORES
+
+GET  http://localhost:8000/api/tarjeta-lecturas?desde=2026-02-01&hasta=2026-02-28
+     // TRAE LAS LECTURAS EN UN RANGO DE FECHAS
+       ESTA SE DEBE USAR PARA REPORTES DE ACTIVIDAD POR PERIODO
+
+GET  http://localhost:8000/api/tarjeta-lecturas?per_page=10
+     // TRAE 10 LECTURAS POR PAGINA
+       ESTA SE DEBE USAR CUANDO QUIERAS CONTROLAR EL TAMANO DE LA RESPUESTA
+
+GET  http://localhost:8000/api/tarjeta-lecturas/1
+     // TRAE EL DETALLE DE LA LECTURA CON ID 1 CON TODO SU CONTEXTO
+
+POST http://localhost:8000/api/tarjeta-lecturas
+     // REGISTRA UNA NUEVA LECTURA (LO LLAMA EL LECTOR FISICO O LA SIMULACION)
+       AUTOMATICAMENTE BUSCA LA TARJETA POR UID Y DETERMINA SI FUE EXITOSA
+       ESTA SE DEBE USAR CADA VEZ QUE EL HARDWARE O SIMULADOR DETECTE UNA TARJETA
+       REQUIERE BODY JSON: { uid_leido, modulo, tipo_lectura, exito, detalle, operador_usuario_id, pedido_id }
+
+******************************************************************
+ SALDO MONEDERO  (MODULO 4.2 - SALDO DIGITAL)
+******************************************************************
+
+GET  http://localhost:8000/api/saldo-monederos
+     // TRAE TODOS LOS MONEDEROS REGISTRADOS EN EL SISTEMA
+       ESTA SE DEBE USAR PARA EL DASHBOARD GENERAL DE SALDOS
+
+GET  http://localhost:8000/api/saldo-monederos?usuario_id=1
+     // TRAE EL MONEDERO DEL USUARIO CON ID 1
+       ESTA SE DEBE USAR PARA FILTRAR EL MONEDERO DE UN USUARIO ESPECIFICO
+
+GET  http://localhost:8000/api/saldo-monederos/usuario/1
+     // CONSULTA DIRECTA DEL SALDO DEL USUARIO CON ID 1
+       ESTA ES LA RUTA PRINCIPAL PARA SABER EL SALDO DE UN USUARIO
+       ESTA SE DEBE USAR DESDE CUALQUIER MODULO QUE NECESITE VERIFICAR SALDO ANTES DE COBRAR
+
+GET  http://localhost:8000/api/saldo-monederos/usuario/4
+     // CONSULTA DIRECTA DEL SALDO DEL USUARIO CON ID 4
+
+GET  http://localhost:8000/api/saldo-monederos/1
+     // TRAE EL DETALLE DEL MONEDERO CON ID INTERNO 1
+       INCLUYE SALDO DISPONIBLE Y SALDO RETENIDO
+
+POST http://localhost:8000/api/saldo-monederos
+     // CREA UN MONEDERO NUEVO PARA UN USUARIO
+       ESTA SE DEBE USAR CUANDO SE REGISTRE UN USUARIO NUEVO QUE AUN NO TIENE MONEDERO
+       REQUIERE BODY JSON: { usuario_id }
+
+******************************************************************
+ SALDO MOVIMIENTOS  (ABONOS Y CARGOS AL MONEDERO)
+******************************************************************
+
+GET  http://localhost:8000/api/saldo-movimientos
+     // TRAE TODOS LOS MOVIMIENTOS DE SALDO DEL SISTEMA
+       ESTA SE DEBE USAR PARA VER EL HISTORIAL COMPLETO DE ABONOS Y CARGOS
+
+GET  http://localhost:8000/api/saldo-movimientos?usuario_id=1
+     // TRAE TODOS LOS MOVIMIENTOS DEL USUARIO CON ID 1 (ESTADO DE CUENTA)
+       ESTA SE DEBE USAR PARA MOSTRAR EL ESTADO DE CUENTA DE UN USUARIO
+
+GET  http://localhost:8000/api/saldo-movimientos?usuario_id=4
+     // TRAE TODOS LOS MOVIMIENTOS DEL USUARIO CON ID 4
+
+GET  http://localhost:8000/api/saldo-movimientos?tipo=abono
+     // TRAE SOLO LOS ABONOS (RECARGAS DE SALDO)
+       ESTA SE DEBE USAR PARA EL MODULO 4.8 DE RECARGAS
+
+GET  http://localhost:8000/api/saldo-movimientos?tipo=cargo
+     // TRAE SOLO LOS CARGOS (CONSUMOS DESCONTADOS DEL SALDO)
+       ESTA SE DEBE USAR PARA VER TODOS LOS CONSUMOS REALIZADOS
+
+GET  http://localhost:8000/api/saldo-movimientos?modulo=cafeteria
+     // TRAE LOS MOVIMIENTOS ORIGINADOS EN LA CAFETERIA
+       ESTA SE DEBE USAR PARA REPORTES DE CONSUMO POR AREA
+       VALORES POSIBLES: cafeteria, copias, souvenirs, biblioteca, recarga, rfid, otro
+
+GET  http://localhost:8000/api/saldo-movimientos?modulo=copias
+     // TRAE LOS MOVIMIENTOS DEL MODULO DE COPIAS/IMPRESIONES
+
+GET  http://localhost:8000/api/saldo-movimientos?modulo=recarga
+     // TRAE SOLO LOS MOVIMIENTOS DE TIPO RECARGA DE SALDO
+
+GET  http://localhost:8000/api/saldo-movimientos?saldo_monedero_id=1
+     // TRAE LOS MOVIMIENTOS DEL MONEDERO CON ID 1
+       ESTA SE DEBE USAR CUANDO TENGAS EL ID DEL MONEDERO Y QUIERAS SU HISTORIAL
+
+GET  http://localhost:8000/api/saldo-movimientos?desde=2026-02-01&hasta=2026-02-28
+     // TRAE LOS MOVIMIENTOS EN UN RANGO DE FECHAS
+       ESTA SE DEBE USAR PARA REPORTES DE CONSUMO POR PERIODO
+
+GET  http://localhost:8000/api/saldo-movimientos?per_page=10
+     // TRAE 10 MOVIMIENTOS POR PAGINA
+       ESTA SE DEBE USAR CUANDO QUIERAS CONTROLAR EL TAMANO DE LA RESPUESTA
+
+GET  http://localhost:8000/api/saldo-movimientos/1
+     // TRAE EL DETALLE DEL MOVIMIENTO CON ID 1
+       INCLUYE MONTO, SALDO ANTES Y DESPUES, CONCEPTO Y MODULO
+
+POST http://localhost:8000/api/saldo-movimientos
+     // REGISTRA UN ABONO O CARGO AL MONEDERO DEL USUARIO
+       ACTUALIZA AUTOMATICAMENTE EL SALDO DISPONIBLE EN saldo_monedero
+       SI ES CARGO Y NO HAY SALDO SUFICIENTE, DEVUELVE ERROR 422
+       ESTA SE DEBE USAR DESDE CUALQUIER MODULO QUE COBRE O RECARGUE SALDO
+       REQUIERE BODY JSON: { usuario_id, tipo, monto, modulo, concepto, operador_usuario_id, tarjeta_lectura_id, referencia_tabla, referencia_id }
+
+******************************************************************
+ PEDIDOS  (MODULO 4.5 - PEDIDOS Y SEGUIMIENTO)
+******************************************************************
+
+GET  http://localhost:8000/api/pedidos
+     // TRAE TODOS LOS PEDIDOS DEL SISTEMA
+       ESTA SE DEBE USAR PARA EL DASHBOARD GENERAL DE PEDIDOS
+
+GET  http://localhost:8000/api/pedidos?usuario_id=1
+     // TRAE TODOS LOS PEDIDOS DEL USUARIO CON ID 1
+       ESTA SE DEBE USAR CUANDO EL USUARIO CONSULTE SU HISTORIAL DE PEDIDOS
+
+GET  http://localhost:8000/api/pedidos?usuario_id=4
+     // TRAE TODOS LOS PEDIDOS DEL USUARIO CON ID 4
+
+GET  http://localhost:8000/api/pedidos?estado=creado
+     // TRAE SOLO LOS PEDIDOS RECIEN CREADOS (ESPERANDO SER ACEPTADOS)
+       ESTA SE DEBE USAR EN EL PANEL DEL PROVEEDOR PARA VER PEDIDOS NUEVOS ENTRANTES
+       ESTADOS POSIBLES: creado, aceptado, en_proceso, listo, entregado, cancelado
+
+GET  http://localhost:8000/api/pedidos?estado=aceptado
+     // TRAE LOS PEDIDOS QUE EL PROVEEDOR YA ACEPTO
+
+GET  http://localhost:8000/api/pedidos?estado=en_proceso
+     // TRAE LOS PEDIDOS QUE ESTAN SIENDO PREPARADOS
+
+GET  http://localhost:8000/api/pedidos?estado=listo
+     // TRAE LOS PEDIDOS LISTOS PARA ENTREGAR
+       ESTA SE DEBE USAR PARA NOTIFICAR AL USUARIO QUE SU PEDIDO ESTA LISTO
+
+GET  http://localhost:8000/api/pedidos?estado=entregado
+     // TRAE LOS PEDIDOS YA ENTREGADOS
+       ESTA SE DEBE USAR PARA REPORTES DE PEDIDOS COMPLETADOS
+
+GET  http://localhost:8000/api/pedidos?estado=cancelado
+     // TRAE LOS PEDIDOS CANCELADOS
+       ESTA SE DEBE USAR PARA REPORTES Y ANALISIS DE CANCELACIONES
+
+GET  http://localhost:8000/api/pedidos?modulo=cafeteria
+     // TRAE SOLO LOS PEDIDOS DE LA CAFETERIA
+       ESTA SE DEBE USAR EN EL PANEL DEL MODULO 4.9 PARA FILTRAR POR AREA
+       VALORES POSIBLES: cafeteria, copias, souvenirs, biblioteca, otro
+
+GET  http://localhost:8000/api/pedidos?modulo=copias
+     // TRAE SOLO LOS PEDIDOS DEL MODULO DE COPIAS/IMPRESIONES
+
+GET  http://localhost:8000/api/pedidos?operador_id=2
+     // TRAE LOS PEDIDOS ATENDIDOS POR EL OPERADOR CON ID 2
+       ESTA SE DEBE USAR PARA REPORTES DE RENDIMIENTO POR OPERADOR EN EL MODULO 4.9
+
+GET  http://localhost:8000/api/pedidos?folio=F-ABC
+     // BUSCA UN PEDIDO POR SU NUMERO DE FOLIO (BUSQUEDA PARCIAL)
+       ESTA SE DEBE USAR CUANDO EL USUARIO O PROVEEDOR BUSQUE UN PEDIDO POR FOLIO
+
+GET  http://localhost:8000/api/pedidos?desde=2026-02-01&hasta=2026-02-28
+     // TRAE LOS PEDIDOS EN UN RANGO DE FECHAS
+       ESTA SE DEBE USAR PARA REPORTES DE PEDIDOS POR PERIODO
+
+GET  http://localhost:8000/api/pedidos?per_page=5
+     // TRAE 5 PEDIDOS POR PAGINA
+       ESTA SE DEBE USAR CUANDO QUIERAS CONTROLAR EL TAMANO DE LA RESPUESTA
+
+GET  http://localhost:8000/api/pedidos/1
+     // TRAE EL DETALLE COMPLETO DEL PEDIDO CON ID 1
+       INCLUYE USUARIO, OPERADOR, LECTURA DE TARJETA Y MOVIMIENTO DE SALDO ASOCIADO
+
+POST http://localhost:8000/api/pedidos
+     // CREA UN PEDIDO NUEVO EN ESTADO "creado"
+       GENERA AUTOMATICAMENTE EL NUMERO DE FOLIO UNICO
+       ESTA SE DEBE USAR DESDE EL MODULO 4.4 (CHECKOUT) CUANDO EL USUARIO CONFIRME SU COMPRA
+       REQUIERE BODY JSON: { usuario_id, modulo, total, descripcion, notas }
+
+PUT  http://localhost:8000/api/pedidos/1
+     // ACTUALIZA NOTAS, DESCRIPCION O TOTAL DEL PEDIDO CON ID 1
+       ESTA SE DEBE USAR PARA CORRECCIONES ANTES DE QUE SEA ACEPTADO
+
+DELETE http://localhost:8000/api/pedidos/1
+     // ELIMINA (SOFT DELETE) EL PEDIDO CON ID 1
+       ESTA SE DEBE USAR SOLO PARA ELIMINAR PEDIDOS CREADOS POR ERROR
+
+POST http://localhost:8000/api/pedidos/1/estado
+     // CAMBIA EL ESTADO DEL PEDIDO CON ID 1
+       ESTA SE DEBE USAR EN EL PANEL DEL PROVEEDOR (MODULO 4.9) PARA AVANZAR EL PEDIDO
+       FLUJO NORMAL: creado → aceptado → en_proceso → listo → entregado
+       REQUIERE BODY JSON: { estado, operador_usuario_id }
+
+POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
+     // CONFIRMA LA ENTREGA DEL PEDIDO CON ID 1 USANDO LA TARJETA RFID/NFC DEL USUARIO
+       CAMBIA EL ESTADO A "entregado" Y REGISTRA LA LECTURA DE TARJETA
+       ESTA SE DEBE USAR DESDE EL MODULO 4.10 CUANDO EL LECTOR CONFIRME LA ENTREGA
+       REQUIERE BODY JSON: { tarjeta_lectura_id }
+
+******************************************************************
  BODIES JSON PARA POST / PUT (COMO PODER UTILIZAR LOS DIFERENTES URL)
 ******************************************************************
 
@@ -420,4 +732,88 @@ GET  http://localhost:8000/api/bitacora/actividad/10
     "fecha_nacimiento": "1995-06-15",
     "genero": "masculino",
     "direccion": "Calle Falsa 123"
+}
+
+── POST /api/tarjetas ──────────────────────────────────────────
+{
+    "usuario_id": 4,
+    "uid": "A1B2C3D4E5F6",
+    "estado": "activa",
+    "registrado_por_usuario_id": 1
+}
+
+── PUT /api/tarjetas/{id} ──────────────────────────────────────
+{
+    "estado": "perdida",
+    "motivo_bloqueo": "El usuario reporto que no encuentra su tarjeta"
+}
+
+── POST /api/tarjetas/{id}/bloquear ────────────────────────────
+{
+    "motivo_bloqueo": "Tarjeta reportada como robada",
+    "bloqueado_por_usuario_id": 1
+}
+
+── POST /api/tarjeta-lecturas ──────────────────────────────────
+{
+    "uid_leido": "A1B2C3D4E5F6",
+    "modulo": "cafeteria",
+    "tipo_lectura": "consumo",
+    "exito": true,
+    "detalle": "Lectura en caja 1",
+    "operador_usuario_id": 2
+}
+
+── POST /api/saldo-monederos ───────────────────────────────────
+{
+    "usuario_id": 4
+}
+
+── POST /api/saldo-movimientos — ABONO (recarga de saldo) ──────
+{
+    "usuario_id": 4,
+    "tipo": "abono",
+    "monto": 100.00,
+    "modulo": "recarga",
+    "concepto": "Recarga de saldo en ventanilla",
+    "operador_usuario_id": 1
+}
+
+── POST /api/saldo-movimientos — CARGO (consumo) ───────────────
+{
+    "usuario_id": 4,
+    "tipo": "cargo",
+    "monto": 35.50,
+    "modulo": "cafeteria",
+    "concepto": "Comida del dia",
+    "operador_usuario_id": 2,
+    "tarjeta_lectura_id": 1,
+    "referencia_tabla": "pedido",
+    "referencia_id": 5
+}
+
+── POST /api/pedidos ───────────────────────────────────────────
+{
+    "usuario_id": 4,
+    "modulo": "cafeteria",
+    "total": 35.50,
+    "descripcion": "Comida del dia: arroz, pollo y agua",
+    "notas": "Sin chile"
+}
+
+── PUT /api/pedidos/{id} ───────────────────────────────────────
+{
+    "notas": "Sin chile y sin sal",
+    "descripcion": "Comida del dia actualizada"
+}
+
+── POST /api/pedidos/{id}/estado ───────────────────────────────
+{
+    "estado": "aceptado",
+    "operador_usuario_id": 2
+}
+
+── POST /api/pedidos/{id}/confirmar-tarjeta ────────────────────
+{
+    "tarjeta_lectura_id": 5
 }

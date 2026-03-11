@@ -122,6 +122,107 @@ GET     http://localhost:8000/api/bitacora/actividad/5
 GET     http://localhost:8000/api/bitacora/actividad/10
 
 ******************************************************************
+ TARJETAS UNIVERSITARIAS
+******************************************************************
+GET     http://localhost:8000/api/tarjetas
+GET     http://localhost:8000/api/tarjetas?estado=activa
+GET     http://localhost:8000/api/tarjetas?estado=bloqueada
+GET     http://localhost:8000/api/tarjetas?estado=perdida
+GET     http://localhost:8000/api/tarjetas?estado=cancelada
+GET     http://localhost:8000/api/tarjetas?usuario_id=1
+GET     http://localhost:8000/api/tarjetas?usuario_id=4
+GET     http://localhost:8000/api/tarjetas/uid/A1B2C3D4E5F6
+GET     http://localhost:8000/api/tarjetas/1
+GET     http://localhost:8000/api/tarjetas/2
+POST    http://localhost:8000/api/tarjetas
+PUT     http://localhost:8000/api/tarjetas/1
+DELETE  http://localhost:8000/api/tarjetas/1
+POST    http://localhost:8000/api/tarjetas/1/bloquear
+POST    http://localhost:8000/api/tarjetas/1/desbloquear
+
+******************************************************************
+ LECTURAS DE TARJETA
+******************************************************************
+GET     http://localhost:8000/api/tarjeta-lecturas
+GET     http://localhost:8000/api/tarjeta-lecturas?tarjeta_id=1
+GET     http://localhost:8000/api/tarjeta-lecturas?uid_leido=A1B2C3D4E5F6
+GET     http://localhost:8000/api/tarjeta-lecturas?modulo=cafeteria
+GET     http://localhost:8000/api/tarjeta-lecturas?modulo=copias
+GET     http://localhost:8000/api/tarjeta-lecturas?modulo=biblioteca
+GET     http://localhost:8000/api/tarjeta-lecturas?modulo=souvenirs
+GET     http://localhost:8000/api/tarjeta-lecturas?modulo=acceso
+GET     http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=acceso
+GET     http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=consumo
+GET     http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=consulta_saldo
+GET     http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=confirmacion_entrega
+GET     http://localhost:8000/api/tarjeta-lecturas?exito=true
+GET     http://localhost:8000/api/tarjeta-lecturas?exito=false
+GET     http://localhost:8000/api/tarjeta-lecturas?pedido_id=1
+GET     http://localhost:8000/api/tarjeta-lecturas?operador_id=2
+GET     http://localhost:8000/api/tarjeta-lecturas?desde=2026-02-01&hasta=2026-02-28
+GET     http://localhost:8000/api/tarjeta-lecturas?per_page=10
+GET     http://localhost:8000/api/tarjeta-lecturas/1
+GET     http://localhost:8000/api/tarjeta-lecturas/2
+POST    http://localhost:8000/api/tarjeta-lecturas
+
+******************************************************************
+ SALDO MONEDERO
+******************************************************************
+GET     http://localhost:8000/api/saldo-monederos
+GET     http://localhost:8000/api/saldo-monederos?usuario_id=1
+GET     http://localhost:8000/api/saldo-monederos/usuario/1
+GET     http://localhost:8000/api/saldo-monederos/usuario/4
+GET     http://localhost:8000/api/saldo-monederos/1
+GET     http://localhost:8000/api/saldo-monederos/2
+POST    http://localhost:8000/api/saldo-monederos
+
+******************************************************************
+ SALDO MOVIMIENTOS
+******************************************************************
+GET     http://localhost:8000/api/saldo-movimientos
+GET     http://localhost:8000/api/saldo-movimientos?usuario_id=1
+GET     http://localhost:8000/api/saldo-movimientos?usuario_id=4
+GET     http://localhost:8000/api/saldo-movimientos?tipo=abono
+GET     http://localhost:8000/api/saldo-movimientos?tipo=cargo
+GET     http://localhost:8000/api/saldo-movimientos?modulo=cafeteria
+GET     http://localhost:8000/api/saldo-movimientos?modulo=copias
+GET     http://localhost:8000/api/saldo-movimientos?modulo=souvenirs
+GET     http://localhost:8000/api/saldo-movimientos?modulo=recarga
+GET     http://localhost:8000/api/saldo-movimientos?saldo_monedero_id=1
+GET     http://localhost:8000/api/saldo-movimientos?desde=2026-02-01&hasta=2026-02-28
+GET     http://localhost:8000/api/saldo-movimientos?per_page=10
+GET     http://localhost:8000/api/saldo-movimientos/1
+GET     http://localhost:8000/api/saldo-movimientos/2
+POST    http://localhost:8000/api/saldo-movimientos
+
+******************************************************************
+ PEDIDOS
+******************************************************************
+GET     http://localhost:8000/api/pedidos
+GET     http://localhost:8000/api/pedidos?usuario_id=1
+GET     http://localhost:8000/api/pedidos?usuario_id=4
+GET     http://localhost:8000/api/pedidos?estado=creado
+GET     http://localhost:8000/api/pedidos?estado=aceptado
+GET     http://localhost:8000/api/pedidos?estado=en_proceso
+GET     http://localhost:8000/api/pedidos?estado=listo
+GET     http://localhost:8000/api/pedidos?estado=entregado
+GET     http://localhost:8000/api/pedidos?estado=cancelado
+GET     http://localhost:8000/api/pedidos?modulo=cafeteria
+GET     http://localhost:8000/api/pedidos?modulo=copias
+GET     http://localhost:8000/api/pedidos?modulo=souvenirs
+GET     http://localhost:8000/api/pedidos?operador_id=2
+GET     http://localhost:8000/api/pedidos?folio=F-ABC
+GET     http://localhost:8000/api/pedidos?desde=2026-02-01&hasta=2026-02-28
+GET     http://localhost:8000/api/pedidos?per_page=5
+GET     http://localhost:8000/api/pedidos/1
+GET     http://localhost:8000/api/pedidos/2
+POST    http://localhost:8000/api/pedidos
+PUT     http://localhost:8000/api/pedidos/1
+DELETE  http://localhost:8000/api/pedidos/1
+POST    http://localhost:8000/api/pedidos/1/estado
+POST    http://localhost:8000/api/pedidos/1/confirmar-tarjeta
+
+******************************************************************
  BODIES JSON PARA POST / PUT
 ******************************************************************
 
@@ -177,4 +278,88 @@ GET     http://localhost:8000/api/bitacora/actividad/10
     "fecha_nacimiento": "1995-06-15",
     "genero": "masculino",
     "direccion": "Calle Falsa 123"
+}
+
+── POST /api/tarjetas ──────────────────────
+{
+    "usuario_id": 4,
+    "uid": "A1B2C3D4E5F6",
+    "estado": "activa",
+    "registrado_por_usuario_id": 1
+}
+
+── PUT /api/tarjetas/{id} ──────────────────
+{
+    "estado": "perdida",
+    "motivo_bloqueo": "El usuario reporto que no encuentra su tarjeta"
+}
+
+── POST /api/tarjetas/{id}/bloquear ────────
+{
+    "motivo_bloqueo": "Tarjeta reportada como robada",
+    "bloqueado_por_usuario_id": 1
+}
+
+── POST /api/tarjeta-lecturas ──────────────
+{
+    "uid_leido": "A1B2C3D4E5F6",
+    "modulo": "cafeteria",
+    "tipo_lectura": "consumo",
+    "exito": true,
+    "detalle": "Lectura en caja 1",
+    "operador_usuario_id": 2
+}
+
+── POST /api/saldo-monederos ───────────────
+{
+    "usuario_id": 4
+}
+
+── POST /api/saldo-movimientos (abono) ─────
+{
+    "usuario_id": 4,
+    "tipo": "abono",
+    "monto": 100.00,
+    "modulo": "recarga",
+    "concepto": "Recarga de saldo en ventanilla",
+    "operador_usuario_id": 1
+}
+
+── POST /api/saldo-movimientos (cargo) ─────
+{
+    "usuario_id": 4,
+    "tipo": "cargo",
+    "monto": 35.50,
+    "modulo": "cafeteria",
+    "concepto": "Comida del dia",
+    "operador_usuario_id": 2,
+    "tarjeta_lectura_id": 1,
+    "referencia_tabla": "pedido",
+    "referencia_id": 5
+}
+
+── POST /api/pedidos ───────────────────────
+{
+    "usuario_id": 4,
+    "modulo": "cafeteria",
+    "total": 35.50,
+    "descripcion": "Comida del dia: arroz, pollo y agua",
+    "notas": "Sin chile"
+}
+
+── PUT /api/pedidos/{id} ───────────────────
+{
+    "notas": "Sin chile y sin sal",
+    "descripcion": "Comida del dia actualizada"
+}
+
+── POST /api/pedidos/{id}/estado ───────────
+{
+    "estado": "aceptado",
+    "operador_usuario_id": 2
+}
+
+── POST /api/pedidos/{id}/confirmar-tarjeta
+{
+    "tarjeta_lectura_id": 5
 }
