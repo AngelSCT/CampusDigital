@@ -168,6 +168,11 @@ php artisan migrate:fresh --seed
 php artisan serve --host=0.0.0.0 --port=8000 
 npm run dev -- --host 
 
+AJUSTES DENTRO DE CHROME (OPCIONAL) PARA LA CONFIGURACION DE LA CAMARA DEL SIMULADIOR DE TARJETA 
+chrome://flags/#unsafely-treat-insecure-origin-as-secure
+http://192.168.1.20:8001
+---> DARLE EN HABILITAR Y DESPUES EN RELOAD
+
 NOTA:LA CARPETA DESDE LA QUE SE TIENE QUE HACER CAMBIOS PARA 
     SUBIR CAMBIOS O BAJAR CAMBIOS DE GIT ES LA RAIZ CampusDigital
 

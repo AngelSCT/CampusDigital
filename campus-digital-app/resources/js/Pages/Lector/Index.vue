@@ -114,6 +114,27 @@
                                 </svg>
                                 {{ procesando ? 'Procesando...' : 'Procesar Lectura' }}
                             </button>
+
+
+                            <!-- QR para el simulador móvil -->
+                            <div class="flex flex-col items-center gap-3 pt-2 border-t border-slate-700/50">
+                                <p class="text-xs text-slate-500 uppercase tracking-wider font-medium">
+                                    Escanea con la app móvil para simular
+                                </p>
+                                <div class="p-3 bg-slate-900 rounded-xl border border-cyan-500/20 shadow-inner">
+                                    <canvas ref="canvasQr"></canvas>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-slate-500">Código:</span>
+                                    <code class="text-xs font-mono text-cyan-400 bg-slate-800 px-2 py-0.5 rounded tracking-widest">
+                                        {{ codigoLector }}
+                                    </code>
+                                </div>
+                                <p class="text-xs text-slate-600 text-center">
+                                    Al escanear este QR, la app enviará el UID de la tarjeta activa automáticamente
+                                </p>
+                            </div>
+
                         </div>
                     </div>
 
@@ -261,9 +282,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
+import QRCode from 'qrcode';
 
 const props = defineProps({
     lecturasRecientes: { type: Array,  default: () => [] },
@@ -281,6 +303,22 @@ const resultado          = ref(props.scan_result ?? null);
 const pedidoSeleccionado = ref(null);
 const cobrarDeSaldo      = ref(false);
 const uidRef             = ref(null);
+const canvasQr     = ref(null);
+const codigoLector = ref('LECTOR01'); //*********CODIGO DEL LECTOR************
+
+// ← Agregar esto: regenerar QR si el canvas se remonta
+watch(canvasQr, async (nuevoCanvas) => {
+    if (nuevoCanvas) {
+        await QRCode.toCanvas(nuevoCanvas, codigoLector.value, {
+            width:  160,
+            margin: 2,
+            color: {
+                dark:  '#e2e8f0',
+                light: '#0f172a',
+            },
+        });
+    }
+});
 
 const lecturas = computed(() => props.lecturasRecientes ?? []);
 
@@ -311,10 +349,22 @@ async function verificarUidMovil() {
     }
 }
 
-onMounted(() => {
+onMounted(async () => {
     uidRef.value?.focus();
-    // Polling cada 1.5 segundos
     intervaloPolling = setInterval(verificarUidMovil, 1500);
+
+    // ← Agregar esto
+    await nextTick();
+    if (canvasQr.value) {
+        await QRCode.toCanvas(canvasQr.value, codigoLector.value, {
+            width:            160,
+            margin:           2,
+            color: {
+                dark:  '#e2e8f0',
+                light: '#0f172a',
+            },
+        });
+    }
 });
 
 onUnmounted(() => {
