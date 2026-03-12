@@ -116,24 +116,34 @@
                             </button>
 
 
-                            <!-- QR para el simulador móvil -->
-                            <div class="flex flex-col items-center gap-3 pt-2 border-t border-slate-700/50">
-                                <p class="text-xs text-slate-500 uppercase tracking-wider font-medium">
-                                    Escanea con la app móvil para simular
-                                </p>
-                                <div class="p-3 bg-slate-900 rounded-xl border border-cyan-500/20 shadow-inner">
-                                    <canvas ref="canvasQr"></canvas>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs text-slate-500">Código:</span>
-                                    <code class="text-xs font-mono text-cyan-400 bg-slate-800 px-2 py-0.5 rounded tracking-widest">
-                                        {{ codigoLector }}
-                                    </code>
-                                </div>
-                                <p class="text-xs text-slate-600 text-center">
-                                    Al escanear este QR, la app enviará el UID de la tarjeta activa automáticamente
-                                </p>
+                        <!-- QR para el simulador móvil -->
+                        <div class="flex flex-col items-center gap-3 pt-2 border-t border-slate-700/50">
+                            <p class="text-xs text-slate-500 uppercase tracking-wider font-medium">
+                                Escanea con la app móvil para simular
+                            </p>
+                            <div class="p-3 bg-slate-900 rounded-xl border border-cyan-500/20 shadow-inner">
+                                <canvas ref="canvasQr"></canvas>
                             </div>
+
+                            <!-- Input editable del código -->
+                            <div class="flex items-center gap-2 w-full max-w-xs">
+                                <span class="text-xs text-slate-500 whitespace-nowrap">Código:</span>
+                                <input
+                                    v-model="codigoLector"
+                                    type="text"
+                                    maxlength="32"
+                                    spellcheck="false"
+                                    autocomplete="off"
+                                    placeholder="Ej: LECTOR01"
+                                    @input="codigoLector = codigoLector.toUpperCase()"
+                                    class="flex-1 rounded-lg bg-slate-800 border border-slate-600 text-cyan-400 placeholder-slate-600 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20 text-xs px-3 py-1.5 font-mono tracking-widest text-center uppercase transition-all duration-200"
+                                />
+                            </div>
+
+                            <p class="text-xs text-slate-600 text-center">
+                                Al escanear este QR, la app enviará el UID de la tarjeta activa automáticamente
+                            </p>
+                        </div>
 
                         </div>
                     </div>
@@ -304,11 +314,23 @@ const pedidoSeleccionado = ref(null);
 const cobrarDeSaldo      = ref(false);
 const uidRef             = ref(null);
 const canvasQr     = ref(null);
-const codigoLector = ref('LECTOR01'); //*********CODIGO DEL LECTOR************
+const codigoLector = ref(localStorage.getItem('lector_codigo') ?? 'LECTOR01ADD09'); //*********CODIGO DEL LECTOR************
 
 // ← Agregar esto: regenerar QR si el canvas se remonta
+watch(codigoLector, async (nuevoCodigo) => {
+    localStorage.setItem('lector_codigo', nuevoCodigo);  // ← persiste
+    if (canvasQr.value && nuevoCodigo.trim()) {
+        await QRCode.toCanvas(canvasQr.value, nuevoCodigo, {
+            width:  160,
+            margin: 2,
+            color: { dark: '#e2e8f0', light: '#0f172a' },
+        });
+    }
+});
+
+// Este se mantiene igual para cuando se remonta el canvas
 watch(canvasQr, async (nuevoCanvas) => {
-    if (nuevoCanvas) {
+    if (nuevoCanvas && codigoLector.value.trim()) {
         await QRCode.toCanvas(nuevoCanvas, codigoLector.value, {
             width:  160,
             margin: 2,
