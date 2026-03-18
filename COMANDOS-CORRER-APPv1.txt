@@ -160,6 +160,13 @@ git commit -m "TEST COMMIT"
 git push origin main 
 
 
+//SETEAR REPOSITORIO
+git remote set-url origin https://github.com/usuario/nuevo-repo.git
+
+//SUBIR CAMBIOS A UNA RAMA ESPECIFICA
+git push origin main:feature/otra-rama
+
+//EXTRA
 git fetch --all
 
 
