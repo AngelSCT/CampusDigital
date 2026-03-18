@@ -25,6 +25,7 @@ window.route = (name, params) => {
         'perfil.photo.delete': '/perfil/foto',
         'user-password.update': '/user/password',
         'admin.usuarios.index': '/admin/usuarios',
+        'admin.usuarios.show': '/admin/usuarios/:id',
         'admin.usuarios.create': '/admin/usuarios/create',
         'admin.usuarios.store': '/admin/usuarios',
         'admin.usuarios.edit': '/admin/usuarios/:id/edit',
@@ -98,6 +99,9 @@ window.route = (name, params) => {
         'mi-tarjeta.pin.store' : '/mi-tarjeta/pin',
         'mi-tarjeta.escanear': '/mi-tarjeta/escanear',
         'mi-tarjeta.pin': '/mi-tarjeta/pin',
+
+        //RUTA DE ERROR DE PERMISO POR MIDDLEWARE
+        'sin-permiso': '/sin-permiso',
     };
     
     let url = routes[name] || '/';

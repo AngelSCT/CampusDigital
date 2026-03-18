@@ -430,4 +430,34 @@ public function exportByRolePdf(Request $request)
 
     return $pdf->download('usuarios_por_rol_' . now()->format('Y-m-d_His') . '.pdf');
 }
+
+
+public function show(Usuario $usuario)
+{
+    $usuario->load(['roles', 'tarjeta']);
+ 
+    return inertia('Admin/Usuarios/Show', [
+        'usuario' => [
+            'id'               => $usuario->id,
+            'nombre'           => $usuario->nombre,
+            'apellido'         => $usuario->apellido,
+            'email'            => $usuario->email,
+            'telefono'         => $usuario->telefono,
+            'foto_url'         => $usuario->foto_url,
+            'bloqueado'        => (bool) $usuario->bloqueado,
+            'email_verificado' => (bool) $usuario->email_verified_at,
+            'created_at'       => $usuario->created_at,
+            'updated_at'       => $usuario->updated_at,
+            'roles'            => $usuario->roles->map(fn($r) => [
+                'id'     => $r->id,
+                'nombre' => $r->nombre,
+            ]),
+            'tarjeta' => $usuario->tarjeta ? [
+                'uid'        => $usuario->tarjeta->uid,
+                'bloqueada'  => (bool) $usuario->tarjeta->bloqueada,
+                'created_at' => $usuario->tarjeta->created_at,
+            ] : null,
+        ],
+    ]);
+}
 }
