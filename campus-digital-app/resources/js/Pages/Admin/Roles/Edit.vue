@@ -172,7 +172,6 @@ function submit() {
 
     router.put(route('admin.roles.update', props.rol.id), form, {
         onSuccess: () => {
-            // Redirige automáticamente
         },
         onError: (err) => {
             errors.value = err;

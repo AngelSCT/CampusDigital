@@ -1,8 +1,6 @@
 <template>
     <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
 
-
-        <!-- Flash Messages -->
         <div v-if="$page.props.flash?.success" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
             <div class="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-l-4 border-green-500 rounded-lg p-4 backdrop-blur-sm shadow-lg shadow-green-500/10">
                 <div class="flex">
@@ -47,7 +45,6 @@
             </div>
         </div>
 
-        <!-- Page Content -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <slot />
         </main>

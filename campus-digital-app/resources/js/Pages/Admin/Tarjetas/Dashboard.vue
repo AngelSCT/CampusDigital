@@ -45,10 +45,9 @@
                 </div>
             </div>
 
-            <!-- Gráfica lecturas + Uso por módulo -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                <!-- Lecturas por día -->
+                <!-- Lecturas por dia -->
                 <div class="lg:col-span-2 bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-cyan-500/20 shadow-xl shadow-cyan-500/5 p-6">
                     <h2 class="text-base font-semibold text-white mb-4">Lecturas por Día (últimos 14 días)</h2>
                     <div class="flex items-end gap-1 h-32">
@@ -78,7 +77,7 @@
                     </div>
                 </div>
 
-                <!-- Uso por módulo -->
+                <!-- Uso por modulo -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-blue-500/20 shadow-xl shadow-blue-500/5 p-6">
                     <h2 class="text-base font-semibold text-white mb-4">Uso por Módulo (30 días)</h2>
                     <div v-if="lecturasPorModulo.length === 0" class="text-center py-6 text-slate-500 text-sm">Sin datos</div>
@@ -99,10 +98,8 @@
                 </div>
             </div>
 
-            <!-- Usuarios más activos + Tarjetas bloqueadas -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-                <!-- Usuarios más activos -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
                     <div class="px-6 py-4 border-b border-slate-700">
                         <h2 class="text-base font-semibold text-white">Usuarios Más Activos (30 días)</h2>
@@ -126,7 +123,6 @@
                     </div>
                 </div>
 
-                <!-- Tarjetas bloqueadas recientes -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-red-500/20 overflow-hidden">
                     <div class="px-6 py-4 border-b border-red-500/20 flex items-center justify-between">
                         <h2 class="text-base font-semibold text-white">Tarjetas Bloqueadas</h2>
@@ -135,7 +131,7 @@
                     </div>
                     <div class="divide-y divide-slate-700/50">
                         <div v-if="tarjetasBloqueadas.length === 0" class="px-6 py-8 text-center text-slate-500 text-sm">
-                            No hay tarjetas bloqueadas 🎉
+                            No hay tarjetas bloqueadas
                         </div>
                         <div v-for="t in tarjetasBloqueadas" :key="t.id"
                              class="flex items-center gap-3 px-6 py-3 hover:bg-slate-700/20 transition-colors duration-150">
@@ -156,7 +152,6 @@
                 </div>
             </div>
 
-            <!-- Lecturas recientes -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
                 <div class="px-6 py-4 border-b border-slate-700">
                     <h2 class="text-base font-semibold text-white">Lecturas Recientes</h2>

@@ -270,9 +270,9 @@ class RfidDemoSeeder extends Seeder
         $this->command->line("│ Lecturas totales:   {$totalLecturas}");
         $this->command->line('├─────────────────────────────────────────────────┤');
         $this->command->line('│  FLUJOS DEL LECTOR :                            │');
-        $this->command->line('│  1. Login con tarjeta → uid + PIN               │');
-        $this->command->line('│  2. Lector → consulta_saldo → ver $             │');
-        $this->command->line('│  3. Lector → confirmacion_entrega → PED-DEMO-*  │');
+        $this->command->line('│  1. Login con tarjeta - uid + PIN               │');
+        $this->command->line('│  2. Lector - consulta_saldo - ver $             │');
+        $this->command->line('│  3. Lector - confirmacion_entrega - PED-DEMO-*  │');
         $this->command->line('└─────────────────────────────────────────────────┘');
     }
 }

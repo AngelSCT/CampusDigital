@@ -43,7 +43,6 @@ class Pedido extends Model
     const ESTADOS = ['creado', 'aceptado', 'en_proceso', 'listo', 'entregado', 'cancelado'];
     const MODULOS  = ['cafeteria', 'copias', 'souvenirs', 'biblioteca', 'otro'];
 
-    /* ─── Relaciones ──────────────────────────────────────── */
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
@@ -64,7 +63,6 @@ class Pedido extends Model
         return $this->belongsTo(SaldoMovimiento::class, 'saldo_movimiento_id');
     }
 
-    /* ─── Helpers ─────────────────────────────────────────── */
     public function estaListo(): bool
     {
         return $this->estado === 'listo';

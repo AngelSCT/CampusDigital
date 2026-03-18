@@ -18,7 +18,6 @@
                 </a>
             </div>
 
-            <!-- Info del usuario (solo lectura) -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-4">
                 <p class="text-xs text-slate-400 mb-2 uppercase tracking-wider">Usuario asociado</p>
                 <div class="flex items-center gap-3">
@@ -35,7 +34,6 @@
                 </div>
             </div>
 
-            <!-- Formulario -->
             <form @submit.prevent="submit"
                   class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-cyan-500/10 rounded-xl border border-cyan-500/20 overflow-hidden">
                 <div class="p-6 space-y-6">
@@ -67,7 +65,7 @@
                     <!-- Advertencia si cambia UID -->
                     <div v-if="form.uid !== tarjeta.uid"
                          class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
-                        <p class="text-sm text-yellow-400">⚠️ Estás cambiando el UID. Asegúrate de que corresponde al chip físico correcto.</p>
+                        <p class="text-sm text-yellow-400">ADVERTENCIA!: Estás cambiando el UID. Asegúrate de que corresponde al chip físico correcto.</p>
                     </div>
 
 

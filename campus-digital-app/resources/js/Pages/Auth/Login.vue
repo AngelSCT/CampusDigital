@@ -3,15 +3,11 @@
 
         <div class="login-split">
 
-            <!-- ══════════════════════════════════════════════════
-                 LADO IZQUIERDO — Formulario
-            ══════════════════════════════════════════════════ -->
             <div class="split-left">
                 <div class="corner-tl"></div>
                 <div class="corner-br"></div>
                 <div class="form-container">
 
-                    <!-- Header completo — solo en tab correo -->
                     <div class="form-header" v-show="activeTab === 'password'">
                         <div class="brand">
                             <div class="brand-icon">
@@ -29,7 +25,6 @@
                         <p class="welcome-sub">Ingresa tus credenciales para continuar</p>
                     </div>
 
-                    <!-- Header compacto — solo en tab RFID -->
                     <div class="brand-compact" v-show="activeTab === 'rfid'">
                         <div class="brand-icon brand-icon-sm">
                             <i class="fas fa-graduation-cap"></i>
@@ -40,7 +35,6 @@
                         </span>
                     </div>
 
-                    <!-- Tabs -->
                     <div class="tabs">
                         <button
                             type="button"
@@ -60,7 +54,6 @@
                         </button>
                     </div>
 
-                    <!-- ─── TAB: EMAIL / PASSWORD ─────────────────────────── -->
                     <div v-show="activeTab === 'password'">
                         <form @submit.prevent="submit" class="login-form">
 
@@ -137,7 +130,6 @@
                         </form>
                     </div>
 
-                    <!-- ─── TAB: RFID ──────────────────────────────────────── -->
                     <div v-show="activeTab === 'rfid'">
                         <form @submit.prevent="submitRfid" class="login-form">
 
@@ -224,7 +216,6 @@
                         </form>
                     </div>
 
-                    <!-- Footer -->
                     <div class="form-footer">
                         <div class="divider"><span>o</span></div>
                         <p class="register-text">
@@ -236,9 +227,6 @@
                 </div>
             </div>
 
-            <!-- ══════════════════════════════════════════════════
-                 LADO DERECHO — Panel con imagen
-            ══════════════════════════════════════════════════ -->
             <div
                 class="split-right"
                 :class="{ 'has-bg-image': loginBg }"
@@ -288,7 +276,7 @@
 import { useForm, Link, router } from '@inertiajs/vue3';
 import { ref, reactive, onMounted } from 'vue';
 
-const loginBg = '/images/Campus.webp'; // ← cambia la ruta o pon null para degradado
+const loginBg = '/images/Campus.webp'; 
 
 const activeTab = ref('password');
 
@@ -352,9 +340,7 @@ onMounted(() => {});
 <style scoped>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* ══════════════════════════════════════════════════
-   LAYOUT PRINCIPAL
-══════════════════════════════════════════════════ */
+
 .login-wrapper {
     height: 100vh;
     overflow: hidden;
@@ -369,9 +355,6 @@ onMounted(() => {});
     overflow: hidden;
 }
 
-/* ══════════════════════════════════════════════════
-   LADO IZQUIERDO
-══════════════════════════════════════════════════ */
 .split-left {
     width: 45%;
     height: 100%;
@@ -384,7 +367,6 @@ onMounted(() => {});
     position: relative;
 }
 
-/* Esquina superior derecha — cuadrados apilados */
 .split-left::before {
     content: '';
     position: absolute;
@@ -402,7 +384,7 @@ onMounted(() => {});
         42px 42px 0 -6px rgba(168,85,247,0.22);
 }
 
-/* Esquina inferior izquierda — círculos */
+
 .split-left::after {
     content: '';
     position: absolute;
@@ -419,7 +401,7 @@ onMounted(() => {});
         44px -10px 0 -10px rgba(236,72,153,0.18);
 }
 
-/* Esquina superior izquierda — triángulo */
+
 .split-left .corner-tl {
     position: absolute;
     top: 14px; left: 14px;
@@ -432,7 +414,7 @@ onMounted(() => {});
             drop-shadow(22px 26px 0px rgba(168,85,247,0.1));
 }
 
-/* Esquina inferior derecha — diamante */
+
 .split-left .corner-br {
     position: absolute;
     bottom: 20px; right: 20px;
@@ -462,7 +444,6 @@ onMounted(() => {});
 
 .form-header { overflow: hidden; }
 
-/* Brand compacto — tab RFID */
 .brand-compact {
     display: flex;
     align-items: center;
@@ -479,7 +460,6 @@ onMounted(() => {});
 .brand-icon-sm i { font-size: 0.9rem; color: #fff; }
 .brand-compact-title { font-size: 1.05rem; font-weight: 800; line-height: 1; }
 
-/* Brand */
 .brand {
     display: flex;
     align-items: center;
@@ -500,7 +480,6 @@ onMounted(() => {});
 .brand-dark   { color: #1e293b; }
 .brand-sub    { font-size: 0.7rem; color: #94a3b8; letter-spacing: 0.5px; }
 
-/* Bienvenida */
 .welcome-title {
     font-size: 1.4rem; font-weight: 700;
     color: #1e293b; margin-bottom: 0.2rem;
@@ -509,7 +488,6 @@ onMounted(() => {});
     font-size: 0.8rem; color: #94a3b8; margin-bottom: 1.1rem;
 }
 
-/* Tabs */
 .tabs {
     display: flex;
     background: #f8fafc;
@@ -536,7 +514,6 @@ onMounted(() => {});
 .tab-inactive { background: transparent; color: #94a3b8; }
 .tab-inactive:hover { color: #64748b; background: #f1f5f9; }
 
-/* Formulario */
 .login-form { margin-bottom: 0.6rem; }
 .form-group { margin-bottom: 0.85rem; }
 
@@ -622,7 +599,6 @@ onMounted(() => {});
 }
 .btn-rfid:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* Alertas */
 .alert-error {
     display: flex; align-items: center; gap: 0.5rem;
     padding: 0.6rem 0.85rem;
@@ -641,7 +617,6 @@ onMounted(() => {});
 }
 .alert-success i { font-size: 0.9rem; flex-shrink: 0; }
 
-/* RFID */
 .rfid-illustration {
     position: relative; width: 70px; height: 70px;
     margin: 0 auto 0.6rem;
@@ -688,7 +663,6 @@ onMounted(() => {});
 }
 .uid-note i { color: #c4b5fd; font-size: 0.65rem; margin-top: 0.1rem; flex-shrink: 0; }
 
-/* Footer */
 .form-footer { padding-top: 0.75rem; border-top: 1px solid #f1f5f9; margin-top: 0.4rem; }
 .divider { text-align: center; position: relative; margin-bottom: 0.6rem; }
 .divider span {
@@ -706,9 +680,6 @@ onMounted(() => {});
 }
 .register-link:hover { color: #7c3aed; }
 
-/* ══════════════════════════════════════════════════
-   LADO DERECHO — Panel con imagen
-══════════════════════════════════════════════════ */
 .split-right {
     width: 55%;
     height: 100%;
@@ -723,7 +694,6 @@ onMounted(() => {});
     overflow: hidden;
 }
 
-/* Overlay ligero sobre imagen */
 .split-right.has-bg-image::before {
     content: '';
     position: absolute; inset: 0;
@@ -731,7 +701,6 @@ onMounted(() => {});
     z-index: 1;
 }
 
-/* Gradiente negro inferior — hace legible el contenido */
 .right-overlay-bottom {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -744,7 +713,6 @@ onMounted(() => {});
     pointer-events: none;
 }
 
-/* Contenido pegado abajo */
 .right-content {
     position: relative;
     z-index: 3;
@@ -753,7 +721,6 @@ onMounted(() => {});
     max-width: 520px;
 }
 
-/* Badge institucional */
 .right-badge {
     display: inline-flex;
     align-items: center; gap: 0.5rem;
@@ -767,7 +734,6 @@ onMounted(() => {});
 .right-badge i    { font-size: 0.8rem; color: #c4b5fd; }
 .right-badge span { font-size: 0.75rem; color: #e9d5ff; font-weight: 500; letter-spacing: 0.3px; }
 
-/* Texto principal */
 .right-text { margin-bottom: 1.5rem; }
 .right-text h2 {
     font-size: 2.6rem; font-weight: 900;
@@ -787,7 +753,6 @@ onMounted(() => {});
     line-height: 1.65; max-width: 360px;
 }
 
-/* Stats — pills modernos */
 .right-stats {
     display: flex;
     align-items: center;
@@ -818,9 +783,6 @@ onMounted(() => {});
 .stat-pill-icon i { font-size: 0.78rem; color: #e9d5ff; }
 .stat-pill-label  { font-size: 0.8rem; color: rgba(255,255,255,0.85); font-weight: 600; letter-spacing: 0.3px; }
 
-/* ══════════════════════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════════════════════ */
 
 @media (max-height: 700px) and (min-width: 769px) {
     .brand               { margin-bottom: 0.5rem; }

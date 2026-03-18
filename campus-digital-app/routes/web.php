@@ -22,13 +22,11 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Login por tarjeta RFID
+//EXTRA: LOGOIN POR TARJETA RFID
 Route::post('/auth/rfid-login', [RfidLoginController::class, 'login'])
     ->middleware('guest')
     ->name('rfid.login');
 
-// ── Simulador móvil ──────────────────────────────────────────────────
-// El móvil deposita el UID aquí (sin auth ni CSRF)
 Route::post('/simulador/uid', function (Request $request) {
     $uid = strtoupper(trim($request->input('uid', '')));
     if (!$uid) {
@@ -43,36 +41,30 @@ Route::post('/simulador/uid', function (Request $request) {
         ->header('Access-Control-Allow-Origin', '*');
 })->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
-// CORS preflight del móvil
+// CORS PARA EL SIMULADOR MOVIL
 Route::options('/simulador/uid', function () {
     return response('', 200)
         ->header('Access-Control-Allow-Origin', '*')
         ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')
         ->header('Access-Control-Allow-Headers', 'Content-Type');
 });
-// ────────────────────────────────────────────────────────────────────
 
-// Rutas autenticadas
+
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ── Lector RFID (dentro de auth para que el polling funcione) ────
     Route::get('/lector', [TarjetaLecturaController::class, 'index'])->name('lector.index');
     Route::post('/lector/leer', [TarjetaLecturaController::class, 'leer'])->name('lector.leer');
     Route::post('/lector/confirmar-pedido', [TarjetaLecturaController::class, 'confirmarPedido'])->name('lector.confirmar-pedido');
 
-    // La PC web consulta esto cada 1.5s para detectar UID del móvil
     Route::get('/simulador/uid-pendiente', function () {
         return response()->json([
             'uid'       => Cache::get('simulador_uid_pendiente'),
             'timestamp' => Cache::get('simulador_uid_timestamp'),
         ]);
     })->name('simulador.uid-pendiente');
-    // ─────────────────────────────────────────────────────────────────
 
-    // Mi tarjeta
     Route::middleware(['role:estudiante,proveedor_area,administrador'])
         ->prefix('mi-tarjeta')
         ->name('mi-tarjeta.')
@@ -83,7 +75,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/pin',      [MiTarjetaController::class, 'updatePin'])->name('pin.store');
         });
 
-    // Perfil
     Route::prefix('perfil')->name('perfil.')->group(function () {
         Route::get('/',                [PerfilController::class, 'show'])->name('show');
         Route::post('/actualizar',     [PerfilController::class, 'updateProfile'])->name('update');
@@ -91,10 +82,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/foto',         [PerfilController::class, 'deletePhoto'])->name('photo.delete');
     });
 
-    // Administración
     Route::middleware(['role:administrador'])->prefix('admin')->name('admin.')->group(function () {
 
-        // Módulo Tarjetas
         Route::prefix('tarjetas')->name('tarjetas.')->group(function () {
             Route::get('/dashboard', [TarjetaDashboardController::class, 'index'])->name('dashboard');
             Route::get('/',                        [TarjetaController::class, 'index'])->name('index');
@@ -115,7 +104,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/reportes/export-incidentes-pdf', [TarjetaReporteController::class, 'exportIncidentesPdf'])->name('reportes.export-incidentes-pdf');
         });
 
-        // Usuarios
         Route::prefix('usuarios')->name('usuarios.')->group(function () {
             Route::get('/',                        [UsuarioController::class, 'index'])->name('index');
             Route::get('/create',                  [UsuarioController::class, 'create'])->name('create');
@@ -131,7 +119,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/export-by-role-pdf',      [UsuarioController::class, 'exportByRolePdf'])->name('export-by-role-pdf');
         });
 
-        // Roles
         Route::prefix('roles')->name('roles.')->group(function () {
             Route::get('/',           [RolController::class, 'index'])->name('index');
             Route::get('/create',     [RolController::class, 'create'])->name('create');
@@ -141,7 +128,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/{rol}',   [RolController::class, 'destroy'])->name('destroy');
         });
 
-        // Permisos
         Route::prefix('permisos')->name('permisos.')->group(function () {
             Route::get('/',               [PermisoController::class, 'index'])->name('index');
             Route::get('/create',         [PermisoController::class, 'create'])->name('create');
@@ -151,7 +137,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/{permiso}',   [PermisoController::class, 'destroy'])->name('destroy');
         });
 
-        // Bitácora
         Route::prefix('bitacora')->name('bitacora.')->group(function () {
             Route::get('/accesos',                      [BitacoraController::class, 'accesos'])->name('accesos');
             Route::get('/actividad',                    [BitacoraController::class, 'actividad'])->name('actividad');
@@ -167,7 +152,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/export-actividad-modulo-pdf',  [BitacoraController::class, 'exportActividadModuloPdf'])->name('export-actividad-modulo-pdf');
         });
 
-        // Reportes
         Route::prefix('reportes')->name('reportes.')->group(function () {
             Route::get('/usuarios',         [ReporteController::class, 'usuarios'])->name('usuarios');
             Route::get('/accesos',          [ReporteController::class, 'accesos'])->name('accesos');

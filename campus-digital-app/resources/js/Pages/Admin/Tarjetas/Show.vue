@@ -30,7 +30,6 @@
                 </div>
             </div>
 
-            <!-- Info cards -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Tarjeta info -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-cyan-500/20 shadow-xl shadow-cyan-500/5 p-6 space-y-4">
@@ -77,7 +76,6 @@
                     </div>
                 </div>
 
-                <!-- Usuario info -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-blue-500/20 shadow-xl shadow-blue-500/5 p-6 space-y-4">
                     <h2 class="text-base font-semibold text-white">Usuario Asociado</h2>
                     <div v-if="tarjeta.usuario" class="space-y-3">
@@ -98,7 +96,6 @@
                     <p v-else class="text-sm text-slate-500">Sin usuario asociado</p>
                 </div>
 
-                <!-- Stats lecturas -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-6 space-y-4">
                     <h2 class="text-base font-semibold text-white">Estadísticas de Uso</h2>
                     <div class="grid grid-cols-2 gap-3">
@@ -122,7 +119,6 @@
                 </div>
             </div>
 
-            <!-- Historial de lecturas -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
                 <div class="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
                     <h2 class="text-base font-semibold text-white">Historial de Lecturas</h2>
@@ -165,7 +161,6 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
                 <div v-if="lecturas.last_page > 1" class="px-6 py-4 border-t border-slate-700 flex justify-between items-center">
                     <p class="text-sm text-slate-400">{{ lecturas.from }} - {{ lecturas.to }} de {{ lecturas.total }}</p>
                     <div class="flex gap-2">
@@ -177,7 +172,6 @@
                 </div>
             </div>
 
-            <!-- Modal bloqueo -->
             <div v-if="modal.show" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-red-500/30 shadow-2xl w-full max-w-md">
                     <div class="p-6 space-y-4">

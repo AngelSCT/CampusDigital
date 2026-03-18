@@ -2,7 +2,6 @@
     <AuthLayout>
         <div class="max-w-5xl mx-auto space-y-6">
 
-            <!-- Header -->
             <div>
                 <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                     Mi Tarjeta Universitaria
@@ -10,7 +9,6 @@
                 <p class="mt-1 text-sm text-slate-400">Identificación RFID/NFC del campus</p>
             </div>
 
-            <!-- Sin tarjeta -->
             <div v-if="!tarjeta"
                  class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-10 text-center">
                 <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center">
@@ -24,16 +22,12 @@
                 </p>
             </div>
 
-            <!-- Con tarjeta -->
             <template v-else>
 
-                <!-- Grid principal -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    <!-- ── Columna izquierda ── -->
                     <div class="lg:col-span-1 space-y-4">
 
-                        <!-- Tarjeta visual -->
                         <div class="relative overflow-hidden rounded-2xl p-6 h-48"
                              :class="tarjeta.estado === 'activa'
                                  ? 'bg-gradient-to-br from-cyan-700 via-blue-700 to-indigo-800'
@@ -41,21 +35,18 @@
                                      ? 'bg-gradient-to-br from-red-900 via-red-800 to-rose-900'
                                      : 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900'">
 
-                            <!-- Patrón de fondo -->
                             <div class="absolute inset-0 opacity-10">
                                 <div class="absolute top-4 right-4 w-32 h-32 rounded-full border-4 border-white"></div>
                                 <div class="absolute top-8 right-8 w-20 h-20 rounded-full border-4 border-white"></div>
                                 <div class="absolute -bottom-4 -left-4 w-24 h-24 rounded-full border-4 border-white"></div>
                             </div>
 
-                            <!-- Ondas RFID animadas -->
                             <div class="absolute right-6 top-1/2 -translate-y-1/2 opacity-20">
                                 <div class="rfid-wave w-16 h-16 rounded-full border-2 border-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
                                 <div class="rfid-wave w-10 h-10 rounded-full border-2 border-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style="animation-delay:.4s"></div>
                                 <div class="rfid-wave w-5 h-5 rounded-full border-2 border-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style="animation-delay:.8s"></div>
                             </div>
 
-                            <!-- Contenido -->
                             <div class="relative z-10 h-full flex flex-col justify-between">
                                 <div class="flex items-start justify-between">
                                     <div class="flex items-center gap-2">
@@ -86,7 +77,6 @@
                             </div>
                         </div>
 
-                        <!-- Alerta bloqueada -->
                         <div v-if="tarjeta.estado !== 'activa'"
                              class="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
                             <div class="flex items-start gap-3">
@@ -101,7 +91,6 @@
                             </div>
                         </div>
 
-                        <!-- Alerta PIN no configurado -->
                         <div v-if="!tarjeta.tiene_pin"
                              class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
                             <div class="flex items-start gap-3">
@@ -119,7 +108,6 @@
                             </div>
                         </div>
 
-                        <!-- Saldo del monedero -->
                         <div class="bg-gradient-to-br from-cyan-900/40 to-blue-900/40 border border-cyan-500/20 rounded-xl p-5 text-center">
                             <p class="text-xs text-cyan-400 uppercase tracking-wider mb-1">
                                 <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +121,6 @@
                             </p>
                         </div>
 
-                        <!-- Detalles de tarjeta -->
                         <div class="grid grid-cols-2 gap-3">
                             <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-3">
                                 <p class="text-xs text-slate-400 uppercase tracking-wider">Registrada</p>
@@ -145,7 +132,6 @@
                             </div>
                         </div>
 
-                        <!-- PIN — link a página separada -->
                         <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-4 flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-semibold text-white">PIN de Acceso</p>
@@ -167,7 +153,6 @@
                             </div>
                         </div>
 
-                        <!-- Simular escaneo -->
                         <div v-if="tarjeta.estado === 'activa'"
                              class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-blue-500/20 overflow-hidden">
                             <div class="px-4 py-3 border-b border-slate-700">
@@ -225,10 +210,8 @@
                         </div>
                     </div>
 
-                    <!-- ── Columna derecha ── -->
                     <div class="lg:col-span-2 space-y-6">
 
-                        <!-- Últimos movimientos -->
                         <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
                             <div class="px-6 py-4 border-b border-slate-700">
                                 <h2 class="text-base font-semibold text-white flex items-center gap-2">
@@ -265,7 +248,6 @@
                             </div>
                         </div>
 
-                        <!-- Historial de lecturas -->
                         <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
                             <div class="px-6 py-4 border-b border-slate-700">
                                 <h2 class="text-base font-semibold text-white flex items-center gap-2">

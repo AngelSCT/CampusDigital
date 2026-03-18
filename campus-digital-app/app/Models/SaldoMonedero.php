@@ -26,7 +26,6 @@ class SaldoMonedero extends Model
         'deleted_at'       => 'datetime',
     ];
 
-    /* ─── Relaciones ──────────────────────────────────────── */
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
@@ -37,9 +36,7 @@ class SaldoMonedero extends Model
         return $this->hasMany(SaldoMovimiento::class, 'saldo_monedero_id');
     }
 
-    /* ─── Helpers ─────────────────────────────────────────── */
 
-    // Obtiene o crea el monedero de un usuario
     public static function obtenerOCrear(int $usuarioId): self
     {
         return self::firstOrCreate(
@@ -53,7 +50,6 @@ class SaldoMonedero extends Model
         return $this->saldo_disponible >= $monto;
     }
 
-    // Carga saldo y crea el movimiento en una transacción atómica
     public function abonar(float $monto, string $concepto, string $modulo = 'otro', ?int $operadorId = null): SaldoMovimiento
     {
         return \DB::transaction(function () use ($monto, $concepto, $modulo, $operadorId) {
@@ -75,7 +71,6 @@ class SaldoMonedero extends Model
         });
     }
 
-    // Descuenta saldo y crea el movimiento en una transacción atómica
     public function cargar(float $monto, string $concepto, string $modulo = 'otro', ?int $operadorId = null, ?int $tarjetaLecturaId = null): SaldoMovimiento
     {
         if (!$this->tieneSaldo($monto)) {

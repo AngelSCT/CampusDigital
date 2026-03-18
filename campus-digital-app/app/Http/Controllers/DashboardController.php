@@ -15,7 +15,6 @@ class DashboardController extends Controller
         $user = $request->user();
         $user->load('roles');
         
-        // Dashboard diferenciado por rol
         if ($user->hasRole('administrador')) {
             return $this->dashboardAdministrador($user);
         } elseif ($user->hasRole('proveedor_area')) {
@@ -53,14 +52,14 @@ class DashboardController extends Controller
     private function dashboardProveedor($user)
     {
         return Inertia::render('Dashboard/Proveedor', [
-            // Aquí puedes agregar stats del proveedor cuando tengas los módulos
+            
         ]);
     }
 
     private function dashboardEstudiante($user)
     {
         return Inertia::render('Dashboard/Estudiante', [
-            // Aquí puedes agregar stats del estudiante cuando tengas los módulos
+            
         ]);
     }
 }

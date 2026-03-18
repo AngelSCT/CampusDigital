@@ -24,7 +24,6 @@ class RfidLoginController extends Controller
             ->with('usuario')
             ->first();
 
-        // ── UID no registrado ────────────────────────────────
         if (!$tarjeta) {
             $this->bitacoraFallida(null, '', 'rfid_login_failed',
                 'UID no registrado: ' . $uid, $request);
@@ -32,7 +31,6 @@ class RfidLoginController extends Controller
             return back()->withErrors(['uid' => 'Tarjeta no reconocida en el sistema.']);
         }
 
-        // ── PIN no configurado ───────────────────────────────
         if (!$tarjeta->pin_hash) {
             $this->bitacoraFallida($tarjeta->usuario_id,
                 $tarjeta->usuario?->email ?? '', 'rfid_login_failed',
@@ -41,7 +39,6 @@ class RfidLoginController extends Controller
             return back()->withErrors(['pin' => 'Esta tarjeta no tiene PIN configurado. Ingresa a tu perfil y configura tu PIN primero.']);
         }
 
-        // ── PIN incorrecto ───────────────────────────────────
         if (!Hash::check($data['pin'], $tarjeta->pin_hash)) {
             $this->bitacoraFallida($tarjeta->usuario_id,
                 $tarjeta->usuario?->email ?? '', 'rfid_login_failed',
@@ -50,7 +47,6 @@ class RfidLoginController extends Controller
             return back()->withErrors(['pin' => 'PIN incorrecto.']);
         }
 
-        // ── Tarjeta bloqueada / perdida / cancelada ──────────
         if ($tarjeta->estaBloqueada()) {
             $this->bitacoraFallida($tarjeta->usuario_id,
                 $tarjeta->usuario?->email ?? '', 'rfid_login_failed',
@@ -67,7 +63,6 @@ class RfidLoginController extends Controller
             return back()->withErrors(['uid' => $msg]);
         }
 
-        // ── Tarjeta no activa ────────────────────────────────
         if (!$tarjeta->estaActiva()) {
             $this->bitacoraFallida($tarjeta->usuario_id,
                 $tarjeta->usuario?->email ?? '', 'rfid_login_failed',
@@ -78,12 +73,10 @@ class RfidLoginController extends Controller
 
         $usuario = $tarjeta->usuario;
 
-        // ── Usuario eliminado ────────────────────────────────
         if (!$usuario || $usuario->deleted_at) {
             return back()->withErrors(['uid' => 'El usuario asociado a esta tarjeta no está disponible.']);
         }
 
-        // ── Usuario bloqueado ────────────────────────────────
         if ($usuario->estaBloqueado()) {
             $this->bitacoraFallida($usuario->id, $usuario->email,
                 'rfid_login_failed', 'Usuario bloqueado. Acceso por tarjeta denegado.', $request);
@@ -91,15 +84,13 @@ class RfidLoginController extends Controller
             return back()->withErrors(['uid' => 'Tu cuenta está bloqueada. Contacta a administración.']);
         }
 
-        // ── Email no verificado ──────────────────────────────
         if (!$usuario->hasVerifiedEmail()) {
             $this->bitacoraFallida($usuario->id, $usuario->email,
                 'rfid_login_failed', 'Email no verificado.', $request);
 
             return back()->withErrors(['uid' => 'Debes verificar tu correo electrónico antes de usar la tarjeta.']);
         }
-
-        // ── LOGIN EXITOSO ────────────────────────────────────
+        
         Auth::login($usuario, false);
         $request->session()->regenerate();
 

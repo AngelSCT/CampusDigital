@@ -14,7 +14,6 @@ class TarjetaReporteController extends Controller
 {
     public function index(Request $request)
     {
-        // ── Reporte 1: Lecturas por usuario ─────────────────
         $queryLecturas = TarjetaLectura::with(['tarjeta.usuario:id,nombre,apellido,email', 'operador:id,nombre,apellido'])
             ->when($request->filled('desde'), fn($q) => $q->whereDate('created_at', '>=', $request->desde))
             ->when($request->filled('hasta'), fn($q) => $q->whereDate('created_at', '<=', $request->hasta))
@@ -25,7 +24,6 @@ class TarjetaReporteController extends Controller
 
         $lecturas = $queryLecturas->paginate(20)->withQueryString();
 
-        // ── Reporte 2: Uso por módulo ────────────────────────
         $usoModulo = TarjetaLectura::select('modulo', DB::raw('COUNT(*) as total'), DB::raw('SUM(CASE WHEN exito=true THEN 1 ELSE 0 END) as exitosas'))
             ->when($request->filled('desde'), fn($q) => $q->whereDate('created_at', '>=', $request->desde))
             ->when($request->filled('hasta'), fn($q) => $q->whereDate('created_at', '<=', $request->hasta))
@@ -33,7 +31,6 @@ class TarjetaReporteController extends Controller
             ->orderByDesc('total')
             ->get();
 
-        // ── Reporte 3: Incidentes (tarjetas bloqueadas + lecturas fallidas) ──
         $incidentes = TarjetaUniversitaria::with(['usuario:id,nombre,apellido,email', 'bloqueadoPor:id,nombre,apellido'])
             ->whereIn('estado', ['bloqueada', 'perdida', 'cancelada'])
             ->latest('bloqueado_at')
@@ -50,7 +47,6 @@ class TarjetaReporteController extends Controller
         ]);
     }
 
-    /* ─── Exportar CSV lecturas ─────────────────────────── */
 
     public function exportCsv(Request $request)
     {
@@ -91,7 +87,6 @@ class TarjetaReporteController extends Controller
         ]);
     }
 
-    /* ─── Exportar PDF lecturas ─────────────────────────── */
 
     public function exportLecturasPdf(Request $request)
     {
@@ -114,7 +109,6 @@ class TarjetaReporteController extends Controller
         return $pdf->download('lecturas_tarjeta_' . now()->format('Ymd_His') . '.pdf');
     }
 
-    /* ─── Exportar CSV módulos ──────────────────────────── */
 
     public function exportModuloCsv(Request $request)
     {
@@ -143,7 +137,6 @@ class TarjetaReporteController extends Controller
         ]);
     }
 
-    /* ─── Exportar PDF módulos ──────────────────────────── */
 
     public function exportModuloPdf(Request $request)
     {
@@ -163,7 +156,6 @@ class TarjetaReporteController extends Controller
         return $pdf->download('uso_modulo_' . now()->format('Ymd_His') . '.pdf');
     }
 
-    /* ─── Exportar CSV incidentes ───────────────────────── */
 
     public function exportIncidentesCsv(Request $request)
     {

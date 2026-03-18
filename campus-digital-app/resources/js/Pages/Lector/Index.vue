@@ -2,7 +2,6 @@
     <PublicLayout>
         <div class="max-w-6xl mx-auto space-y-6">
 
-            <!-- Header -->
             <div>
                 <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                     Lector RFID/NFC
@@ -12,13 +11,10 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                <!-- ── Columna izquierda: panel de escaneo ── -->
                 <div class="lg:col-span-2 space-y-4">
 
-                    <!-- Panel lector -->
                     <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-cyan-500/20 shadow-xl shadow-cyan-500/5 overflow-hidden">
 
-                        <!-- Animación RFID -->
                         <div class="relative bg-gradient-to-br from-cyan-900/30 to-blue-900/20 p-8 flex flex-col items-center justify-center border-b border-cyan-500/20">
                             <div class="relative">
                                 <div :class="procesando ? 'animate-ping' : ''"
@@ -39,7 +35,6 @@
 
                         <div class="p-6 space-y-5">
 
-                            <!-- Módulos -->
                             <div>
                                 <label class="block text-sm font-medium text-white mb-2">Módulo</label>
                                 <div class="grid grid-cols-3 gap-2">
@@ -59,7 +54,6 @@
                                 </div>
                             </div>
 
-                            <!-- Tipos -->
                             <div>
                                 <label class="block text-sm font-medium text-white mb-2">Tipo de lectura</label>
                                 <div class="flex flex-wrap gap-2">
@@ -76,7 +70,6 @@
                                 </div>
                             </div>
 
-                            <!-- UID Input -->
                             <div>
                                 <label class="block text-sm font-medium text-white mb-2">
                                     UID de la Tarjeta <span class="text-red-400">*</span>
@@ -102,7 +95,6 @@
                                 </div>
                             </div>
 
-                            <!-- Botón escanear -->
                             <button @click="escanear" :disabled="procesando || !uid.trim()"
                                     class="w-full py-3 bg-gradient-to-br from-cyan-600 to-blue-600 border border-transparent rounded-lg text-sm font-semibold text-white hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2">
                                 <svg v-if="procesando" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -115,8 +107,6 @@
                                 {{ procesando ? 'Procesando...' : 'Procesar Lectura' }}
                             </button>
 
-
-                        <!-- QR para el simulador móvil -->
                         <div class="flex flex-col items-center gap-3 pt-2 border-t border-slate-700/50">
                             <p class="text-xs text-slate-500 uppercase tracking-wider font-medium">
                                 Escanea con la app móvil para simular
@@ -125,7 +115,6 @@
                                 <canvas ref="canvasQr"></canvas>
                             </div>
 
-                            <!-- Input editable del código -->
                             <div class="flex items-center gap-2 w-full max-w-xs">
                                 <span class="text-xs text-slate-500 whitespace-nowrap">Código:</span>
                                 <input
@@ -148,7 +137,6 @@
                         </div>
                     </div>
 
-                    <!-- Resultado del escaneo -->
                     <transition name="fade">
                         <div v-if="resultado"
                              :class="resultado.exito
@@ -156,7 +144,6 @@
                                  : 'border-red-500/40 shadow-red-500/10 from-red-900/30'"
                              class="bg-gradient-to-br to-slate-900 rounded-xl border shadow-xl p-5 space-y-4">
 
-                            <!-- Cabecera resultado -->
                             <div class="flex items-center gap-3">
                                 <div :class="resultado.exito ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'"
                                      class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -173,7 +160,6 @@
                                 </div>
                             </div>
 
-                            <!-- Info usuario -->
                             <div v-if="resultado.exito && resultado.usuario"
                                  class="bg-slate-800/50 rounded-lg p-3 flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
@@ -186,14 +172,12 @@
                                 </div>
                             </div>
 
-                            <!-- Saldo -->
                             <div v-if="resultado.tipo === 'consulta_saldo'"
                                  class="flex items-center gap-3 bg-slate-800/50 rounded-lg p-3">
                                 <p class="text-sm text-slate-400">Saldo disponible:</p>
                                 <p class="text-2xl font-bold text-cyan-400 font-mono">${{ resultado.saldo }}</p>
                             </div>
 
-                            <!-- Pedidos pendientes -->
                             <div v-if="resultado.tipo === 'confirmacion_entrega'">
                                 <div v-if="resultado.pedidos_pendientes?.length > 0" class="space-y-2">
                                     <p class="text-xs text-slate-400 mb-2">Pedidos pendientes en {{ moduloLabel(moduloSeleccionado) }}:</p>
@@ -211,7 +195,6 @@
                                         <span class="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs">{{ p.estado }}</span>
                                     </div>
 
-                                    <!-- Confirmar entrega -->
                                     <div v-if="pedidoSeleccionado" class="mt-3 space-y-3 pt-3 border-t border-slate-700">
                                         <label class="flex items-center gap-2 cursor-pointer">
                                             <input type="checkbox" v-model="cobrarDeSaldo"
@@ -246,7 +229,6 @@
                     </transition>
                 </div>
 
-                <!-- ── Columna derecha: historial ── -->
                 <div class="lg:col-span-1">
                     <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden sticky top-6">
                         <div class="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
@@ -316,9 +298,8 @@ const uidRef             = ref(null);
 const canvasQr     = ref(null);
 const codigoLector = ref(localStorage.getItem('lector_codigo') ?? 'LECTOR01ADD09'); //*********CODIGO DEL LECTOR************
 
-// ← Agregar esto: regenerar QR si el canvas se remonta
 watch(codigoLector, async (nuevoCodigo) => {
-    localStorage.setItem('lector_codigo', nuevoCodigo);  // ← persiste
+    localStorage.setItem('lector_codigo', nuevoCodigo); 
     if (canvasQr.value && nuevoCodigo.trim()) {
         await QRCode.toCanvas(canvasQr.value, nuevoCodigo, {
             width:  160,
@@ -328,7 +309,6 @@ watch(codigoLector, async (nuevoCodigo) => {
     }
 });
 
-// Este se mantiene igual para cuando se remonta el canvas
 watch(canvasQr, async (nuevoCanvas) => {
     if (nuevoCanvas && codigoLector.value.trim()) {
         await QRCode.toCanvas(nuevoCanvas, codigoLector.value, {
@@ -344,8 +324,7 @@ watch(canvasQr, async (nuevoCanvas) => {
 
 const lecturas = computed(() => props.lecturasRecientes ?? []);
 
-// ── Polling del simulador móvil ───────────────────────────────────────
-let ultimoTimestamp = null;   // para detectar si llegó uno NUEVO
+let ultimoTimestamp = null; 
 let intervaloPolling = null;
 
 async function verificarUidMovil() {
@@ -353,21 +332,16 @@ async function verificarUidMovil() {
         const respuesta = await fetch('/simulador/uid-pendiente');
         const datos     = await respuesta.json();
 
-        // Solo actuar si hay UID y es diferente al último procesado
         if (datos.uid && datos.timestamp && datos.timestamp !== ultimoTimestamp) {
             ultimoTimestamp = datos.timestamp;
 
-            // Llenar el input con el UID recibido
             uid.value = datos.uid;
 
-            // Pequeña pausa visual para que se vea el UID en el input
             await new Promise(r => setTimeout(r, 400));
 
-            // Disparar el escaneo automáticamente
             escanear();
         }
     } catch (e) {
-        // Silencioso — si falla el polling no importa
     }
 }
 
@@ -375,7 +349,6 @@ onMounted(async () => {
     uidRef.value?.focus();
     intervaloPolling = setInterval(verificarUidMovil, 1500);
 
-    // ← Agregar esto
     await nextTick();
     if (canvasQr.value) {
         await QRCode.toCanvas(canvasQr.value, codigoLector.value, {
@@ -392,7 +365,6 @@ onMounted(async () => {
 onUnmounted(() => {
     clearInterval(intervaloPolling);
 });
-// ─────────────────────────────────────────────────────────────────────
 
 function escanear() {
     if (!uid.value.trim() || procesando.value) return;

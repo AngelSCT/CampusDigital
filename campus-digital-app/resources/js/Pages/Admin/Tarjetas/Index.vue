@@ -141,7 +141,6 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
                 <div v-if="tarjetas.last_page > 1" class="px-6 py-4 border-t border-slate-700 flex justify-between items-center">
                     <p class="text-sm text-slate-400">
                         Mostrando {{ tarjetas.from }} - {{ tarjetas.to }} de {{ tarjetas.total }}
@@ -159,7 +158,6 @@
                 </div>
             </div>
 
-            <!-- Modal Bloqueo -->
             <div v-if="modalBloqueo.show"
                  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-red-500/30 shadow-2xl w-full max-w-md">
@@ -188,7 +186,6 @@
                             </div>
                         </div>
 
-                        <!-- Reactivar -->
                         <p v-else class="text-sm text-slate-300 mb-4">¿Confirmas que deseas reactivar esta tarjeta?</p>
                     </div>
                     <div class="px-6 py-4 border-t border-slate-700 flex justify-end gap-3">

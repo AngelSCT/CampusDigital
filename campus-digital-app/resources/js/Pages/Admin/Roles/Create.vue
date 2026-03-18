@@ -171,7 +171,6 @@ function submit() {
 
     router.post(route('admin.roles.store'), form, {
         onSuccess: () => {
-            // Redirige automáticamente
         },
         onError: (err) => {
             errors.value = err;

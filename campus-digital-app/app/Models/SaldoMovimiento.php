@@ -46,7 +46,6 @@ class SaldoMovimiento extends Model
         'biblioteca', 'recarga', 'rfid', 'otro',
     ];
 
-    /* ─── Relaciones ──────────────────────────────────────── */
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');

@@ -2,16 +2,12 @@
     <div class="login-wrapper">
         <div class="login-split">
 
-            <!-- ══════════════════════════════════════════════════
-                 LADO IZQUIERDO — Formulario
-            ══════════════════════════════════════════════════ -->
             <div class="split-left">
                 <div class="corner-tl"></div>
                 <div class="corner-br"></div>
 
                 <div class="form-container">
 
-                    <!-- Header -->
                     <div class="form-header">
                         <div class="brand">
                             <div class="brand-icon">
@@ -34,7 +30,6 @@
                         <p class="welcome-sub">Crea una nueva contraseña segura para tu cuenta</p>
                     </div>
 
-                    <!-- Formulario -->
                     <form @submit.prevent="submit" class="login-form">
 
                         <div v-if="Object.keys(form.errors).length > 0" class="alert-error">
@@ -42,7 +37,6 @@
                             <span>Por favor corrige los errores en el formulario</span>
                         </div>
 
-                        <!-- Email (readonly) -->
                         <div class="form-group">
                             <label for="email" class="form-label">
                                 <i class="fas fa-envelope"></i>
@@ -57,7 +51,6 @@
                             />
                         </div>
 
-                        <!-- Nueva Contraseña -->
                         <div class="form-group">
                             <label for="password" class="form-label">
                                 <i class="fas fa-lock"></i>
@@ -89,7 +82,6 @@
                             </span>
                         </div>
 
-                        <!-- Confirmar Contraseña -->
                         <div class="form-group">
                             <label for="password_confirmation" class="form-label">
                                 <i class="fas fa-lock"></i>
@@ -120,7 +112,6 @@
                             </span>
                         </div>
 
-                        <!-- Fortaleza de contraseña -->
                         <div v-if="form.password" class="password-strength">
                             <div class="strength-bar">
                                 <div
@@ -134,7 +125,6 @@
                             </span>
                         </div>
 
-                        <!-- Requisitos -->
                         <div class="password-requirements">
                             <p class="requirements-title">
                                 <i class="fas fa-info-circle"></i>
@@ -168,7 +158,6 @@
                         </button>
                     </form>
 
-                    <!-- Footer -->
                     <div class="form-footer">
                         <div class="divider"><span>o</span></div>
                         <p class="register-text">
@@ -186,9 +175,6 @@
                 </div>
             </div>
 
-            <!-- ══════════════════════════════════════════════════
-                 LADO DERECHO — Panel con imagen
-            ══════════════════════════════════════════════════ -->
             <div
                 class="split-right"
                 :class="{ 'has-bg-image': loginBg }"
@@ -290,9 +276,7 @@ const submit = () => {
 <style scoped>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* ══════════════════════════════════════════════════
-   LAYOUT PRINCIPAL
-══════════════════════════════════════════════════ */
+
 .login-wrapper {
     height: 100vh;
     overflow: hidden;
@@ -307,9 +291,7 @@ const submit = () => {
     overflow: hidden;
 }
 
-/* ══════════════════════════════════════════════════
-   LADO IZQUIERDO
-══════════════════════════════════════════════════ */
+
 .split-left {
     width: 45%;
     height: 100%;
@@ -322,7 +304,6 @@ const submit = () => {
     position: relative;
 }
 
-/* Esquina superior derecha */
 .split-left::before {
     content: '';
     position: absolute;
@@ -340,7 +321,6 @@ const submit = () => {
         42px 42px 0 -6px rgba(168,85,247,0.22);
 }
 
-/* Esquina inferior izquierda */
 .split-left::after {
     content: '';
     position: absolute;
@@ -357,7 +337,6 @@ const submit = () => {
         44px -10px 0 -10px rgba(236,72,153,0.18);
 }
 
-/* Esquina superior izquierda */
 .split-left .corner-tl {
     position: absolute;
     top: 14px; left: 14px;
@@ -370,7 +349,6 @@ const submit = () => {
             drop-shadow(22px 26px 0px rgba(168,85,247,0.1));
 }
 
-/* Esquina inferior derecha */
 .split-left .corner-br {
     position: absolute;
     bottom: 20px; right: 20px;
@@ -398,7 +376,6 @@ const submit = () => {
 }
 .form-container::-webkit-scrollbar { display: none; }
 
-/* Brand */
 .brand {
     display: flex;
     align-items: center;
@@ -419,7 +396,6 @@ const submit = () => {
 .brand-dark   { color: #1e293b; }
 .brand-sub    { font-size: 0.7rem; color: #94a3b8; letter-spacing: 0.5px; }
 
-/* Ícono candado */
 .key-icon-wrapper {
     width: 52px; height: 52px;
     margin: 0 auto 0.75rem;
@@ -438,7 +414,6 @@ const submit = () => {
 .title-purple { color: #a855f7; }
 .welcome-sub  { font-size: 0.8rem; color: #94a3b8; }
 
-/* Formulario */
 .login-form { margin-bottom: 0.5rem; }
 .form-group { margin-bottom: 0.7rem; }
 
@@ -486,7 +461,6 @@ const submit = () => {
     font-size: 0.68rem; margin-top: 0.25rem; padding-left: 0.5rem;
 }
 
-/* Fortaleza */
 .password-strength { margin-bottom: 0.65rem; margin-top: -0.2rem; }
 .strength-bar {
     width: 100%; height: 3px;
@@ -504,7 +478,6 @@ const submit = () => {
 .strength-text.strong      { color: #34d399; }
 .strength-text.very-strong { color: #22c55e; }
 
-/* Requisitos */
 .password-requirements {
     background: #faf5ff;
     border: 1.5px solid #e9d5ff;
@@ -545,7 +518,6 @@ const submit = () => {
 }
 .btn-login:disabled { opacity: 0.65; cursor: not-allowed; }
 
-/* Alertas */
 .alert-error {
     display: flex; align-items: center; gap: 0.5rem;
     padding: 0.6rem 0.85rem;
@@ -555,7 +527,6 @@ const submit = () => {
 }
 .alert-error i { font-size: 0.9rem; flex-shrink: 0; }
 
-/* Footer */
 .form-footer { padding-top: 0.6rem; border-top: 1px solid #f1f5f9; margin-top: 0.4rem; }
 .divider { text-align: center; position: relative; margin-bottom: 0.5rem; }
 .divider span {
@@ -584,9 +555,6 @@ const submit = () => {
 }
 .security-badge i { color: #a855f7; font-size: 0.8rem; }
 
-/* ══════════════════════════════════════════════════
-   LADO DERECHO
-══════════════════════════════════════════════════ */
 .split-right {
     width: 55%;
     height: 100%;
@@ -667,9 +635,6 @@ const submit = () => {
 .stat-pill-icon i { font-size: 0.78rem; color: #e9d5ff; }
 .stat-pill-label  { font-size: 0.8rem; color: rgba(255,255,255,0.85); font-weight: 600; letter-spacing: 0.3px; }
 
-/* ══════════════════════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════════════════════ */
 @media (max-height: 700px) and (min-width: 769px) {
     .brand              { margin-bottom: 0.5rem; }
     .welcome-title      { font-size: 1.15rem; }

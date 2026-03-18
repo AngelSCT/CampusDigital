@@ -33,7 +33,6 @@ class TarjetaUniversitaria extends Model
         'deleted_at'   => 'datetime',
     ];
 
-    /* ─── Relaciones ─────────────────────────────────────── */
 
     public function usuario()
     {
@@ -55,20 +54,18 @@ class TarjetaUniversitaria extends Model
         return $this->hasMany(TarjetaLectura::class, 'tarjeta_id');
     }
 
-    // NUEVO: acceso directo al monedero del dueño de la tarjeta
     public function monedero()
     {
         return $this->hasOneThrough(
             SaldoMonedero::class,
             Usuario::class,
-            'id',          // FK en usuario
-            'usuario_id',  // FK en saldo_monedero
-            'usuario_id',  // FK local en tarjeta_universitaria
-            'id'           // PK en usuario
+            'id',         
+            'usuario_id', 
+            'usuario_id', 
+            'id'          
         );
     }
 
-    /* ─── Helpers ────────────────────────────────────────── */
 
     public function estaActiva(): bool
     {

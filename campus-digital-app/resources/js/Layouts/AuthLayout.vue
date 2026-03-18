@@ -224,7 +224,6 @@ const page = usePage();
 const showUserMenu = ref(false);
 const showMobileMenu = ref(false);
 
-// Computed properties
 const userName = computed(() => {
     const user = page.props.auth?.user;
     return user ? `${user.nombre} ${user.apellido}` : 'Usuario';

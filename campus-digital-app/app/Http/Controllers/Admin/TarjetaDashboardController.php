@@ -12,7 +12,6 @@ class TarjetaDashboardController extends Controller
 {
     public function index()
     {
-        // ── Estadísticas generales ──────────────────────────
         $stats = [
             'total_tarjetas'   => TarjetaUniversitaria::count(),
             'activas'          => TarjetaUniversitaria::where('estado', 'activa')->count(),
@@ -21,7 +20,6 @@ class TarjetaDashboardController extends Controller
             'lecturas_semana'  => TarjetaLectura::where('created_at', '>=', now()->subDays(7))->count(),
         ];
 
-        // ── Lecturas por día (últimos 14 días) ───────────────
         $lecturasPorDia = TarjetaLectura::select(
                 DB::raw('DATE(created_at) as fecha'),
                 DB::raw('COUNT(*) as total'),
@@ -33,7 +31,6 @@ class TarjetaDashboardController extends Controller
             ->orderBy('fecha')
             ->get();
 
-        // Rellenar días vacíos
         $diasCompletos = [];
         for ($i = 13; $i >= 0; $i--) {
             $fecha = now()->subDays($i)->toDateString();
@@ -46,14 +43,12 @@ class TarjetaDashboardController extends Controller
             ];
         }
 
-        // ── Lecturas por módulo ──────────────────────────────
         $lecturasPorModulo = TarjetaLectura::select('modulo', DB::raw('COUNT(*) as total'))
             ->whereDate('created_at', '>=', now()->subDays(30))
             ->groupBy('modulo')
             ->orderByDesc('total')
             ->get();
 
-        // ── Usuarios más activos (últimos 30 días) ───────────
         $usuariosActivos = TarjetaUniversitaria::select(
                 'tarjeta_universitaria.id',
                 'tarjeta_universitaria.uid',
@@ -71,14 +66,13 @@ class TarjetaDashboardController extends Controller
             ->take(10)
             ->get();
 
-        // ── Tarjetas bloqueadas recientes ────────────────────
         $tarjetasBloqueadas = TarjetaUniversitaria::with(['usuario:id,nombre,apellido,email', 'bloqueadoPor:id,nombre,apellido'])
             ->whereIn('estado', ['bloqueada', 'perdida', 'cancelada'])
             ->latest('bloqueado_at')
             ->take(5)
             ->get();
 
-        // ── Lecturas recientes ───────────────────────────────
+
         $lecturasRecientes = TarjetaLectura::with([
                 'tarjeta.usuario:id,nombre,apellido',
                 'operador:id,nombre,apellido',

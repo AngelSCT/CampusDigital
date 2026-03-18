@@ -44,13 +44,11 @@ class Usuario extends Authenticatable implements MustVerifyEmail
         'deleted_at' => 'datetime',
     ];
 
-    // Override para Fortify
     public function getAuthPassword()
     {
         return $this->password_hash;
     }
 
-    // Override para email verification
     public function hasVerifiedEmail()
     {
         return $this->email_verificado;
@@ -90,7 +88,6 @@ class Usuario extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(ActividadBitacora::class, 'usuario_id');
     }
 
-    // Métodos auxiliares
     public function hasRole($roleName)
     {
         return $this->roles()->where('nombre', $roleName)->exists();

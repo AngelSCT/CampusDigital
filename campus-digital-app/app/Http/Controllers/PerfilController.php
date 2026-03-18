@@ -47,17 +47,15 @@ class PerfilController extends Controller
     public function updatePhoto(Request $request)
     {
         $request->validate([
-            'photo' => ['required', 'image', 'max:2048'], // 2MB max
+            'photo' => ['required', 'image', 'max:2048'], 
         ]);
 
         $usuario = auth()->user();
 
-        // Eliminar foto anterior si existe
         if ($usuario->foto_url && Storage::disk('public')->exists($usuario->foto_url)) {
             Storage::disk('public')->delete($usuario->foto_url);
         }
 
-        // Guardar nueva foto
         $path = $request->file('photo')->store('fotos-perfil', 'public');
 
         $usuario->update([

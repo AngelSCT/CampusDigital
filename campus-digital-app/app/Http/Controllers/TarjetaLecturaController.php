@@ -13,7 +13,6 @@ use Inertia\Inertia;
 
 class TarjetaLecturaController extends Controller
 {
-    /* ─── Panel del lector (vista proveedor) ─────────────── */
 
     public function index()
     {
@@ -47,7 +46,6 @@ class TarjetaLecturaController extends Controller
         ]);
     }
 
-    /* ─── Procesar lectura ───────────────────────────────── */
 
     public function leer(Request $request)
     {
@@ -67,7 +65,6 @@ class TarjetaLecturaController extends Controller
             ->with('usuario:id,nombre,apellido,email,foto_url')
             ->first();
 
-        // ── Tarjeta no encontrada ────────────────────────────
         if (!$tarjeta) {
             TarjetaLectura::create([
                 'tarjeta_id'          => null,
@@ -89,7 +86,6 @@ class TarjetaLecturaController extends Controller
             ]);
         }
 
-        // ── Tarjeta bloqueada ────────────────────────────────
         if ($tarjeta->estaBloqueada()) {
             TarjetaLectura::create([
                 'tarjeta_id'          => $tarjeta->id,
@@ -121,7 +117,6 @@ class TarjetaLecturaController extends Controller
             ]);
         }
 
-        // ── Despachar según tipo ─────────────────────────────
         return match ($tipo) {
             'consulta_saldo'       => $this->consultarSaldo($request, $tarjeta, $uid, $modulo, $operadorId),
             'confirmacion_entrega' => $this->confirmarEntrega($request, $tarjeta, $uid, $modulo, $operadorId),
@@ -129,7 +124,6 @@ class TarjetaLecturaController extends Controller
         };
     }
 
-    /* ─── Consulta rápida de saldo ───────────────────────── */
 
     private function consultarSaldo(Request $request, TarjetaUniversitaria $tarjeta, string $uid, string $modulo, ?int $operadorId)
     {
@@ -164,7 +158,6 @@ class TarjetaLecturaController extends Controller
         ]);
     }
 
-    /* ─── Muestra pedidos pendientes para confirmar ──────── */
 
     private function confirmarEntrega(Request $request, TarjetaUniversitaria $tarjeta, string $uid, string $modulo, ?int $operadorId)
     {
@@ -215,7 +208,6 @@ class TarjetaLecturaController extends Controller
         ]);
     }
 
-    /* ─── Confirmar pedido específico con tarjeta ────────── */
 
     public function confirmarPedido(Request $request)
     {
@@ -298,7 +290,6 @@ class TarjetaLecturaController extends Controller
         }
     }
 
-    /* ─── Acceso / consumo simple ────────────────────────── */
 
     private function registrarAccesoOConsumo(Request $request, TarjetaUniversitaria $tarjeta, string $uid, string $modulo, string $tipo, ?int $operadorId)
     {

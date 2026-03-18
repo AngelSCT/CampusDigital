@@ -2,7 +2,6 @@
     <AuthLayout>
         <div class="py-6">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Header -->
                 <div class="mb-6">
                     <h2 class="text-2xl font-bold leading-7 text-white">
                         Mi Perfil
@@ -12,7 +11,6 @@
                     </p>
                 </div>
 
-                <!-- Información Personal -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl mb-6 border border-blue-500/20">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-white mb-4 flex items-center">
@@ -24,7 +22,6 @@
                         
                         <form @submit.prevent="actualizarPerfil" class="space-y-4">
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <!-- Nombre -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Nombre</label>
                                     <input 
@@ -36,7 +33,6 @@
                                     <p class="mt-1 text-xs text-slate-400">Contacta al administrador para cambiar tu nombre</p>
                                 </div>
 
-                                <!-- Apellido -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Apellido</label>
                                     <input 
@@ -48,7 +44,6 @@
                                     <p class="mt-1 text-xs text-slate-400">Contacta al administrador para cambiar tu apellido</p>
                                 </div>
 
-                                <!-- Email -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Email</label>
                                     <input 
@@ -60,7 +55,6 @@
                                     <p class="mt-1 text-xs text-slate-400">Contacta al administrador para cambiar tu email</p>
                                 </div>
 
-                                <!-- Teléfono -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Teléfono</label>
                                     <input 
@@ -70,7 +64,6 @@
                                     >
                                 </div>
 
-                                <!-- Fecha de Nacimiento -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Fecha de Nacimiento</label>
                                     <input 
@@ -80,7 +73,6 @@
                                     >
                                 </div>
 
-                                <!-- Género -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Género</label>
                                     <select 
@@ -96,7 +88,6 @@
                                 </div>
                             </div>
 
-                            <!-- Dirección -->
                             <div>
                                 <label class="block text-sm font-medium text-white">Dirección</label>
                                 <textarea 
@@ -106,7 +97,6 @@
                                 ></textarea>
                             </div>
 
-                            <!-- Botón Guardar -->
                             <div class="flex justify-end">
                                 <button 
                                     type="submit" 
@@ -120,7 +110,6 @@
                     </div>
                 </div>
 
-                <!-- Foto de Perfil -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl mb-6 border border-blue-500/20">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-white mb-4 flex items-center">
@@ -176,7 +165,6 @@
                     </div>
                 </div>
 
-                <!-- Información de Cuenta -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl mb-6 border border-blue-500/20">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-white mb-4 flex items-center">
@@ -225,7 +213,6 @@
                     </div>
                 </div>
 
-                <!-- Cambiar Contraseña -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-white mb-4 flex items-center">
@@ -314,7 +301,7 @@ const actualizarPerfil = () => {
     formPerfil.post(route('perfil.update'), {
         preserveScroll: true,
         onSuccess: () => {
-            // Mensaje de éxito
+            
         },
     });
 };

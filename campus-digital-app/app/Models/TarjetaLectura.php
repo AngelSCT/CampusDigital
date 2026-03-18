@@ -35,7 +35,6 @@ class TarjetaLectura extends Model
         'deleted_at' => 'datetime',
     ];
 
-    // Constantes para usar en controladores sin strings hardcodeados
     const TIPOS = [
         'acceso',
         'consumo',
@@ -52,7 +51,6 @@ class TarjetaLectura extends Model
         'otro',
     ];
 
-    /* ─── Relaciones ─────────────────────────────────────── */
 
     public function tarjeta()
     {

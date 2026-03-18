@@ -2,7 +2,6 @@
     <AuthLayout>
         <div class="max-w-md mx-auto space-y-6">
 
-            <!-- Header -->
             <div>
                 <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                     {{ tienePin ? 'Cambiar PIN' : 'Configurar PIN' }}
@@ -15,7 +14,6 @@
                 </p>
             </div>
 
-            <!-- Sin tarjeta -->
             <div v-if="!tieneTarjeta"
                  class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
                 <div class="flex items-start gap-3">
@@ -28,11 +26,9 @@
                 </div>
             </div>
 
-            <!-- Formulario -->
             <div v-if="tieneTarjeta"
                  class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
 
-                <!-- Ícono de encabezado -->
                 <div class="px-6 pt-8 pb-4 text-center border-b border-slate-700">
                     <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-600/30 to-cyan-600/30 border border-blue-500/30 flex items-center justify-center">
                         <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,7 +40,6 @@
 
                 <div class="p-6 space-y-5">
 
-                    <!-- Alert success local -->
                     <div v-if="alertSuccess"
                          class="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded-lg text-sm text-green-400">
                         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,7 +48,6 @@
                         {{ alertSuccess }}
                     </div>
 
-                    <!-- Alert error local -->
                     <div v-if="alertError"
                          class="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400">
                         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,7 +58,6 @@
 
                     <form @submit.prevent="guardar" class="space-y-5">
 
-                        <!-- PIN actual (solo si ya tiene) -->
                         <div v-if="tienePin">
                             <label class="block text-sm font-medium text-white mb-2">
                                 PIN Actual
@@ -94,12 +87,10 @@
                             <p v-if="form.errors.pin_actual" class="mt-1 text-xs text-red-400">{{ form.errors.pin_actual }}</p>
                         </div>
 
-                        <!-- Nuevo PIN -->
                         <div>
                             <label class="block text-sm font-medium text-white mb-2">
                                 {{ tienePin ? 'Nuevo PIN' : 'PIN (4 dígitos)' }}
                             </label>
-                            <!-- Puntos indicadores -->
                             <div class="flex gap-2 justify-center mb-3">
                                 <div v-for="i in 4" :key="i"
                                      class="w-3 h-3 rounded-full border-2 transition-all duration-200"
@@ -133,7 +124,6 @@
                             <p v-if="form.errors.pin_nuevo" class="mt-1 text-xs text-red-400">{{ form.errors.pin_nuevo }}</p>
                         </div>
 
-                        <!-- Confirmar PIN -->
                         <div>
                             <label class="block text-sm font-medium text-white mb-2">Confirmar PIN</label>
                             <div class="relative">
@@ -161,7 +151,6 @@
                             <p v-if="pinsNoCoinciden" class="mt-1 text-xs text-red-400">Los PINs no coinciden.</p>
                         </div>
 
-                        <!-- Aviso seguridad -->
                         <div class="flex items-start gap-3 p-3 bg-slate-700/30 border border-slate-600/50 rounded-lg">
                             <svg class="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
@@ -171,7 +160,6 @@
                             </p>
                         </div>
 
-                        <!-- Botón guardar -->
                         <button type="submit"
                                 :disabled="form.processing || !formValido"
                                 class="w-full py-3 bg-gradient-to-br from-cyan-600 to-blue-600 border border-transparent rounded-lg text-sm font-semibold text-white hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2">
@@ -188,7 +176,6 @@
                 </div>
             </div>
 
-            <!-- Volver -->
             <div class="text-center">
                 <Link :href="route('mi-tarjeta.show')"
                       class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 transition-colors duration-200">

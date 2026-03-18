@@ -15,7 +15,6 @@
                 </a>
             </div>
 
-            <!-- Filtros -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-5">
                 <h2 class="text-sm font-semibold text-white mb-4">Filtros de búsqueda</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
@@ -81,7 +80,6 @@
                 </div>
             </div>
 
-            <!-- Tabs -->
             <div class="flex gap-1 bg-slate-800/50 rounded-xl p-1 border border-slate-700">
                 <button v-for="tab in tabs" :key="tab.id" @click="tabActivo = tab.id"
                         :class="tabActivo === tab.id
@@ -92,7 +90,6 @@
                 </button>
             </div>
 
-            <!-- Tab: Lecturas -->
             <div v-if="tabActivo === 'lecturas'"
                  class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-cyan-500/20 overflow-hidden">
                 <div class="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
@@ -139,7 +136,6 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- Pagination -->
                 <div v-if="lecturas.last_page > 1" class="px-6 py-4 border-t border-slate-700 flex justify-between items-center">
                     <p class="text-sm text-slate-400">{{ lecturas.from }} - {{ lecturas.to }} de {{ lecturas.total }}</p>
                     <div class="flex gap-2">
@@ -149,7 +145,6 @@
                            class="px-3 py-1 rounded-lg border border-slate-600 text-sm text-white hover:bg-slate-700/50">Siguiente</a>
                     </div>
                 </div>
-                <!-- ── Exportar Lecturas ── -->
                 <div class="px-6 py-4 border-t border-slate-700 flex flex-wrap gap-3 bg-slate-900/30">
                     <span class="text-xs text-slate-500 self-center mr-1">Exportar esta tabla:</span>
                     <a :href="exportUrl"
@@ -169,7 +164,6 @@
                 </div>
             </div>
 
-            <!-- Tab: Uso por módulo -->
             <div v-if="tabActivo === 'modulo'"
                  class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-blue-500/20 p-6">
                 <h2 class="text-base font-semibold text-white mb-4">Uso por Módulo</h2>
@@ -191,7 +185,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- ── Exportar Uso por Módulo ── -->
                 <div class="mt-6 pt-4 border-t border-slate-700 flex flex-wrap gap-3">
                     <span class="text-xs text-slate-500 self-center mr-1">Exportar esta tabla:</span>
                     <a :href="exportPdfUrl('modulo', 'csv')"
@@ -211,7 +204,6 @@
                 </div>
             </div>
 
-            <!-- Tab: Incidentes -->
             <div v-if="tabActivo === 'incidentes'"
                  class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-red-500/20 overflow-hidden">
                 <div class="px-6 py-4 border-b border-red-500/20 flex items-center justify-between">
@@ -259,7 +251,6 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- ── Exportar Incidentes ── -->
                 <div class="px-6 py-4 border-t border-red-500/20 flex flex-wrap gap-3 bg-slate-900/30">
                     <span class="text-xs text-slate-500 self-center mr-1">Exportar esta tabla:</span>
                     <a :href="route('admin.tarjetas.reportes.export-incidentes')"

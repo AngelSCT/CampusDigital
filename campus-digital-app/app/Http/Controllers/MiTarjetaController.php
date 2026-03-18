@@ -11,13 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
-// NOTA: Este controlador extrae las funciones miTarjeta() y updatePin()
-// que tenías dentro de Admin/TarjetaController.php.
-// Después de crear este archivo, ELIMINA esas dos funciones del TarjetaController.
 
 class MiTarjetaController extends Controller
 {
-    /* ─── Vista Mi Tarjeta (estudiante) ──────────────────── */
 
     public function show()
     {
@@ -84,7 +80,6 @@ class MiTarjetaController extends Controller
         ]);
     }
 
-    /* ─── Simular escaneo (estudiante) ───────────────────── */
 
     public function simularEscaneo(Request $request)
     {
@@ -122,7 +117,6 @@ class MiTarjetaController extends Controller
         return back()->with('success', 'Escaneo simulado en módulo: ' . $data['modulo']);
     }
 
-    /* ─── Configurar / Cambiar PIN ───────────────────────── */
 
     public function showPin()
     {
@@ -148,7 +142,6 @@ class MiTarjetaController extends Controller
             'pin_confirmar' => 'required|digits:4|same:pin_nuevo',
         ];
 
-        // Solo pedir el PIN actual si ya tiene uno configurado
         if ($tarjeta->pin_hash) {
             $rules['pin_actual'] = 'required|digits:4';
         }

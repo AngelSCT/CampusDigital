@@ -14,7 +14,6 @@ class BitacoraController extends Controller
     {
         $query = AccesoBitacora::with('usuario');
 
-        // Filtros
         if ($request->filled('search')) {
             $query->where('email_intentado', 'ilike', "%{$request->search}%");
         }
@@ -50,7 +49,6 @@ class BitacoraController extends Controller
     {
         $query = ActividadBitacora::with('usuario');
 
-        // Filtros
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('accion', 'ilike', "%{$request->search}%")
@@ -196,7 +194,6 @@ public function exportAccesosPeriodo(Request $request)
         
         fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
         
-        // Información del reporte
         fputcsv($file, ['REPORTE DE ACCESOS POR PERÍODO']);
         fputcsv($file, ['']);
         fputcsv($file, ['Período:', $request->fecha_desde . ' al ' . $request->fecha_hasta]);
@@ -212,7 +209,6 @@ public function exportAccesosPeriodo(Request $request)
         fputcsv($file, ['']);
         fputcsv($file, ['']);
         
-        // Encabezados
         fputcsv($file, [
             'ID',
             'Usuario',
@@ -225,7 +221,6 @@ public function exportAccesosPeriodo(Request $request)
             'Fecha y Hora'
         ]);
         
-        // Datos
         foreach ($accesos as $acceso) {
             fputcsv($file, [
                 $acceso->id,
@@ -250,7 +245,6 @@ public function exportAccesosPeriodo(Request $request)
         fputcsv($file, ['Accesos fallidos:', $accesos->where('exito', false)->count()]);
         fputcsv($file, ['']);
         
-        // Estadísticas por evento
         $eventoStats = $accesos->groupBy('evento');
         fputcsv($file, ['ACCESOS POR EVENTO']);
         fputcsv($file, ['Evento', 'Total', 'Exitosos', 'Fallidos']);
@@ -411,7 +405,6 @@ public function exportActividadPeriodo(Request $request)
         
         fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
         
-        // Información del reporte
         fputcsv($file, ['REPORTE DE ACTIVIDAD POR PERÍODO']);
         fputcsv($file, ['']);
         fputcsv($file, ['Período:', $request->fecha_desde . ' al ' . $request->fecha_hasta]);
@@ -427,7 +420,6 @@ public function exportActividadPeriodo(Request $request)
         fputcsv($file, ['']);
         fputcsv($file, ['']);
         
-        // Encabezados
         fputcsv($file, [
             'ID',
             'Usuario',
@@ -442,7 +434,6 @@ public function exportActividadPeriodo(Request $request)
             'Fecha y Hora'
         ]);
         
-        // Datos
         foreach ($actividades as $actividad) {
             fputcsv($file, [
                 $actividad->id,
@@ -469,7 +460,6 @@ public function exportActividadPeriodo(Request $request)
         fputcsv($file, ['Actividades fallidas:', $actividades->where('exito', false)->count()]);
         fputcsv($file, ['']);
         
-        // Estadísticas por módulo
         $moduloStats = $actividades->groupBy('modulo');
         fputcsv($file, ['ACTIVIDADES POR MÓDULO']);
         fputcsv($file, ['Módulo', 'Total', 'Exitosas', 'Fallidas']);
@@ -621,7 +611,6 @@ public function exportActividadModulo(Request $request)
             fputcsv($file, ['Fallidas:', $items->where('exito', false)->count()]);
             fputcsv($file, ['']);
             
-            // Encabezados de columnas
             fputcsv($file, [
                 'ID',
                 'Usuario',
@@ -632,7 +621,6 @@ public function exportActividadModulo(Request $request)
                 'Fecha y Hora'
             ]);
             
-            // Datos
             foreach ($items as $actividad) {
                 fputcsv($file, [
                     $actividad->id,
@@ -649,7 +637,6 @@ public function exportActividadModulo(Request $request)
             fputcsv($file, ['']);
         }
         
-        // Resumen general
         fputcsv($file, ['RESUMEN GENERAL']);
         fputcsv($file, ['']);
         fputcsv($file, ['Módulo', 'Total Actividades', 'Exitosas', 'Fallidas']);

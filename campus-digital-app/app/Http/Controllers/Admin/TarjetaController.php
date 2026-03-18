@@ -10,13 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-// NOTA: Se eliminaron miTarjeta() y updatePin() de este controlador.
-// Ahora viven en App\Http\Controllers\MiTarjetaController.
-// El resto del controlador permanece IDÉNTICO al que tenías.
 
 class TarjetaController extends Controller
 {
-    /* ─── INDEX ──────────────────────────────────────────── */
 
     public function index(Request $request)
     {
@@ -51,7 +47,6 @@ class TarjetaController extends Controller
         ]);
     }
 
-    /* ─── CREATE ─────────────────────────────────────────── */
 
     public function create()
     {
@@ -64,7 +59,6 @@ class TarjetaController extends Controller
         ]);
     }
 
-    /* ─── STORE ──────────────────────────────────────────── */
 
     public function store(Request $request)
     {
@@ -94,7 +88,6 @@ class TarjetaController extends Controller
             ->with('success', 'Tarjeta registrada exitosamente.');
     }
 
-    /* ─── SHOW ───────────────────────────────────────────── */
 
     public function show(TarjetaUniversitaria $tarjeta)
     {
@@ -119,7 +112,6 @@ class TarjetaController extends Controller
         ]);
     }
 
-    /* ─── EDIT ───────────────────────────────────────────── */
 
     public function edit(TarjetaUniversitaria $tarjeta)
     {
@@ -130,7 +122,6 @@ class TarjetaController extends Controller
         ]);
     }
 
-    /* ─── UPDATE ─────────────────────────────────────────── */
 
     public function update(Request $request, TarjetaUniversitaria $tarjeta)
     {
@@ -151,7 +142,6 @@ class TarjetaController extends Controller
             ->with('success', 'Tarjeta actualizada.');
     }
 
-    /* ─── DESTROY ────────────────────────────────────────── */
 
     public function destroy(TarjetaUniversitaria $tarjeta)
     {
@@ -161,7 +151,6 @@ class TarjetaController extends Controller
             ->with('success', 'Tarjeta eliminada.');
     }
 
-    /* ─── TOGGLE BLOCK ───────────────────────────────────── */
 
     public function toggleBlock(Request $request, TarjetaUniversitaria $tarjeta)
     {

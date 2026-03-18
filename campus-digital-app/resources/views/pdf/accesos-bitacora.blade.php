@@ -1,4 +1,3 @@
-<!--/home/nerii/Desktop/PROYECTOS/SOTFWARE/CampusDigital/campus-digital-app/resources/views/pdf/accesos-bitacora.blade.php-->
 <!DOCTYPE html>
 <html lang="es">
 <head>
