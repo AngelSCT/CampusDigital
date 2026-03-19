@@ -146,9 +146,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->middleware('permission:user.read')
                 ->name('index');
 
-            Route::get('/{usuario}', [UsuarioController::class, 'show'])
-                ->middleware('permission:user.read')
-                ->name('show');
 
             Route::get('/create', [UsuarioController::class, 'create'])
                 ->middleware('permission:user.write')
@@ -157,6 +154,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/', [UsuarioController::class, 'store'])
                 ->middleware('permission:user.write')
                 ->name('store');
+
+            Route::get('/{usuario}', [UsuarioController::class, 'show'])
+                ->middleware('permission:user.read')
+                ->name('show');
 
             Route::get('/{usuario}/edit', [UsuarioController::class, 'edit'])
                 ->middleware('permission:user.write')
