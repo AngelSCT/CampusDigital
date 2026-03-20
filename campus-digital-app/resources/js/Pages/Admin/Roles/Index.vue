@@ -190,7 +190,7 @@ function clearFilters() {
 }
 
 function isSystemRole(nombre) {
-    return ['administrador', 'docente', 'alumno'].includes(nombre.toLowerCase());
+    return ['administrador'].includes(nombre.toLowerCase());
 }
 
 function confirmDelete(rol) {

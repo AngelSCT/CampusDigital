@@ -24,35 +24,50 @@
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <label class="block text-sm font-medium text-white">Nombre</label>
-                                    <input 
-                                        v-model="formPerfil.nombre" 
-                                        type="text" 
-                                        disabled
-                                        class="mt-1 bg-slate-900/50 text-slate-400 shadow-sm block w-full sm:text-sm border border-slate-700 rounded-lg px-3 py-2 focus:outline-none"
+                                    <input
+                                        v-model="formPerfil.nombre"
+                                        type="text"
+                                        :disabled="!esAdmin"
+                                        :class="esAdmin
+                                            ? 'bg-slate-900 text-white border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                            : 'bg-slate-900/50 text-slate-400 border-slate-700 cursor-not-allowed'"
+                                        class="mt-1 shadow-sm block w-full sm:text-sm rounded-lg px-3 py-2 transition-all duration-200"
                                     >
-                                    <p class="mt-1 text-xs text-slate-400">Contacta al administrador para cambiar tu nombre</p>
+                                    <p v-if="!esAdmin" class="mt-1 text-xs text-slate-400">
+                                        Contacta al administrador para cambiar tu nombre
+                                    </p>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-white">Apellido</label>
-                                    <input 
-                                        v-model="formPerfil.apellido" 
-                                        type="text" 
-                                        disabled
-                                        class="mt-1 bg-slate-900/50 text-slate-400 shadow-sm block w-full sm:text-sm border border-slate-700 rounded-lg px-3 py-2 focus:outline-none"
+                                    <input
+                                        v-model="formPerfil.apellido"
+                                        type="text"
+                                        :disabled="!esAdmin"
+                                        :class="esAdmin
+                                            ? 'bg-slate-900 text-white border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                            : 'bg-slate-900/50 text-slate-400 border-slate-700 cursor-not-allowed'"
+                                        class="mt-1 shadow-sm block w-full sm:text-sm rounded-lg px-3 py-2 transition-all duration-200"
                                     >
-                                    <p class="mt-1 text-xs text-slate-400">Contacta al administrador para cambiar tu apellido</p>
+                                    <p v-if="!esAdmin" class="mt-1 text-xs text-slate-400">
+                                        Contacta al administrador para cambiar tu apellido
+                                    </p>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-white">Email</label>
-                                    <input 
-                                        v-model="formPerfil.email" 
-                                        type="email" 
-                                        disabled
-                                        class="mt-1 bg-slate-900/50 text-slate-400 shadow-sm block w-full sm:text-sm border border-slate-700 rounded-lg px-3 py-2 focus:outline-none"
+                                    <input
+                                        v-model="formPerfil.email"
+                                        type="email"
+                                        :disabled="!esAdmin"
+                                        :class="esAdmin
+                                            ? 'bg-slate-900 text-white border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                            : 'bg-slate-900/50 text-slate-400 border-slate-700 cursor-not-allowed'"
+                                        class="mt-1 shadow-sm block w-full sm:text-sm rounded-lg px-3 py-2 transition-all duration-200"
                                     >
-                                    <p class="mt-1 text-xs text-slate-400">Contacta al administrador para cambiar tu email</p>
+                                    <p v-if="!esAdmin" class="mt-1 text-xs text-slate-400">
+                                        Contacta al administrador para cambiar tu email
+                                    </p>
                                 </div>
 
                                 <div>
@@ -276,17 +291,24 @@
 <script setup>
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const props = defineProps({
     usuario: Object,
 });
+
+const esAdmin = computed(() =>
+    props.usuario.roles?.some(r => r.nombre.toLowerCase() === 'administrador')
+);
 
 const formPerfil = useForm({
     nombre: props.usuario.nombre,
     apellido: props.usuario.apellido,
     email: props.usuario.email,
     telefono: props.usuario.telefono || '',
-    fecha_nacimiento: props.usuario.perfil?.fecha_nacimiento || '',
+    fecha_nacimiento: props.usuario.perfil?.fecha_nacimiento
+    ? String(props.usuario.perfil.fecha_nacimiento).substring(0, 10)
+    : '',
     genero: props.usuario.perfil?.genero || '',
     direccion: props.usuario.perfil?.direccion || '',
 });

@@ -445,7 +445,7 @@ public function show(Usuario $usuario)
             'telefono'         => $usuario->telefono,
             'foto_url'         => $usuario->foto_url,
             'bloqueado'        => (bool) $usuario->bloqueado,
-            'email_verificado' => (bool) $usuario->email_verified_at,
+            'email_verificado' => (bool) $usuario->email_verificado,
             'created_at'       => $usuario->created_at,
             'updated_at'       => $usuario->updated_at,
             'roles'            => $usuario->roles->map(fn($r) => [

@@ -47,6 +47,13 @@ Route::options('/simulador/uid', function () {
         ->header('Access-Control-Allow-Headers', 'Content-Type');
 });
 
+Route::get('/simulador/uid-pendiente', function () {
+        return response()->json([
+            'uid'       => Cache::get('simulador_uid_pendiente'),
+            'timestamp' => Cache::get('simulador_uid_timestamp'),
+        ]);
+})->name('simulador.uid-pendiente');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -60,14 +67,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/lector/leer',            [TarjetaLecturaController::class, 'leer'])->name('lector.leer');
     Route::post('/lector/confirmar-pedido',[TarjetaLecturaController::class, 'confirmarPedido'])->name('lector.confirmar-pedido');
 
-    Route::get('/simulador/uid-pendiente', function () {
-        return response()->json([
-            'uid'       => Cache::get('simulador_uid_pendiente'),
-            'timestamp' => Cache::get('simulador_uid_timestamp'),
-        ]);
-    })->name('simulador.uid-pendiente');
 
-    Route::middleware(['role:estudiante,proveedor_area,administrador'])
+    Route::middleware(['role'])
         ->prefix('mi-tarjeta')
         ->name('mi-tarjeta.')
         ->group(function () {
@@ -142,6 +143,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::prefix('usuarios')->name('usuarios.')->group(function () {
 
+
             Route::get('/', [UsuarioController::class, 'index'])
                 ->middleware('permission:user.read')
                 ->name('index');
@@ -150,6 +152,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/create', [UsuarioController::class, 'create'])
                 ->middleware('permission:user.write')
                 ->name('create');
+
+            Route::get('/export',            [UsuarioController::class, 'export'])->middleware('permission:report.users')->name('export');
+            Route::get('/export-by-role',    [UsuarioController::class, 'exportByRole'])->middleware('permission:report.users')->name('export-by-role');
+            Route::get('/export-pdf',        [UsuarioController::class, 'exportPdf'])->middleware('permission:report.users')->name('export-pdf');
+            Route::get('/export-by-role-pdf',[UsuarioController::class, 'exportByRolePdf'])->middleware('permission:report.users')->name('export-by-role-pdf');
 
             Route::post('/', [UsuarioController::class, 'store'])
                 ->middleware('permission:user.write')
@@ -179,10 +186,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->middleware('permission:user.write')
                 ->name('reset-password');
 
-            Route::get('/export',            [UsuarioController::class, 'export'])->middleware('permission:report.users')->name('export');
-            Route::get('/export-by-role',    [UsuarioController::class, 'exportByRole'])->middleware('permission:report.users')->name('export-by-role');
-            Route::get('/export-pdf',        [UsuarioController::class, 'exportPdf'])->middleware('permission:report.users')->name('export-pdf');
-            Route::get('/export-by-role-pdf',[UsuarioController::class, 'exportByRolePdf'])->middleware('permission:report.users')->name('export-by-role-pdf');
         });
 
 

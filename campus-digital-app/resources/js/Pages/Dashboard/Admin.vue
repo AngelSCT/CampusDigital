@@ -421,11 +421,13 @@
 </template>
 
 <script setup>
-import { computed, onMounted, nextTick, ref } from 'vue';
+import { computed, onMounted, onUnmounted, nextTick, ref } from 'vue';
 import { Chart, registerables } from 'chart.js';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 
 Chart.register(...registerables);
+
+const chartInstances = ref([]);
 
 const props = defineProps({ stats: Object });
 
@@ -480,11 +482,17 @@ function initials(u) {
 }
 
 onMounted(async () => {
-    await nextTick(); 
+    await nextTick();
+    await new Promise(r => setTimeout(r, 50));
+
+    // Destruir instancias previas
+    chartInstances.value.forEach(c => c.destroy());
+    chartInstances.value = [];
+
     const gc = 'rgba(30,58,138,0.18)';
     const tc = '#94a3b8';
 
-    new Chart(chartAccesos.value, {
+    chartInstances.value.push(new Chart(chartAccesos.value, {
         type: 'line',
         data: {
             labels: props.stats.accesos_por_dia.map(d => d.dia),
@@ -494,37 +502,37 @@ onMounted(async () => {
             ],
         },
         options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{color:gc},ticks:{color:tc}}, y:{grid:{color:gc},ticks:{color:tc},beginAtZero:true} } },
-    });
+    }));
 
-    new Chart(chartModulos.value, {
+    chartInstances.value.push(new Chart(chartModulos.value, {
         type: 'bar',
         data: {
             labels: props.stats.actividad_por_modulo.map(m => m.modulo),
             datasets: [{ label:'Acciones', data: props.stats.actividad_por_modulo.map(m => m.total), backgroundColor:['rgba(59,130,246,0.7)','rgba(34,197,94,0.7)','rgba(245,158,11,0.7)','rgba(168,85,247,0.7)','rgba(6,182,212,0.7)','rgba(239,68,68,0.7)','rgba(249,115,22,0.7)','rgba(100,116,139,0.7)'], borderRadius:6 }],
         },
         options: { indexAxis:'y', responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{color:gc},ticks:{color:tc},beginAtZero:true}, y:{grid:{display:false},ticks:{color:tc}} } },
-    });
+    }));
 
-    new Chart(chartTarjetas.value, {
+    chartInstances.value.push(new Chart(chartTarjetas.value, {
         type: 'doughnut',
         data: {
             labels:['Activas','Bloqueadas','Perdidas'],
             datasets:[{ data:[props.stats.tarjetas_activas, props.stats.tarjetas_bloqueadas, props.stats.tarjetas_perdidas], backgroundColor:['rgba(34,197,94,0.8)','rgba(239,68,68,0.8)','rgba(234,179,8,0.8)'], borderColor:['#22c55e','#ef4444','#eab308'], borderWidth:1.5, hoverOffset:6 }],
         },
         options: { cutout:'68%', plugins:{legend:{display:false}} },
-    });
+    }));
 
-    new Chart(chartCrecimiento.value, {
+    chartInstances.value.push(new Chart(chartCrecimiento.value, {
         type: 'line',
         data: {
             labels: props.stats.crecimiento_usuarios.map(d => d.dia),
             datasets:[{ label:'Nuevos', data: props.stats.crecimiento_usuarios.map(d => d.total), borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,0.15)', fill:true, tension:0.4, pointBackgroundColor:'#60a5fa', pointRadius:3 }],
         },
         options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{color:gc},ticks:{color:tc,font:{size:10}}}, y:{grid:{color:gc},ticks:{color:tc},beginAtZero:true} } },
-    });
+    }));
 
     const horas = props.stats.actividad_por_hora ?? [];
-    new Chart(chartHoras.value, {
+    chartInstances.value.push(new Chart(chartHoras.value, {
         type: 'bar',
         data: {
             labels: horas.map(h => `${String(h.hora).padStart(2,'0')}h`),
@@ -536,7 +544,12 @@ onMounted(async () => {
             }), borderRadius:4 }],
         },
         options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false},ticks:{color:tc,font:{size:9}}}, y:{grid:{color:gc},ticks:{color:tc},beginAtZero:true} } },
-    });
+    }));
+});
+
+onUnmounted(() => {
+    chartInstances.value.forEach(c => c.destroy());
+    chartInstances.value = [];
 });
 </script>
 

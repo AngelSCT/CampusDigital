@@ -11,6 +11,9 @@ use Inertia\Inertia;
 
 class RolController extends Controller
 {
+
+    private const ROL_PROTEGIDO = 'administrador';
+
     public function index(Request $request)
     {
         $query = Rol::withCount('usuarios');
@@ -75,6 +78,30 @@ class RolController extends Controller
             'permisos.*' => ['exists:permiso,id'],
         ]);
 
+        if (strtolower($rol->nombre) === self::ROL_PROTEGIDO) {
+
+            if (strtolower($validated['nombre']) !== self::ROL_PROTEGIDO) {
+                return back()->withErrors(['nombre' => 'El nombre del rol administrador no puede modificarse.']);
+            }
+
+            $permisosRestringidos = \App\Models\Permiso::whereIn('clave', [
+                'role.read', 'role.write', 'role.delete', 'role.show',
+                'permission.read', 'permission.write', 'permission.delete', 'permission.show',
+            ])->pluck('id')->toArray();
+
+            $permisosFinales = array_unique(
+                array_merge($validated['permisos'] ?? [], $permisosRestringidos)
+            );
+
+            $rol->update([
+                'descripcion' => $validated['descripcion'] ?? '',
+            ]);
+            $rol->permisos()->sync($permisosFinales);
+
+            return redirect()->route('admin.roles.index')
+                ->with('success', 'Rol actualizado (nombre y permisos de seguridad no modificables).');
+        }
+
         $rol->update([
             'nombre' => $validated['nombre'],
             'descripcion' => $validated['descripcion'] ?? '',
@@ -87,6 +114,11 @@ class RolController extends Controller
 
     public function destroy(Rol $rol)
     {
+
+        if (strtolower($rol->nombre) === self::ROL_PROTEGIDO) {
+            return back()->withErrors(['error' => 'El rol administrador no puede eliminarse.']);
+        }
+
         if ($rol->usuarios()->count() > 0) {
             return back()->withErrors(['error' => 'No puedes eliminar un rol que tiene usuarios asignados.']);
         }

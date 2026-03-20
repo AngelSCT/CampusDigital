@@ -25,15 +25,23 @@
                             <label for="nombre" class="block text-sm font-medium text-white mb-2">
                                 Nombre del Rol <span class="text-red-400">*</span>
                             </label>
+                            <!-- Campo nombre: deshabilitado si es administrador -->
                             <input
                                 v-model="form.nombre"
                                 id="nombre"
                                 type="text"
                                 required
                                 maxlength="50"
+                                :disabled="esAdministrador"
                                 class="block w-full rounded-lg bg-slate-700/50 border text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500/50 sm:text-sm transition-all duration-200"
-                                :class="errors.nombre ? 'border-red-500' : 'border-slate-600 focus:border-blue-500'"
+                                :class="[
+                                    esAdministrador ? 'opacity-50 cursor-not-allowed' : '',
+                                    errors.nombre ? 'border-red-500' : 'border-slate-600 focus:border-blue-500'
+                                ]"
                             />
+                            <p v-if="esAdministrador" class="mt-1 text-xs text-amber-400">
+                                ⚠ El nombre del rol administrador no puede modificarse.
+                            </p>
                             <p v-if="errors.nombre" class="mt-1 text-sm text-red-400">{{ errors.nombre }}</p>
                         </div>
 
@@ -124,21 +132,23 @@
                                     :key="permiso.id"
                                     class="flex items-start hover:bg-slate-700/20 rounded-lg p-2 transition-colors duration-150"
                                 >
-                                    <input
-                                        :id="`permiso-${permiso.id}`"
-                                        v-model="form.permisos"
-                                        :value="permiso.id"
-                                        type="checkbox"
-                                        class="h-4 w-4 text-blue-600 focus:ring-2 focus:ring-blue-500/50 border-slate-600 rounded bg-slate-700/50 mt-1 transition-colors duration-200"
-                                    />
-                                    <label
-                                        :for="`permiso-${permiso.id}`"
-                                        class="ml-3 block cursor-pointer flex-1"
-                                    >
-                                        <!-- Resalta el texto que coincide con la búsqueda -->
-                                        <span class="text-sm font-medium text-white" v-html="highlight(permiso.clave)"></span>
-                                        <p v-if="permiso.descripcion" class="text-xs text-slate-400 mt-0.5">{{ permiso.descripcion }}</p>
-                                    </label>
+                                <input
+                                    :id="`permiso-${permiso.id}`"
+                                    v-model="form.permisos"
+                                    :value="permiso.id"
+                                    type="checkbox"
+                                    :disabled="esAdministrador && permisosProtegidos.includes(permiso.id)"
+                                    class="h-4 w-4 text-blue-600 focus:ring-2 focus:ring-blue-500/50 border-slate-600 rounded bg-slate-700/50 mt-1 transition-colors duration-200"
+                                    :class="esAdministrador && permisosProtegidos.includes(permiso.id) ? 'opacity-50 cursor-not-allowed' : ''"
+                                />
+                                <label :for="`permiso-${permiso.id}`" class="ml-3 block cursor-pointer flex-1">
+                                    <span class="text-sm font-medium text-white" v-html="highlight(permiso.clave)"></span>
+                                    <span
+                                        v-if="esAdministrador && permisosProtegidos.includes(permiso.id)"
+                                        class="ml-2 text-xs text-amber-400"
+                                    >🔒 protegido</span>
+                                    <p v-if="permiso.descripcion" class="text-xs text-slate-400 mt-0.5">{{ permiso.descripcion }}</p>
+                                </label>
                                 </div>
                             </div>
                         </div>
@@ -176,6 +186,19 @@
 import { reactive, ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
+
+const esAdministrador = computed(() =>
+    props.rol.nombre?.toLowerCase() === 'administrador'
+);
+
+const permisosProtegidos = computed(() =>
+    props.permisos
+        .filter(p => [
+            'role.read','role.write','role.delete','role.show',
+            'permission.read','permission.write','permission.delete','permission.show'
+        ].includes(p.clave))
+        .map(p => p.id)
+);
 
 const props = defineProps({
     rol: Object,
