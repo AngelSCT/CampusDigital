@@ -36,7 +36,7 @@
                 <div class="h-24 bg-gradient-to-r from-blue-600/30 to-slate-700/30 relative">
                     <div class="absolute -bottom-10 left-6">
                         <img
-                            :src="usuario.foto_url || '/default-avatar.png'"
+                            :src="usuario.foto_url ? `/storage/${usuario.foto_url}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(usuario.nombre + ' ' + usuario.apellido)}&background=1E40AF&color=fff`"
                             :alt="`${usuario.nombre} ${usuario.apellido}`"
                             class="h-20 w-20 rounded-full ring-4 ring-slate-800 object-cover"
                         >

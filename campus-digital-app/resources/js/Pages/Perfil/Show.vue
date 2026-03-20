@@ -317,14 +317,12 @@ const cambiarPassword = () => {
 
 const subirFoto = (event) => {
     const file = event.target.files[0];
-    if (file) {
-        const formData = new FormData();
-        formData.append('photo', file);
-        
-        useForm(formData).post(route('perfil.photo.update'), {
-            preserveScroll: true,
-        });
-    }
+    if (!file) return;
+
+    useForm({ photo: file }).post(route('perfil.photo.update'), {
+        preserveScroll: true,
+        forceFormData: true,
+    });
 };
 
 const eliminarFoto = () => {

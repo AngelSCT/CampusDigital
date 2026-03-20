@@ -22,13 +22,18 @@ class RolesPermisosSeeder extends Seeder
 
         $permisos = [
 
-            // ── 4.1 
+            // 4.1 
             ['clave' => 'user.read',            'descripcion' => 'Consultar usuarios'],
+            ['clave' => 'user.show',            'descripcion' => 'Ver usuario informacion'],
             ['clave' => 'user.write',           'descripcion' => 'Crear/editar usuarios'],
             ['clave' => 'role.read',            'descripcion' => 'Consultar roles'],
+            ['clave' => 'role.show',            'descripcion' => 'Ver roles detalles'],
             ['clave' => 'role.write',           'descripcion' => 'Administrar roles'],
+            ['clave' => 'role.delete',           'descripcion' => 'Eliminar roles'],
             ['clave' => 'permission.read',      'descripcion' => 'Consultar permisos'],
+            ['clave' => 'permission.show',      'descripcion' => 'Ver permisos detalles'],
             ['clave' => 'permission.write',     'descripcion' => 'Administrar permisos'],
+            ['clave' => 'permission.delete',     'descripcion' => 'Eliminar permisos'],
             ['clave' => 'audit.read',           'descripcion' => 'Consultar bitácoras'],
 
             ['clave' => 'user.delete',          'descripcion' => 'Eliminar/desactivar usuarios'],
@@ -36,7 +41,9 @@ class RolesPermisosSeeder extends Seeder
             ['clave' => 'audit.write',          'descripcion' => 'Registrar eventos en bitácora'],
             ['clave' => 'report.users',         'descripcion' => 'Ver reportes de usuarios y accesos'],
 
-            // ── 4.2 
+            
+
+            // 4.2 
             ['clave' => 'wallet.read',          'descripcion' => 'Consultar saldo propio'],
             ['clave' => 'wallet.read.any',      'descripcion' => 'Consultar saldo de cualquier usuario'],
             ['clave' => 'wallet.charge',        'descripcion' => 'Registrar cargos al monedero'],
@@ -46,21 +53,21 @@ class RolesPermisosSeeder extends Seeder
             ['clave' => 'wallet.history.any',   'descripcion' => 'Consultar historial de movimientos de cualquier usuario'],
             ['clave' => 'report.wallet',        'descripcion' => 'Ver reportes de saldo y movimientos'],
 
-            // ── 4.3 
+            // 4.3 
             ['clave' => 'catalog.read',         'descripcion' => 'Consultar catálogo de servicios y productos'],
             ['clave' => 'catalog.write',        'descripcion' => 'Crear/editar servicios y productos'],
             ['clave' => 'catalog.delete',       'descripcion' => 'Eliminar/desactivar productos del catálogo'],
             ['clave' => 'catalog.price.write',  'descripcion' => 'Modificar precios del catálogo'],
             ['clave' => 'report.catalog',       'descripcion' => 'Ver reportes del catálogo'],
 
-            // ── 4.4 
+            // 4.4 
             ['clave' => 'cart.read',            'descripcion' => 'Consultar carrito propio'],
             ['clave' => 'cart.write',           'descripcion' => 'Agregar/quitar items del carrito'],
             ['clave' => 'checkout.execute',     'descripcion' => 'Confirmar checkout/compra'],
             ['clave' => 'checkout.read.any',    'descripcion' => 'Consultar checkouts de todos los usuarios'],
             ['clave' => 'report.checkout',      'descripcion' => 'Ver reportes de consumos y checkouts'],
 
-            // ── 4.5 
+            // 4.5 
             ['clave' => 'order.read',           'descripcion' => 'Consultar pedidos propios'],
             ['clave' => 'order.read.any',       'descripcion' => 'Consultar pedidos de cualquier usuario o área'],
             ['clave' => 'order.write',          'descripcion' => 'Crear pedidos'],
@@ -69,7 +76,7 @@ class RolesPermisosSeeder extends Seeder
             ['clave' => 'order.evidence.write', 'descripcion' => 'Registrar evidencia de entrega (folio/QR)'],
             ['clave' => 'report.orders',        'descripcion' => 'Ver reportes de pedidos'],
 
-            // ── 4.6 
+            // 4.6 
             ['clave' => 'ticket.read',          'descripcion' => 'Consultar tickets propios'],
             ['clave' => 'ticket.read.any',      'descripcion' => 'Consultar todos los tickets del sistema'],
             ['clave' => 'ticket.write',         'descripcion' => 'Crear tickets de servicio interno'],
@@ -78,7 +85,7 @@ class RolesPermisosSeeder extends Seeder
             ['clave' => 'ticket.close',         'descripcion' => 'Cerrar tickets con evidencia'],
             ['clave' => 'report.tickets',       'descripcion' => 'Ver reportes de tickets y tiempos de atención'],
 
-            // ── 4.7 
+            // 4.7 
             ['clave' => 'reservation.read',     'descripcion' => 'Consultar reservas propias'],
             ['clave' => 'reservation.read.any', 'descripcion' => 'Consultar todas las reservas del sistema'],
             ['clave' => 'reservation.write',    'descripcion' => 'Crear reservas de recursos o turnos'],
@@ -86,7 +93,7 @@ class RolesPermisosSeeder extends Seeder
             ['clave' => 'resource.write',       'descripcion' => 'Administrar recursos reservables (salas, labs, equipos)'],
             ['clave' => 'report.reservations',  'descripcion' => 'Ver reportes de reservas y ocupación'],
 
-            // ── 4.8 
+            // 4.8 
             ['clave' => 'topup.execute',        'descripcion' => 'Realizar recarga de saldo'],
             ['clave' => 'topup.read',           'descripcion' => 'Consultar historial de recargas propias'],
             ['clave' => 'topup.read.any',       'descripcion' => 'Consultar historial de recargas de todos los usuarios'],
@@ -96,14 +103,14 @@ class RolesPermisosSeeder extends Seeder
             ['clave' => 'conciliation.read',    'descripcion' => 'Consultar conciliación de recargas'],
             ['clave' => 'report.payments',      'descripcion' => 'Ver reportes de recargas y pagos'],
 
-            // ── 4.9 
+            // 4.9 
             ['clave' => 'provider.orders.read',   'descripcion' => 'Ver pedidos entrantes del área propia'],
             ['clave' => 'provider.orders.manage', 'descripcion' => 'Aceptar, rechazar y actualizar pedidos del área'],
             ['clave' => 'provider.delivery',      'descripcion' => 'Confirmar entrega/consumo de pedidos'],
             ['clave' => 'provider.wallet.read',   'descripcion' => 'Consultar saldo del usuario (solo lectura, en contexto de entrega)'],
             ['clave' => 'report.provider',        'descripcion' => 'Ver reportes operativos del área proveedora'],
 
-            // ── 4.10 
+            // 4.10 
             ['clave' => 'card.read',            'descripcion' => 'Consultar datos de tarjeta propia'],
             ['clave' => 'card.read.any',        'descripcion' => 'Consultar tarjetas de cualquier usuario'],
             ['clave' => 'card.write',           'descripcion' => 'Registrar y asociar tarjetas a usuarios'],

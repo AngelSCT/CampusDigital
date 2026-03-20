@@ -14,7 +14,6 @@
                                 Dashboard
                             </a>
                             
-                            <!-- Links de Administrador -->
                             <template v-if="isAdmin">
                                 <a href="/admin/usuarios" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
                                     Usuarios
@@ -35,7 +34,6 @@
                         </div>
                     </div>
                     
-                    <!-- User Menu Desktop -->
                     <div class="hidden sm:ml-6 sm:flex sm:items-center">
                         <div class="ml-3 relative">
                             <button @click="toggleUserMenu" type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-slate-900 transition-all duration-300 group">
@@ -46,7 +44,6 @@
                                 </svg>
                             </button>
                             
-                            <!-- Dropdown Menu -->
                             <transition
                                 enter-active-class="transition ease-out duration-200"
                                 enter-from-class="transform opacity-0 scale-95"
@@ -95,7 +92,6 @@
                         </div>
                     </div>
 
-                    <!-- Mobile menu button -->
                     <div class="flex items-center sm:hidden">
                         <button @click="toggleMobileMenu" type="button" class="inline-flex items-center justify-center p-2 rounded-lg text-white hover:text-blue-400 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-all duration-300">
                             <svg class="h-6 w-6" :class="{ 'hidden': showMobileMenu, 'block': !showMobileMenu }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -109,7 +105,6 @@
                 </div>
             </div>
 
-            <!-- Mobile menu -->
             <transition
                 enter-active-class="transition ease-out duration-200"
                 enter-from-class="opacity-0 -translate-y-1"
@@ -140,7 +135,6 @@
                         </template>
                     </div>
                     
-                    <!-- User section mobile -->
                     <div class="pt-4 pb-3 border-t border-blue-500/20">
                         <div class="flex items-center px-4">
                             <div class="flex-shrink-0">
@@ -164,7 +158,6 @@
             </transition>
         </nav>
 
-        <!-- Flash Messages -->
         <div v-if="$page.props.flash?.success" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
             <div class="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-l-4 border-green-500 rounded-lg p-4 backdrop-blur-sm shadow-lg shadow-green-500/10">
                 <div class="flex">
@@ -209,7 +202,6 @@
             </div>
         </div>
 
-        <!-- Page Content -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <slot />
         </main>
@@ -234,7 +226,7 @@ const userEmail = computed(() => page.props.auth?.user?.email || '');
 const userAvatar = computed(() => {
     const user = page.props.auth?.user;
     if (user?.foto_url) {
-        return user.foto_url;
+        return `/storage/${user.foto_url}`;  
     }
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(userName.value)}&background=1E40AF&color=fff`;
 });
@@ -248,7 +240,6 @@ const isAdmin = computed(() => {
     return userRoles.value.includes('administrador');
 });
 
-// Methods
 function toggleUserMenu() {
     showUserMenu.value = !showUserMenu.value;
     showMobileMenu.value = false;
@@ -265,7 +256,6 @@ function logout() {
     }
 }
 
-// Click outside to close
 function handleClickOutside(event) {
     const userMenuButton = event.target.closest('button');
     if (!userMenuButton) {

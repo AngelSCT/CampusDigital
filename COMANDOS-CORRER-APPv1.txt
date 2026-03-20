@@ -123,6 +123,7 @@ git clone https://github.com/AngelSCT/CampusDigital
 
     php artisan migrate
     php artisan db:seed
+    php artisan storage:link
 
 ---------------------------------------------------------------------------------------------
 

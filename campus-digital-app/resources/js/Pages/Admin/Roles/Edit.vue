@@ -1,7 +1,6 @@
 <template>
     <AuthLayout>
         <div class="max-w-4xl mx-auto space-y-6">
-            <!-- Header -->
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
@@ -17,7 +16,6 @@
                 </a>
             </div>
 
-            <!-- Formulario -->
             <form @submit.prevent="submit" class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20 overflow-hidden">
                 <div class="p-6 space-y-6">
                     <!-- Información Básica -->
@@ -39,7 +37,6 @@
                             <p v-if="errors.nombre" class="mt-1 text-sm text-red-400">{{ errors.nombre }}</p>
                         </div>
 
-                        <!-- Descripción -->
                         <div>
                             <label for="descripcion" class="block text-sm font-medium text-white mb-2">
                                 Descripción
@@ -55,9 +52,8 @@
                         </div>
                     </div>
 
-                    <!-- Permisos -->
                     <div>
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center justify-between mb-3">
                             <label class="block text-sm font-medium text-white">
                                 Permisos Asignados
                             </label>
@@ -80,6 +76,28 @@
                             </div>
                         </div>
 
+                        <div class="relative mb-2">
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <input
+                                v-model="busquedaPermiso"
+                                type="text"
+                                placeholder="Buscar permiso..."
+                                class="block w-full pl-9 pr-4 py-2 rounded-lg bg-slate-700/50 border border-slate-600 text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 sm:text-sm transition-all duration-200"
+                            />
+                            <button
+                                v-if="busquedaPermiso"
+                                type="button"
+                                @click="busquedaPermiso = ''"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
                         <div class="border border-slate-700 rounded-lg p-4 max-h-96 overflow-y-auto bg-slate-900/30">
                             <div v-if="permisos.length === 0" class="text-center py-8">
                                 <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-700/50 flex items-center justify-center">
@@ -89,9 +107,20 @@
                                 </div>
                                 <p class="text-slate-400">No hay permisos disponibles</p>
                             </div>
+
+                            <!-- Sin resultados de búsqueda -->
+                            <div v-else-if="permisosFiltrados.length === 0" class="text-center py-8">
+                                <svg class="w-10 h-10 mx-auto text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                                <p class="text-sm text-slate-500">
+                                    Sin resultados para "<span class="text-slate-300">{{ busquedaPermiso }}</span>"
+                                </p>
+                            </div>
+
                             <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div
-                                    v-for="permiso in permisos"
+                                    v-for="permiso in permisosFiltrados"
                                     :key="permiso.id"
                                     class="flex items-start hover:bg-slate-700/20 rounded-lg p-2 transition-colors duration-150"
                                 >
@@ -106,19 +135,23 @@
                                         :for="`permiso-${permiso.id}`"
                                         class="ml-3 block cursor-pointer flex-1"
                                     >
-                                        <span class="text-sm font-medium text-white">{{ permiso.clave }}</span>
+                                        <!-- Resalta el texto que coincide con la búsqueda -->
+                                        <span class="text-sm font-medium text-white" v-html="highlight(permiso.clave)"></span>
                                         <p v-if="permiso.descripcion" class="text-xs text-slate-400 mt-0.5">{{ permiso.descripcion }}</p>
                                     </label>
                                 </div>
                             </div>
                         </div>
+
                         <p class="mt-2 text-sm text-slate-400">
                             <span class="text-blue-400 font-medium">{{ form.permisos.length }}</span> permiso(s) seleccionado(s)
+                            <span v-if="busquedaPermiso" class="text-slate-500">
+                                · mostrando <span class="text-slate-300">{{ permisosFiltrados.length }}</span> de {{ permisos.length }}
+                            </span>
                         </p>
                     </div>
                 </div>
 
-                <!-- Botones de Acción -->
                 <div class="bg-slate-900/50 px-6 py-4 flex justify-end gap-3 border-t border-slate-700">
                     <a
                         :href="route('admin.roles.index')"
@@ -140,7 +173,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 
@@ -157,6 +190,26 @@ const form = reactive({
 
 const errors = ref({});
 const processing = ref(false);
+
+const busquedaPermiso = ref('');
+
+const permisosFiltrados = computed(() => {
+    if (!busquedaPermiso.value.trim()) return props.permisos;
+    const q = busquedaPermiso.value.toLowerCase();
+    return props.permisos.filter(p =>
+        p.clave.toLowerCase().includes(q) ||
+        (p.descripcion && p.descripcion.toLowerCase().includes(q))
+    );
+});
+
+function highlight(texto) {
+    if (!busquedaPermiso.value.trim()) return texto;
+    const escaped = busquedaPermiso.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return texto.replace(
+        new RegExp(`(${escaped})`, 'gi'),
+        '<mark class="bg-blue-500/30 text-blue-200 rounded px-0.5">$1</mark>'
+    );
+}
 
 function selectAllPermisos() {
     form.permisos = props.permisos.map(p => p.id);

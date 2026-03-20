@@ -5,9 +5,9 @@ URLS DE LA API REST DE LA APLICACION (SE PUEDEN PROBAR CON INSOMNIA O POSTMAN)
 HEADER 1: X-API-KEY    - 4f8a2b1c9d3e7f6a0b5c8d2e1f4a7b3c6d9e2f5a8b1c4d7e0f3a6b9c2d5e8f1a
 HEADER 2: Accept       - application/json
 
-******************************************************************
+
  USUARIOS
-******************************************************************
+
 GET     http://localhost:8000/api/usuarios
 GET     http://localhost:8000/api/usuarios?search=juan
 GET     http://localhost:8000/api/usuarios?bloqueado=true
@@ -20,9 +20,9 @@ PUT     http://localhost:8000/api/usuarios/1
 DELETE  http://localhost:8000/api/usuarios/1
 POST    http://localhost:8000/api/usuarios/1/toggle-block
 
-******************************************************************
+
  ROLES
-******************************************************************
+
 GET     http://localhost:8000/api/roles
 GET     http://localhost:8000/api/roles/1
 GET     http://localhost:8000/api/roles/2
@@ -31,9 +31,9 @@ POST    http://localhost:8000/api/roles
 PUT     http://localhost:8000/api/roles/1
 DELETE  http://localhost:8000/api/roles/1
 
-******************************************************************
+
  PERMISOS
-******************************************************************
+
 GET     http://localhost:8000/api/permisos
 GET     http://localhost:8000/api/permisos/1
 GET     http://localhost:8000/api/permisos/2
@@ -42,9 +42,9 @@ POST    http://localhost:8000/api/permisos
 PUT     http://localhost:8000/api/permisos/1
 DELETE  http://localhost:8000/api/permisos/1
 
-******************************************************************
+
  ROL - PERMISO
-******************************************************************
+
 GET     http://localhost:8000/api/rol-permisos
 GET     http://localhost:8000/api/rol-permisos?rol_id=1
 GET     http://localhost:8000/api/rol-permisos?rol_id=2
@@ -52,9 +52,9 @@ GET     http://localhost:8000/api/rol-permisos?rol_id=3
 POST    http://localhost:8000/api/rol-permisos
 DELETE  http://localhost:8000/api/rol-permisos/1
 
-******************************************************************
+
  USUARIO - ROL
-******************************************************************
+
 GET     http://localhost:8000/api/usuario-roles
 GET     http://localhost:8000/api/usuario-roles?usuario_id=1
 GET     http://localhost:8000/api/usuario-roles?usuario_id=2
@@ -62,18 +62,18 @@ GET     http://localhost:8000/api/usuario-roles?rol_id=1
 POST    http://localhost:8000/api/usuario-roles
 DELETE  http://localhost:8000/api/usuario-roles/1
 
-******************************************************************
+
  PERFILES
-******************************************************************
+
 GET     http://localhost:8000/api/usuario-perfiles
 GET     http://localhost:8000/api/usuario-perfiles/1
 GET     http://localhost:8000/api/usuario-perfiles/2
 GET     http://localhost:8000/api/usuario-perfiles/3
 PUT     http://localhost:8000/api/usuario-perfiles/1
 
-******************************************************************
+
  SESIONES
-******************************************************************
+
 GET     http://localhost:8000/api/sesiones
 GET     http://localhost:8000/api/sesiones?activa=true
 GET     http://localhost:8000/api/sesiones?activa=false
@@ -84,9 +84,9 @@ GET     http://localhost:8000/api/sesiones?per_page=5
 GET     http://localhost:8000/api/sesiones/1
 GET     http://localhost:8000/api/sesiones/2
 
-******************************************************************
+
  BITÁCORA — ACCESOS
-******************************************************************
+
 GET     http://localhost:8000/api/bitacora/accesos
 GET     http://localhost:8000/api/bitacora/accesos?evento=login_success
 GET     http://localhost:8000/api/bitacora/accesos?evento=login_failed
@@ -103,9 +103,9 @@ GET     http://localhost:8000/api/bitacora/accesos/1
 GET     http://localhost:8000/api/bitacora/accesos/2
 GET     http://localhost:8000/api/bitacora/accesos/7
 
-******************************************************************
+
  BITÁCORA — ACTIVIDAD
-******************************************************************
+
 GET     http://localhost:8000/api/bitacora/actividad
 GET     http://localhost:8000/api/bitacora/actividad?usuario_id=1
 GET     http://localhost:8000/api/bitacora/actividad?modulo=seguridad
@@ -121,9 +121,9 @@ GET     http://localhost:8000/api/bitacora/actividad/1
 GET     http://localhost:8000/api/bitacora/actividad/5
 GET     http://localhost:8000/api/bitacora/actividad/10
 
-******************************************************************
+
  TARJETAS UNIVERSITARIAS
-******************************************************************
+
 GET     http://localhost:8000/api/tarjetas
 GET     http://localhost:8000/api/tarjetas?estado=activa
 GET     http://localhost:8000/api/tarjetas?estado=bloqueada
@@ -140,9 +140,9 @@ DELETE  http://localhost:8000/api/tarjetas/1
 POST    http://localhost:8000/api/tarjetas/1/bloquear
 POST    http://localhost:8000/api/tarjetas/1/desbloquear
 
-******************************************************************
+
  LECTURAS DE TARJETA
-******************************************************************
+
 GET     http://localhost:8000/api/tarjeta-lecturas
 GET     http://localhost:8000/api/tarjeta-lecturas?tarjeta_id=1
 GET     http://localhost:8000/api/tarjeta-lecturas?uid_leido=A1B2C3D4E5F6
@@ -165,9 +165,9 @@ GET     http://localhost:8000/api/tarjeta-lecturas/1
 GET     http://localhost:8000/api/tarjeta-lecturas/2
 POST    http://localhost:8000/api/tarjeta-lecturas
 
-******************************************************************
+
  SALDO MONEDERO
-******************************************************************
+
 GET     http://localhost:8000/api/saldo-monederos
 GET     http://localhost:8000/api/saldo-monederos?usuario_id=1
 GET     http://localhost:8000/api/saldo-monederos/usuario/1
@@ -176,9 +176,9 @@ GET     http://localhost:8000/api/saldo-monederos/1
 GET     http://localhost:8000/api/saldo-monederos/2
 POST    http://localhost:8000/api/saldo-monederos
 
-******************************************************************
+
  SALDO MOVIMIENTOS
-******************************************************************
+
 GET     http://localhost:8000/api/saldo-movimientos
 GET     http://localhost:8000/api/saldo-movimientos?usuario_id=1
 GET     http://localhost:8000/api/saldo-movimientos?usuario_id=4
@@ -195,9 +195,9 @@ GET     http://localhost:8000/api/saldo-movimientos/1
 GET     http://localhost:8000/api/saldo-movimientos/2
 POST    http://localhost:8000/api/saldo-movimientos
 
-******************************************************************
+
  PEDIDOS
-******************************************************************
+
 GET     http://localhost:8000/api/pedidos
 GET     http://localhost:8000/api/pedidos?usuario_id=1
 GET     http://localhost:8000/api/pedidos?usuario_id=4
@@ -222,11 +222,11 @@ DELETE  http://localhost:8000/api/pedidos/1
 POST    http://localhost:8000/api/pedidos/1/estado
 POST    http://localhost:8000/api/pedidos/1/confirmar-tarjeta
 
-******************************************************************
- BODIES JSON PARA POST / PUT
-******************************************************************
 
-── POST /api/usuarios ──────────────────────
+ BODIES JSON PARA POST / PUT
+
+
+POST /api/usuarios
 {
     "nombre": "Carlos",
     "apellido": "López",
@@ -235,52 +235,52 @@ POST    http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "telefono": "5551234567"
 }
 
-── PUT /api/usuarios/{id} ──────────────────
+PUT /api/usuarios/{id} 
 {
     "nombre": "Carlos Alberto",
     "telefono": "5559999999"
 }
 
-── POST /api/roles ─────────────────────────
+POST /api/roles
 {
     "nombre": "moderador",
     "descripcion": "Rol de moderación",
     "activo": true
 }
 
-── PUT /api/roles/{id} ─────────────────────
+PUT /api/roles/{id} 
 {
     "descripcion": "Descripción actualizada",
     "activo": false
 }
 
-── POST /api/permisos ──────────────────────
+POST /api/permisos
 {
     "clave": "reporte.read",
     "descripcion": "Ver reportes",
     "activo": true
 }
 
-── POST /api/rol-permisos ──────────────────
+POST /api/rol-permisos
 {
     "rol_id": 1,
     "permiso_id": 2
 }
 
-── POST /api/usuario-roles ─────────────────
+POST /api/usuario-roles
 {
     "usuario_id": 4,
     "rol_id": 2
 }
 
-── PUT /api/usuario-perfiles/{id} ──────────
+PUT /api/usuario-perfiles/{id}
 {
     "fecha_nacimiento": "1995-06-15",
     "genero": "masculino",
     "direccion": "Calle Falsa 123"
 }
 
-── POST /api/tarjetas ──────────────────────
+POST /api/tarjetas 
 {
     "usuario_id": 4,
     "uid": "A1B2C3D4E5F6",
@@ -288,19 +288,19 @@ POST    http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "registrado_por_usuario_id": 1
 }
 
-── PUT /api/tarjetas/{id} ──────────────────
+PUT /api/tarjetas/{id} 
 {
     "estado": "perdida",
     "motivo_bloqueo": "El usuario reporto que no encuentra su tarjeta"
 }
 
-── POST /api/tarjetas/{id}/bloquear ────────
+POST /api/tarjetas/{id}/bloquear
 {
     "motivo_bloqueo": "Tarjeta reportada como robada",
     "bloqueado_por_usuario_id": 1
 }
 
-── POST /api/tarjeta-lecturas ──────────────
+POST /api/tarjeta-lecturas 
 {
     "uid_leido": "A1B2C3D4E5F6",
     "modulo": "cafeteria",
@@ -310,12 +310,12 @@ POST    http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "operador_usuario_id": 2
 }
 
-── POST /api/saldo-monederos ───────────────
+POST /api/saldo-monederos
 {
     "usuario_id": 4
 }
 
-── POST /api/saldo-movimientos (abono) ─────
+POST /api/saldo-movimientos (abono)
 {
     "usuario_id": 4,
     "tipo": "abono",
@@ -325,7 +325,7 @@ POST    http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "operador_usuario_id": 1
 }
 
-── POST /api/saldo-movimientos (cargo) ─────
+POST /api/saldo-movimientos (cargo) 
 {
     "usuario_id": 4,
     "tipo": "cargo",
@@ -338,7 +338,7 @@ POST    http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "referencia_id": 5
 }
 
-── POST /api/pedidos ───────────────────────
+POST /api/pedidos 
 {
     "usuario_id": 4,
     "modulo": "cafeteria",
@@ -347,19 +347,19 @@ POST    http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "notas": "Sin chile"
 }
 
-── PUT /api/pedidos/{id} ───────────────────
+PUT /api/pedidos/{id}
 {
     "notas": "Sin chile y sin sal",
     "descripcion": "Comida del dia actualizada"
 }
 
-── POST /api/pedidos/{id}/estado ───────────
+POST /api/pedidos/{id}/estado
 {
     "estado": "aceptado",
     "operador_usuario_id": 2
 }
 
-── POST /api/pedidos/{id}/confirmar-tarjeta
+POST /api/pedidos/{id}/confirmar-tarjeta
 {
     "tarjeta_lectura_id": 5
 }

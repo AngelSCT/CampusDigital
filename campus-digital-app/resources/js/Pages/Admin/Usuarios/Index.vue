@@ -179,7 +179,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center min-w-[200px]">
                                         <div class="h-10 w-10 flex-shrink-0">
-                                            <img class="h-10 w-10 rounded-full ring-2 ring-slate-600" :src="usuario.foto_url || '/default-avatar.png'" alt="">
+                                            <img class="h-10 w-10 rounded-full ring-2 ring-slate-600" :src="usuario.foto_url ? `/storage/${usuario.foto_url}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(usuario.nombre + ' ' + usuario.apellido)}&background=1E40AF&color=fff`" alt="">
                                         </div>
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-white">{{ usuario.nombre }} {{ usuario.apellido }}</div>

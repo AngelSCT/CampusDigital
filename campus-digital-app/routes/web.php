@@ -156,7 +156,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->name('store');
 
             Route::get('/{usuario}', [UsuarioController::class, 'show'])
-                ->middleware('permission:user.read')
+                ->middleware('permission:user.show')
                 ->name('show');
 
             Route::get('/{usuario}/edit', [UsuarioController::class, 'edit'])
@@ -190,9 +190,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/',           [RolController::class, 'index'])->middleware('permission:role.read')->name('index');
             Route::get('/create',     [RolController::class, 'create'])->middleware('permission:role.write')->name('create');
             Route::post('/',          [RolController::class, 'store'])->middleware('permission:role.write')->name('store');
+            Route::get('/{rol}',      [RolController::class, 'show'])->middleware('permission:role.show')->name('show'); 
             Route::get('/{rol}/edit', [RolController::class, 'edit'])->middleware('permission:role.write')->name('edit');
             Route::put('/{rol}',      [RolController::class, 'update'])->middleware('permission:role.write')->name('update');
-            Route::delete('/{rol}',   [RolController::class, 'destroy'])->middleware('permission:role.write')->name('destroy');
+            Route::delete('/{rol}',   [RolController::class, 'destroy'])->middleware('permission:role.delete')->name('destroy');
         });
 
 
@@ -200,9 +201,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/',               [PermisoController::class, 'index'])->middleware('permission:permission.read')->name('index');
             Route::get('/create',         [PermisoController::class, 'create'])->middleware('permission:permission.write')->name('create');
             Route::post('/',              [PermisoController::class, 'store'])->middleware('permission:permission.write')->name('store');
+            Route::get('/{permiso}',      [PermisoController::class, 'show'])->middleware('permission:permission.show')->name('show');  
             Route::get('/{permiso}/edit', [PermisoController::class, 'edit'])->middleware('permission:permission.write')->name('edit');
             Route::put('/{permiso}',      [PermisoController::class, 'update'])->middleware('permission:permission.write')->name('update');
-            Route::delete('/{permiso}',   [PermisoController::class, 'destroy'])->middleware('permission:permission.write')->name('destroy');
+            Route::delete('/{permiso}',   [PermisoController::class, 'destroy'])->middleware('permission:permission.delete')->name('destroy');
         });
 
         Route::prefix('bitacora')->name('bitacora.')->middleware('permission:audit.read')->group(function () {
