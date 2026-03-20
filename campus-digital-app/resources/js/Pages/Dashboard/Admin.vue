@@ -421,7 +421,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, nextTick, ref } from 'vue';
 import { Chart, registerables } from 'chart.js';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 
@@ -479,7 +479,8 @@ function initials(u) {
     return ((u.nombre?.[0] ?? '') + (u.apellido?.[0] ?? '')).toUpperCase();
 }
 
-onMounted(() => {
+onMounted(async () => {
+    await nextTick(); 
     const gc = 'rgba(30,58,138,0.18)';
     const tc = '#94a3b8';
 
