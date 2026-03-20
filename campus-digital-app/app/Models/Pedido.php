@@ -79,4 +79,9 @@ class Pedido extends Model
         $siguiente = static::whereDate('created_at', today())->count() + 1;
         return sprintf('PED-%s-%04d', $fecha, $siguiente);
     }
+
+    public function historial()
+    {
+    return $this->hasMany(PedidoHistorial::class, 'pedido_id')->orderBy('created_at', 'asc');
+    }
 }

@@ -16,6 +16,9 @@ use App\Http\Controllers\Admin\TarjetaReporteController;
 use App\Http\Controllers\TarjetaLecturaController;
 use App\Http\Controllers\Auth\RfidLoginController;
 use App\Http\Controllers\MiTarjetaController;
+use App\Http\Controllers\Pedidos\PedidoController;
+use App\Http\Controllers\Pedidos\PedidoDashboardController;
+use App\Http\Controllers\Pedidos\PedidoReporteController;
 
 
 Route::get('/', function () {
@@ -234,5 +237,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/accesos-export',   [ReporteController::class, 'exportAccesos'])->name('accesos.export');
             Route::get('/actividad-export', [ReporteController::class, 'exportActividad'])->name('actividad.export');
         });
+    });
+
+    // ── Módulo 4.5: Pedidos y Seguimiento ─────────────────────────
+    Route::prefix('pedidos')->name('pedidos.')->group(function () {
+
+        // ── RUTAS FIJAS PRIMERO (antes del parámetro) ──────────────
+        Route::get('/panel/dashboard',             [PedidoDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/panel/operador',              [PedidoController::class, 'operador'])->name('operador');
+        Route::get('/panel/reportes',              [PedidoReporteController::class, 'index'])->name('reportes');
+        Route::get('/panel/reportes/export-csv',   [PedidoReporteController::class, 'exportCsv'])->name('reportes.export-csv');
+        Route::get('/panel/reportes/export-excel', [PedidoReporteController::class, 'exportExcel'])->name('reportes.export-excel');
+        Route::get('/panel/reportes/export-pdf',   [PedidoReporteController::class, 'exportPdf'])->name('reportes.export-pdf');
+
+        // ── RUTAS CON PARÁMETRO DESPUÉS ────────────────────────────
+        Route::get('/',                        [PedidoController::class, 'index'])->name('index');
+        Route::get('/{pedido}',             [PedidoController::class, 'show'])->name('show')->whereNumber('pedido');
+        Route::post('/{pedido}/cancelar',   [PedidoController::class, 'cancelar'])->name('cancelar')->whereNumber('pedido');
+        Route::get('/{pedido}/estado-json', [PedidoController::class, 'estadoJson'])->name('estado-json')->whereNumber('pedido');
+        Route::post('/{pedido}/estado',     [PedidoController::class, 'cambiarEstado'])->name('cambiar-estado')->whereNumber('pedido');
     });
 });
