@@ -31,6 +31,12 @@
                                     Tarjetas
                                 </a>
                             </template>
+                                <a href="/archivos" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                                    </svg>
+                                    Archivos
+                                </a>
                         </div>
                     </div>
                     
@@ -77,6 +83,14 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                                             </svg>
                                             Mi Tarjeta
+                                        </a>
+
+                                        <!-- Mis Archivos -->
+                                        <a href="/archivos" class="block px-4 py-2 text-sm text-white hover:bg-blue-500/10 hover:text-blue-400 flex items-center transition-all duration-200">
+                                            <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                                            </svg>
+                                            Mis Archivos
                                         </a>
                                         
                                         <!-- Cerrar Sesión -->

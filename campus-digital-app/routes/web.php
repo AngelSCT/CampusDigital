@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\TarjetaReporteController;
 use App\Http\Controllers\TarjetaLecturaController;
 use App\Http\Controllers\Auth\RfidLoginController;
 use App\Http\Controllers\MiTarjetaController;
+use App\Http\Controllers\Archivos\ArchivoController;
 
 
 Route::get('/', function () {
@@ -87,6 +88,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/actualizar', [PerfilController::class, 'updateProfile'])->name('update');
         Route::post('/foto',       [PerfilController::class, 'updatePhoto'])->name('photo.update');
         Route::delete('/foto',     [PerfilController::class, 'deletePhoto'])->name('photo.delete');
+    });
+
+    Route::prefix('archivos')->name('archivos.')->middleware('permission:file.read')->group(function () {
+        Route::get('/',                                    [ArchivoController::class, 'index'])->name('index');
+        Route::post('/carpeta',                            [ArchivoController::class, 'crearCarpeta'])->middleware('permission:file.write')->name('carpeta.crear');
+        Route::delete('/carpeta/{carpeta}',                [ArchivoController::class, 'eliminarCarpeta'])->middleware('permission:file.delete')->name('carpeta.eliminar');
+        Route::post('/carpeta/{carpeta}/renombrar',        [ArchivoController::class, 'renombrarCarpeta'])->middleware('permission:file.write')->name('carpeta.renombrar');
+        Route::post('/subir',                              [ArchivoController::class, 'subir'])->middleware('permission:file.write')->name('subir');
+        Route::get('/{archivo}/descargar',                 [ArchivoController::class, 'descargar'])->name('descargar');
+        Route::get('/{archivo}/previsualizar',             [ArchivoController::class, 'previsualizar'])->name('previsualizar');
+        Route::delete('/{archivo}',                        [ArchivoController::class, 'eliminarArchivo'])->middleware('permission:file.delete')->name('eliminar');
+        Route::post('/{archivo}/marcar-visto',             [ArchivoController::class, 'marcarVisto'])->middleware('permission:file.admin')->name('marcar-visto');
+        Route::post('/{archivo}/desmarcar-visto',          [ArchivoController::class, 'desmarcarVisto'])->middleware('permission:file.admin')->name('desmarcar-visto');
+        Route::post('/{archivo}/nota',                     [ArchivoController::class, 'agregarNota'])->middleware('permission:file.admin')->name('nota');
     });
 
     Route::middleware(['role:administrador'])->prefix('admin')->name('admin.')->group(function () {

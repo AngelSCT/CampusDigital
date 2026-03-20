@@ -104,6 +104,19 @@ window.route = (name, params) => {
 
         //RUTA DE ERROR DE PERMISO POR MIDDLEWARE
         'sin-permiso': '/sin-permiso',
+
+        //RUTAS DEL EXPLORADOR DE ARCHIVOS
+        'archivos.index':            '/archivos',
+        'archivos.carpeta.crear':    '/archivos/carpeta',
+        'archivos.carpeta.eliminar': '/archivos/carpeta/:id',
+        'archivos.carpeta.renombrar':'/archivos/carpeta/:id/renombrar',
+        'archivos.subir':            '/archivos/subir',
+        'archivos.descargar':        '/archivos/:id/descargar',
+        'archivos.previsualizar':    '/archivos/:id/previsualizar',
+        'archivos.eliminar':         '/archivos/:id',
+        'archivos.marcar-visto':     '/archivos/:id/marcar-visto',
+        'archivos.desmarcar-visto':  '/archivos/:id/desmarcar-visto',
+        'archivos.nota':             '/archivos/:id/nota',
     };
     
     let url = routes[name] || '/';

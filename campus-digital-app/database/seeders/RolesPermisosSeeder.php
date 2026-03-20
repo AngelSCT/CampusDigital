@@ -118,6 +118,14 @@ class RolesPermisosSeeder extends Seeder
             ['clave' => 'card.auth',            'descripcion' => 'Autenticar usuarios por proximidad (RFID/NFC)'],
             ['clave' => 'card.import',          'descripcion' => 'Importar tarjetas de forma masiva por CSV'],
             ['clave' => 'report.cards',         'descripcion' => 'Ver reportes de uso, incidentes y auditoría de tarjetas'],
+
+            //PERMISOS DEL EXPLORADOR DE ARCHIVOS
+            ['clave' => 'file.read',       'descripcion' => 'Ver y descargar archivos propios'],
+            ['clave' => 'file.write',      'descripcion' => 'Subir archivos y crear carpetas'],
+            ['clave' => 'file.delete',     'descripcion' => 'Eliminar archivos y carpetas propios'],
+            ['clave' => 'file.read.any',   'descripcion' => 'Ver archivos de cualquier usuario'],
+            ['clave' => 'file.delete.any', 'descripcion' => 'Eliminar archivos de cualquier usuario'],
+            ['clave' => 'file.admin',      'descripcion' => 'Marcar como visto y agregar notas admin'],
         ];
 
         foreach ($permisos as $permiso) {
@@ -149,6 +157,9 @@ class RolesPermisosSeeder extends Seeder
             'ticket.write',
             'ticket.status.write',
             'ticket.close',
+            'file.read',
+            'file.write',
+            'file.delete',
         ];
 
         $permisosProveedorRows = DB::table('permiso')
@@ -184,6 +195,9 @@ class RolesPermisosSeeder extends Seeder
             'topup.read',
             'voucher.read',
             'card.read',
+            'file.read',
+            'file.write',
+            'file.delete',
         ];
 
         $permisosEstudianteRows = DB::table('permiso')
