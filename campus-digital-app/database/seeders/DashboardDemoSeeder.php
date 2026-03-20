@@ -342,7 +342,7 @@ class DashboardDemoSeeder extends Seeder
                 $tipoLectura = self::TIPOS_LECTURA[array_rand(self::TIPOS_LECTURA)];
                 $exito       = $tarjeta['estado'] === 'activa' ? (rand(1, 10) > 1) : false;
 
-                $diasAtras = rand(1, 3) === 1 ? 0 : rand(1, 14);
+                $diasAtras = rand(1, 2);
                 $fecha     = now()->subDays($diasAtras)->subHours(rand(6, 22))->subMinutes(rand(0, 59));
 
                 DB::table('tarjeta_lectura')->insert([

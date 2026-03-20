@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'simulador/uid',
             'simulador/*',
+            'auth/rfid-login',
         ]);
 
         $middleware->web(append: [
