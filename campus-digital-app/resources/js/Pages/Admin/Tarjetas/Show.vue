@@ -1,7 +1,6 @@
 <template>
     <AuthLayout>
         <div class="space-y-6">
-            <!-- Header -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div class="flex items-center gap-4">
                     <a :href="route('admin.tarjetas.index')"
@@ -31,7 +30,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Tarjeta info -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-cyan-500/20 shadow-xl shadow-cyan-500/5 p-6 space-y-4">
                     <div class="flex items-center justify-between">
                         <h2 class="text-base font-semibold text-white">Información de Tarjeta</h2>

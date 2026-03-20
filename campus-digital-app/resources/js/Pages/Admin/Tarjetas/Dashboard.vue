@@ -1,7 +1,6 @@
 <template>
     <AuthLayout>
         <div class="space-y-6">
-            <!-- Header -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
@@ -21,7 +20,6 @@
                 </div>
             </div>
 
-            <!-- Stats principales -->
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-5">
                     <p class="text-xs text-slate-400 uppercase tracking-wider">Total Tarjetas</p>
@@ -47,19 +45,16 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                <!-- Lecturas por dia -->
                 <div class="lg:col-span-2 bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-cyan-500/20 shadow-xl shadow-cyan-500/5 p-6">
                     <h2 class="text-base font-semibold text-white mb-4">Lecturas por Día (últimos 14 días)</h2>
                     <div class="flex items-end gap-1 h-32">
                         <div v-for="dia in lecturasPorDia" :key="dia.fecha"
                              class="flex-1 flex flex-col items-center gap-1 group">
                             <div class="relative w-full flex flex-col justify-end" style="height: 100px;">
-                                <!-- Barra total -->
                                 <div
                                     :style="{ height: maxLecturas > 0 ? (dia.total / maxLecturas * 100) + '%' : '2px' }"
                                     class="w-full bg-gradient-to-t from-cyan-600 to-blue-500 rounded-t transition-all duration-300 group-hover:from-cyan-500 group-hover:to-blue-400 min-h-[2px]">
                                 </div>
-                                <!-- Tooltip -->
                                 <div class="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
                                     {{ dia.total }} lecturas
                                 </div>
@@ -77,7 +72,6 @@
                     </div>
                 </div>
 
-                <!-- Uso por modulo -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-blue-500/20 shadow-xl shadow-blue-500/5 p-6">
                     <h2 class="text-base font-semibold text-white mb-4">Uso por Módulo (30 días)</h2>
                     <div v-if="lecturasPorModulo.length === 0" class="text-center py-6 text-slate-500 text-sm">Sin datos</div>

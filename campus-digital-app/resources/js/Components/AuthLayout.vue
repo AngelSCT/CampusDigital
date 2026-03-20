@@ -1,18 +1,15 @@
 <template>
     <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <!-- Navbar -->
         <nav class="bg-gradient-to-r from-slate-900/95 to-slate-800/95 backdrop-blur-xl border-b border-blue-500/20 shadow-lg shadow-blue-500/5">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex">
-                        <!-- Logo -->
                         <div class="flex-shrink-0 flex items-center">
                             <a :href="route('dashboard')" class="text-xl font-bold bg-gradient-to-r from-blue-500 to-blue-400 bg-clip-text text-transparent hover:from-blue-400 hover:to-blue-300 transition-all duration-300">
                                 Campus Digital
                             </a>
                         </div>
 
-                        <!-- Navigation Links -->
                         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                             <a 
                                 :href="route('dashboard')"
@@ -26,7 +23,6 @@
                                 Dashboard
                             </a>
 
-                            <!-- Links de Administrador -->
                             <template v-if="tieneRol('administrador')">
                                 <a 
                                     :href="route('admin.usuarios.index')"
@@ -56,7 +52,6 @@
                                         </svg>
                                     </button>
 
-                                    <!-- Dropdown Menu -->
                                     <transition
                                         enter-active-class="transition ease-out duration-200"
                                         enter-from-class="opacity-0 scale-95"
@@ -88,7 +83,6 @@
                         </div>
                     </div>
 
-                    <!-- User Menu -->
                     <div class="hidden sm:ml-6 sm:flex sm:items-center">
                         <div class="relative">
                             <button 
@@ -104,7 +98,6 @@
                                 </svg>
                             </button>
 
-                            <!-- Dropdown Menu -->
                             <transition
                                 enter-active-class="transition ease-out duration-200"
                                 enter-from-class="opacity-0 scale-95"
@@ -133,7 +126,6 @@
                         </div>
                     </div>
 
-                    <!-- Mobile menu button -->
                     <div class="flex items-center sm:hidden">
                         <button 
                             @click="mostrarMenuMovil = !mostrarMenuMovil"
@@ -147,7 +139,6 @@
                 </div>
             </div>
 
-            <!-- Mobile menu -->
             <transition
                 enter-active-class="transition ease-out duration-200"
                 enter-from-class="opacity-0 -translate-y-1"
@@ -216,9 +207,7 @@
             </transition>
         </nav>
 
-        <!-- Page Content -->
         <main>
-            <!-- Flash Messages -->
             <div v-if="$page.props.flash?.success" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
                 <div class="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-l-4 border-green-500 rounded-lg p-4 mb-4 backdrop-blur-sm shadow-lg shadow-green-500/10">
                     <div class="flex">

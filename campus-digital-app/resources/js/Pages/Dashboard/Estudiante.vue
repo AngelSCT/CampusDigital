@@ -1,7 +1,6 @@
 <template>
     <AuthLayout>
         <div class="space-y-6">
-            <!-- Header -->
             <div>
                 <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                     ¡Bienvenido, {{ $page.props.auth.user.nombre }}!
@@ -9,7 +8,6 @@
                 <p class="mt-1 text-sm text-white">Dashboard de Estudiante</p>
             </div>
 
-            <!-- Stats Cards -->
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <!-- Saldo Disponible -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden shadow-xl shadow-green-500/10 rounded-xl border border-green-500/20">
@@ -40,7 +38,6 @@
                     </div>
                 </div>
 
-                <!-- Pedidos Activos -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20">
                     <div class="p-5">
                         <div class="flex items-center">
@@ -69,7 +66,6 @@
                     </div>
                 </div>
 
-                <!-- Reservas -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden shadow-xl shadow-purple-500/10 rounded-xl border border-purple-500/20">
                     <div class="p-5">
                         <div class="flex items-center">
@@ -98,7 +94,6 @@
                     </div>
                 </div>
 
-                <!-- Tickets -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden shadow-xl shadow-yellow-500/10 rounded-xl border border-yellow-500/20">
                     <div class="p-5">
                         <div class="flex items-center">
@@ -128,7 +123,6 @@
                 </div>
             </div>
 
-            <!-- Accesos Rápidos -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20">
                 <div class="px-4 py-5 sm:p-6">
                     <h3 class="text-lg leading-6 font-medium text-white mb-4">Servicios Disponibles</h3>
@@ -142,7 +136,6 @@
                             <span class="text-xs text-slate-400 mt-1">Ordena tu comida</span>
                         </a>
 
-                        <!-- Copias/Impresiones -->
                         <a href="#" class="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/30 rounded-xl hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105 transition-all duration-300 group">
                             <svg class="w-12 h-12 text-blue-400 mb-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -151,7 +144,6 @@
                             <span class="text-xs text-slate-400 mt-1">Imprime tus documentos</span>
                         </a>
 
-                        <!-- Souvenirs -->
                         <a href="#" class="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-pink-500/10 to-pink-600/10 border border-pink-500/30 rounded-xl hover:shadow-lg hover:shadow-pink-500/20 hover:scale-105 transition-all duration-300 group">
                             <svg class="w-12 h-12 text-pink-400 mb-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
@@ -160,7 +152,6 @@
                             <span class="text-xs text-slate-400 mt-1">Artículos del campus</span>
                         </a>
 
-                        <!-- Reservar Sala -->
                         <a href="#" class="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/30 rounded-xl hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 transition-all duration-300 group">
                             <svg class="w-12 h-12 text-purple-400 mb-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -169,7 +160,6 @@
                             <span class="text-xs text-slate-400 mt-1">Salas de estudio</span>
                         </a>
 
-                        <!-- Tickets -->
                         <a href="#" class="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border border-yellow-500/30 rounded-xl hover:shadow-lg hover:shadow-yellow-500/20 hover:scale-105 transition-all duration-300 group">
                             <svg class="w-12 h-12 text-yellow-400 mb-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -178,7 +168,6 @@
                             <span class="text-xs text-slate-400 mt-1">Crear ticket</span>
                         </a>
 
-                        <!-- Mi Tarjeta -->
                         <a href="#" class="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/30 rounded-xl hover:shadow-lg hover:shadow-green-500/20 hover:scale-105 transition-all duration-300 group">
                             <svg class="w-12 h-12 text-green-400 mb-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -190,7 +179,6 @@
                 </div>
             </div>
 
-            <!-- Últimas Transacciones -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20">
                 <div class="px-4 py-5 sm:p-6">
                     <div class="flex justify-between items-center mb-4">

@@ -12,7 +12,6 @@
                     </a>
                     <div>
                         <div class="flex items-center gap-3 flex-wrap">
-                            <!-- Módulo badge -->
                             <span class="px-2 py-0.5 text-xs font-bold rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase tracking-widest font-mono">
                                 {{ stats.modulo }}
                             </span>

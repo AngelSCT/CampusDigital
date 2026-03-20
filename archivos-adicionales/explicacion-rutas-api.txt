@@ -5,9 +5,7 @@ HEADER 2: Accept       - application/json
 
 URLS DE LA API REST DE LA APLICACION (SE PUEDEN PROBAR CON INSOMNIA O POSTMAN)
 
-******************************************************************
- USUARIOS
-******************************************************************
+--USUARIOS--
 
 GET  http://localhost:8000/api/usuarios
      //TRAE LA LISTA COMPLETA DE USUARIOS ACTIVOS (PAGINADA DE 15 EN 15)
@@ -58,9 +56,9 @@ POST http://localhost:8000/api/usuarios/1/toggle-block
      // BLOQUEA AL USUARIO SI ESTA ACTIVO, O LO DESBLOQUEA SI ESTA BLOQUEADO
        ESTA SE DEBE USAR CUANDO QUIERAS SUSPENDER O REACTIVAR UNA CUENTA SIN ELIMINARLA
 
-******************************************************************
- ROLES
-******************************************************************
+
+ --ROLES---
+
 
 GET  http://localhost:8000/api/roles
      // TRAE TODOS LOS ROLES DEL SISTEMA (ADMINISTRADOR, ESTUDIANTE, PROVEEDOR, ETC.)
@@ -89,9 +87,9 @@ DELETE http://localhost:8000/api/roles/1
      // ELIMINA (SOFT DELETE) EL ROL CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS QUITAR UN ROL QUE YA NO SE USA
 
-******************************************************************
- PERMISOS
-******************************************************************
+
+--PERMISOS--
+
 
 GET  http://localhost:8000/api/permisos
      // TRAE TODOS LOS PERMISOS DEL SISTEMA (user.read, user.write, audit.read, ETC.)
@@ -120,9 +118,9 @@ DELETE http://localhost:8000/api/permisos/1
      // ELIMINA (SOFT DELETE) EL PERMISO CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS QUITAR UN PERMISO QUE YA NO APLICA
 
-******************************************************************
- ROL - PERMISO  (QUE PERMISOS TIENE CADA ROL)
-******************************************************************
+
+--ROL - PERMISO  (QUE PERMISOS TIENE CADA ROL)--
+
 
 GET  http://localhost:8000/api/rol-permisos
      // TRAE TODAS LAS ASIGNACIONES DE PERMISOS A ROLES QUE EXISTEN
@@ -149,9 +147,8 @@ DELETE http://localhost:8000/api/rol-permisos/1
      // QUITA EL PERMISO DE UN ROL (POR ID DEL REGISTRO DE LA ASIGNACION)
        ESTA SE DEBE USAR CUANDO QUIERAS RESTRINGIR LO QUE PUEDE HACER UN ROL
 
-******************************************************************
- USUARIO - ROL  (QUE ROLES TIENE CADA USUARIO)
-******************************************************************
+--USUARIO - ROL  (QUE ROLES TIENE CADA USUARIO)--
+
 
 GET  http://localhost:8000/api/usuario-roles
      // TRAE TODAS LAS ASIGNACIONES DE ROLES A USUARIOS
@@ -178,9 +175,8 @@ DELETE http://localhost:8000/api/usuario-roles/1
      // QUITA UN ROL A UN USUARIO (POR ID DEL REGISTRO DE LA ASIGNACION)
        ESTA SE DEBE USAR CUANDO UN USUARIO YA NO DEBA TENER CIERTO NIVEL DE ACCESO
 
-******************************************************************
- PERFILES  (DATOS PERSONALES EXTENDIDOS DEL USUARIO)
-******************************************************************
+--PERFILES  (DATOS PERSONALES EXTENDIDOS DEL USUARIO)--
+
 
 GET  http://localhost:8000/api/usuario-perfiles
      // TRAE LOS PERFILES DE TODOS LOS USUARIOS
@@ -201,9 +197,8 @@ PUT  http://localhost:8000/api/usuario-perfiles/1
        ESTA SE DEBE USAR CUANDO EL USUARIO EDITE SU FECHA DE NACIMIENTO, GENERO O DIRECCION
        REQUIERE BODY JSON: { fecha_nacimiento, genero, direccion }
 
-******************************************************************
- SESIONES  (HISTORIAL DE SESIONES ABIERTAS)
-******************************************************************
+--SESIONES  (HISTORIAL DE SESIONES ABIERTAS)--
+
 
 GET  http://localhost:8000/api/sesiones
      // TRAE TODAS LAS SESIONES REGISTRADAS EN EL SISTEMA PAGINADAS
@@ -239,9 +234,9 @@ GET  http://localhost:8000/api/sesiones/1
 GET  http://localhost:8000/api/sesiones/2
      // TRAE EL DETALLE COMPLETO DE LA SESION CON ID 2
 
-******************************************************************
- BITACORA — ACCESOS  (REGISTRO DE LOGINS, LOGOUTS Y FALLOS)
-******************************************************************
+
+--BITACORA — ACCESOS  (REGISTRO DE LOGINS, LOGOUTS Y FALLOS)--
+
 
 GET  http://localhost:8000/api/bitacora/accesos
      // TRAE TODOS LOS EVENTOS DE ACCESO REGISTRADOS (PAGINADOS)
@@ -300,9 +295,9 @@ GET  http://localhost:8000/api/bitacora/accesos/2
 GET  http://localhost:8000/api/bitacora/accesos/7
      // TRAE EL DETALLE DEL EVENTO CON ID 7 (PRIMER LOGIN FALLIDO REGISTRADO)
 
-******************************************************************
- BITACORA — ACTIVIDAD  (REGISTRO DE ACCIONES DENTRO DEL SISTEMA)
-******************************************************************
+
+--BITACORA — ACTIVIDAD  (REGISTRO DE ACCIONES DENTRO DEL SISTEMA)--
+
 
 GET  http://localhost:8000/api/bitacora/actividad
      // TRAE TODAS LAS ACCIONES REALIZADAS DENTRO DEL SISTEMA (PAGINADAS)
@@ -358,9 +353,9 @@ GET  http://localhost:8000/api/bitacora/actividad/5
 GET  http://localhost:8000/api/bitacora/actividad/10
      // TRAE EL DETALLE DE LA ACCION CON ID 10
 
-******************************************************************
- TARJETAS UNIVERSITARIAS  (MODULO 4.10 - RFID/NFC)
-******************************************************************
+
+--TARJETAS UNIVERSITARIAS  (MODULO 4.10 - RFID/NFC)--
+
 
 GET  http://localhost:8000/api/tarjetas
      // TRAE TODAS LAS TARJETAS UNIVERSITARIAS REGISTRADAS EN EL SISTEMA
@@ -421,9 +416,9 @@ POST http://localhost:8000/api/tarjetas/1/desbloquear
      // DESBLOQUEA LA TARJETA CON ID 1 Y LA REGRESA A ESTADO ACTIVA
        ESTA SE DEBE USAR CUANDO SE RESUELVA LA INCIDENCIA O SE ENTREGUE TARJETA NUEVA
 
-******************************************************************
- LECTURAS DE TARJETA  (LOG DE CADA USO DE LA TARJETA)
-******************************************************************
+
+--LECTURAS DE TARJETA  (LOG DE CADA USO DE LA TARJETA)--
+
 
 GET  http://localhost:8000/api/tarjeta-lecturas
      // TRAE TODOS LOS REGISTROS DE LECTURAS REALIZADAS EN EL SISTEMA
@@ -492,9 +487,9 @@ POST http://localhost:8000/api/tarjeta-lecturas
        ESTA SE DEBE USAR CADA VEZ QUE EL HARDWARE O SIMULADOR DETECTE UNA TARJETA
        REQUIERE BODY JSON: { uid_leido, modulo, tipo_lectura, exito, detalle, operador_usuario_id, pedido_id }
 
-******************************************************************
- SALDO MONEDERO  (MODULO 4.2 - SALDO DIGITAL)
-******************************************************************
+
+--SALDO MONEDERO  (MODULO 4.2 - SALDO DIGITAL)--
+
 
 GET  http://localhost:8000/api/saldo-monederos
      // TRAE TODOS LOS MONEDEROS REGISTRADOS EN EL SISTEMA
@@ -521,9 +516,9 @@ POST http://localhost:8000/api/saldo-monederos
        ESTA SE DEBE USAR CUANDO SE REGISTRE UN USUARIO NUEVO QUE AUN NO TIENE MONEDERO
        REQUIERE BODY JSON: { usuario_id }
 
-******************************************************************
- SALDO MOVIMIENTOS  (ABONOS Y CARGOS AL MONEDERO)
-******************************************************************
+
+--SALDO MOVIMIENTOS  (ABONOS Y CARGOS AL MONEDERO)--
+
 
 GET  http://localhost:8000/api/saldo-movimientos
      // TRAE TODOS LOS MOVIMIENTOS DE SALDO DEL SISTEMA
@@ -578,9 +573,9 @@ POST http://localhost:8000/api/saldo-movimientos
        ESTA SE DEBE USAR DESDE CUALQUIER MODULO QUE COBRE O RECARGUE SALDO
        REQUIERE BODY JSON: { usuario_id, tipo, monto, modulo, concepto, operador_usuario_id, tarjeta_lectura_id, referencia_tabla, referencia_id }
 
-******************************************************************
- PEDIDOS  (MODULO 4.5 - PEDIDOS Y SEGUIMIENTO)
-******************************************************************
+
+--PEDIDOS  (MODULO 4.5 - PEDIDOS Y SEGUIMIENTO)--
+
 
 GET  http://localhost:8000/api/pedidos
      // TRAE TODOS LOS PEDIDOS DEL SISTEMA
@@ -670,11 +665,11 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
        ESTA SE DEBE USAR DESDE EL MODULO 4.10 CUANDO EL LECTOR CONFIRME LA ENTREGA
        REQUIERE BODY JSON: { tarjeta_lectura_id }
 
-******************************************************************
- BODIES JSON PARA POST / PUT (COMO PODER UTILIZAR LOS DIFERENTES URL)
-******************************************************************
 
-── POST /api/usuarios ──────────────────────────────────────────
+--BODIES JSON PARA POST / PUT (COMO PODER UTILIZAR LOS DIFERENTES URL)--
+
+
+── POST /api/usuarios 
 {
     "nombre": "Carlos",
     "apellido": "Lopez",
@@ -683,58 +678,58 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "telefono": "5551234567"
 }
 
-── PUT /api/usuarios/{id} ──────────────────────────────────────
+── PUT /api/usuarios/{id} 
 {
     "nombre": "Carlos Alberto",
     "telefono": "5559999999"
 }
 
-── POST /api/roles ─────────────────────────────────────────────
+── POST /api/roles 
 {
     "nombre": "moderador",
     "descripcion": "Rol de moderacion",
     "activo": true
 }
 
-── PUT /api/roles/{id} ─────────────────────────────────────────
+── PUT /api/roles/{id}
 {
     "descripcion": "Descripcion actualizada",
     "activo": false
 }
 
-── POST /api/permisos ──────────────────────────────────────────
+── POST /api/permisos
 {
     "clave": "reporte.read",
     "descripcion": "Ver reportes",
     "activo": true
 }
 
-── PUT /api/permisos/{id} ──────────────────────────────────────
+── PUT /api/permisos/{id}
 {
     "descripcion": "Permiso actualizado",
     "activo": true
 }
 
-── POST /api/rol-permisos ──────────────────────────────────────
+── POST /api/rol-permisos
 {
     "rol_id": 1,
     "permiso_id": 2
 }
 
-── POST /api/usuario-roles ─────────────────────────────────────
+── POST /api/usuario-roles
 {
     "usuario_id": 4,
     "rol_id": 2
 }
 
-── PUT /api/usuario-perfiles/{id} ──────────────────────────────
+── PUT /api/usuario-perfiles/{id} 
 {
     "fecha_nacimiento": "1995-06-15",
     "genero": "masculino",
     "direccion": "Calle Falsa 123"
 }
 
-── POST /api/tarjetas ──────────────────────────────────────────
+── POST /api/tarjetas 
 {
     "usuario_id": 4,
     "uid": "A1B2C3D4E5F6",
@@ -742,19 +737,19 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "registrado_por_usuario_id": 1
 }
 
-── PUT /api/tarjetas/{id} ──────────────────────────────────────
+── PUT /api/tarjetas/{id}
 {
     "estado": "perdida",
     "motivo_bloqueo": "El usuario reporto que no encuentra su tarjeta"
 }
 
-── POST /api/tarjetas/{id}/bloquear ────────────────────────────
+── POST /api/tarjetas/{id}/bloquear 
 {
     "motivo_bloqueo": "Tarjeta reportada como robada",
     "bloqueado_por_usuario_id": 1
 }
 
-── POST /api/tarjeta-lecturas ──────────────────────────────────
+── POST /api/tarjeta-lecturas 
 {
     "uid_leido": "A1B2C3D4E5F6",
     "modulo": "cafeteria",
@@ -764,12 +759,12 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "operador_usuario_id": 2
 }
 
-── POST /api/saldo-monederos ───────────────────────────────────
+── POST /api/saldo-monederos 
 {
     "usuario_id": 4
 }
 
-── POST /api/saldo-movimientos — ABONO (recarga de saldo) ──────
+── POST /api/saldo-movimientos — ABONO (recarga de saldo) 
 {
     "usuario_id": 4,
     "tipo": "abono",
@@ -779,7 +774,7 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "operador_usuario_id": 1
 }
 
-── POST /api/saldo-movimientos — CARGO (consumo) ───────────────
+── POST /api/saldo-movimientos — CARGO (consumo)
 {
     "usuario_id": 4,
     "tipo": "cargo",
@@ -792,7 +787,7 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "referencia_id": 5
 }
 
-── POST /api/pedidos ───────────────────────────────────────────
+── POST /api/pedidos 
 {
     "usuario_id": 4,
     "modulo": "cafeteria",
@@ -801,19 +796,19 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "notas": "Sin chile"
 }
 
-── PUT /api/pedidos/{id} ───────────────────────────────────────
+── PUT /api/pedidos/{id}
 {
     "notas": "Sin chile y sin sal",
     "descripcion": "Comida del dia actualizada"
 }
 
-── POST /api/pedidos/{id}/estado ───────────────────────────────
+── POST /api/pedidos/{id}/estado 
 {
     "estado": "aceptado",
     "operador_usuario_id": 2
 }
 
-── POST /api/pedidos/{id}/confirmar-tarjeta ────────────────────
+── POST /api/pedidos/{id}/confirmar-tarjeta 
 {
     "tarjeta_lectura_id": 5
 }

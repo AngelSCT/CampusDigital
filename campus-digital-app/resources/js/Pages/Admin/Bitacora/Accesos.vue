@@ -1,7 +1,6 @@
 <template>
     <AuthLayout>
         <div class="space-y-6">
-            <!-- Header -->
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
@@ -20,10 +19,8 @@
                         </svg>
                     </button>
                     
-                    <!-- Menú desplegable -->
                     <div v-if="showExportMenu" class="absolute right-0 mt-2 w-72 rounded-lg shadow-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-blue-500/20 z-10">
                         <div class="py-1">
-                            <!-- Exportar todos - CSV -->
                             <a :href="route('admin.bitacora.export-accesos')" class="flex items-center px-4 py-3 text-sm text-white hover:bg-slate-700/50 transition-colors duration-200">
                                 <svg class="w-5 h-5 mr-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -34,7 +31,6 @@
                                 </div>
                             </a>
 
-                            <!-- Exportar todos - PDF -->
                             <a :href="route('admin.bitacora.export-accesos-pdf')" class="flex items-center px-4 py-3 text-sm text-white hover:bg-slate-700/50 transition-colors duration-200 border-t border-slate-700">
                                 <svg class="w-5 h-5 mr-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -45,13 +41,11 @@
                                 </div>
                             </a>
 
-                            <!-- Separador -->
                             <div class="border-t border-slate-700 my-1"></div>
                             <div class="px-4 py-2">
                                 <p class="text-xs font-semibold text-slate-400 uppercase">Reportes por Período</p>
                             </div>
 
-                            <!-- Por período - CSV -->
                             <button @click="showPeriodModal('csv')" type="button" class="w-full flex items-center px-4 py-3 text-sm text-white hover:bg-slate-700/50 transition-colors duration-200">
                                 <svg class="w-5 h-5 mr-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -62,7 +56,6 @@
                                 </div>
                             </button>
 
-                            <!-- Por período - PDF -->
                             <button @click="showPeriodModal('pdf')" type="button" class="w-full flex items-center px-4 py-3 text-sm text-white hover:bg-slate-700/50 transition-colors duration-200 border-t border-slate-700">
                                 <svg class="w-5 h-5 mr-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -77,10 +70,9 @@
                 </div>
             </div>
 
-            <!-- Filtros -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl p-6 border border-blue-500/20">
                 <form @submit.prevent="applyFilters" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <!-- Búsqueda -->
+
                     <div>
                         <label class="block text-sm font-medium text-white mb-2">Buscar Email</label>
                         <input 
@@ -91,7 +83,6 @@
                         />
                     </div>
 
-                    <!-- Evento -->
                     <div>
                         <label class="block text-sm font-medium text-white mb-2">Evento</label>
                         <select 
@@ -103,7 +94,6 @@
                         </select>
                     </div>
 
-                    <!-- Éxito -->
                     <div>
                         <label class="block text-sm font-medium text-white mb-2">Estado</label>
                         <select 
@@ -116,7 +106,6 @@
                         </select>
                     </div>
 
-                    <!-- Fecha Desde -->
                     <div>
                         <label class="block text-sm font-medium text-white mb-2">Desde</label>
                         <input 
@@ -126,7 +115,6 @@
                         />
                     </div>
 
-                    <!-- Fecha Hasta -->
                     <div>
                         <label class="block text-sm font-medium text-white mb-2">Hasta</label>
                         <input 
@@ -136,7 +124,6 @@
                         />
                     </div>
 
-                    <!-- Botones -->
                     <div class="lg:col-span-5 flex gap-2">
                         <button 
                             type="submit"
@@ -155,7 +142,6 @@
                 </form>
             </div>
 
-            <!-- Tabla -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl overflow-hidden border border-blue-500/20">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-slate-700">
@@ -221,7 +207,6 @@
                     </table>
                 </div>
 
-                <!-- Paginación -->
                 <div v-if="accesos.data.length > 0" class="bg-slate-900 px-4 py-3 border-t border-slate-700 sm:px-6">
                     <div class="flex items-center justify-between">
                         <div class="text-sm text-white">
@@ -253,7 +238,6 @@
             </div>
         </div>
 
-        <!-- Modal de Detalles -->
         <div v-if="showModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" @click="showModal = false">
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 max-w-2xl w-full mx-4 border border-blue-500/20 shadow-2xl shadow-blue-500/20" @click.stop>
                 <div class="flex justify-between items-center mb-4">
@@ -311,7 +295,7 @@
                 </div>
             </div>
         </div>
-        <!-- Modal de Selección de Período -->
+
 <div v-if="showPeriodModalFlag" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" @click="closePeriodModal">
     <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 max-w-md w-full mx-4 border border-blue-500/20 shadow-2xl shadow-blue-500/20" @click.stop>
         <div class="flex justify-between items-center mb-4">
@@ -335,7 +319,6 @@
                 />
             </div>
 
-            <!-- Fecha Hasta -->
             <div>
                 <label class="block text-sm font-medium text-white mb-2">Fecha Hasta *</label>
                 <input 
@@ -370,7 +353,6 @@
                 </select>
             </div>
 
-            <!-- Botones -->
             <div class="flex gap-2 pt-4">
                 <button 
                     type="button"

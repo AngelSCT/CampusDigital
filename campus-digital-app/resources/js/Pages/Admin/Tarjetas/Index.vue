@@ -1,7 +1,6 @@
 <template>
     <AuthLayout>
         <div class="space-y-6">
-            <!-- Header -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
@@ -27,7 +26,6 @@
                 </div>
             </div>
 
-            <!-- Stats -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-4">
                     <p class="text-xs text-slate-400 uppercase tracking-wider">Total</p>
@@ -47,7 +45,6 @@
                 </div>
             </div>
 
-            <!-- Filters -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-4">
                 <div class="flex flex-col sm:flex-row gap-3">
                     <input
@@ -71,7 +68,6 @@
                 </div>
             </div>
 
-            <!-- Table -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-cyan-500/5 rounded-xl border border-cyan-500/20 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-slate-700">

@@ -1,7 +1,6 @@
 <template>
     <AuthLayout>
         <div class="max-w-2xl mx-auto space-y-6">
-            <!-- Header -->
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
@@ -22,7 +21,6 @@
                   class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-cyan-500/10 rounded-xl border border-cyan-500/20 overflow-hidden">
                 <div class="p-6 space-y-6">
 
-                    <!-- Simulador UID -->
                     <div class="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-xl p-4">
                         <div class="flex items-center gap-2 mb-3">
                             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center">
@@ -41,7 +39,6 @@
                         </button>
                     </div>
 
-                    <!-- UID -->
                     <div>
                         <label for="uid" class="block text-sm font-medium text-white mb-2">
                             UID de la Tarjeta <span class="text-red-400">*</span>
@@ -67,7 +64,6 @@
                         <p v-if="errors.uid" class="mt-1 text-sm text-red-400">{{ errors.uid }}</p>
                     </div>
 
-                    <!-- Usuario -->
                     <div>
                         <label for="usuario_id" class="block text-sm font-medium text-white mb-2">
                             Asignar a Usuario <span class="text-red-400">*</span>
@@ -80,7 +76,6 @@
                             class="block w-full rounded-lg bg-slate-700/50 border border-slate-600 text-white placeholder-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 sm:text-sm px-3 py-2 mb-2 transition-all duration-200"
                         />
 
-                        <!-- Usuario seleccionado -->
                         <div v-if="usuarioSeleccionado"
                              class="flex items-center justify-between p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-lg mb-2">
                             <div>
@@ -94,7 +89,6 @@
                             </button>
                         </div>
 
-                        <!-- Lista filtrada -->
                         <div v-if="!usuarioSeleccionado && usuariosFiltrados.length > 0"
                              class="border border-slate-600 rounded-lg overflow-hidden max-h-48 overflow-y-auto">
                             <button
@@ -110,7 +104,6 @@
                         <p v-if="errors.usuario_id" class="mt-1 text-sm text-red-400">{{ errors.usuario_id }}</p>
                     </div>
 
-                    <!-- PIN -->
                     <div>
                         <label for="pin" class="block text-sm font-medium text-white mb-2">
                             PIN de acceso
@@ -133,7 +126,6 @@
 
                 </div>
 
-                <!-- Botones -->
                 <div class="bg-slate-900/50 px-6 py-4 flex justify-end gap-3 border-t border-slate-700">
                     <a :href="route('admin.tarjetas.index')"
                        class="px-4 py-2 border border-slate-600 rounded-lg text-sm font-medium text-white hover:bg-slate-700/50 transition-all duration-200">

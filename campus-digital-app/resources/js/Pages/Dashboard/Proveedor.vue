@@ -1,7 +1,6 @@
 <template>
     <AuthLayout>
         <div class="space-y-6">
-            <!-- Header -->
             <div>
                 <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                     Panel de Proveedor
@@ -9,7 +8,6 @@
                 <p class="mt-1 text-sm text-white">Gestiona tus pedidos y productos</p>
             </div>
 
-            <!-- Stats Cards -->
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <!-- Pedidos Pendientes -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden shadow-xl shadow-yellow-500/10 rounded-xl border border-yellow-500/20">
@@ -40,7 +38,6 @@
                     </div>
                 </div>
 
-                <!-- Pedidos en Proceso -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20">
                     <div class="p-5">
                         <div class="flex items-center">
@@ -69,7 +66,6 @@
                     </div>
                 </div>
 
-                <!-- Pedidos Completados Hoy -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden shadow-xl shadow-green-500/10 rounded-xl border border-green-500/20">
                     <div class="p-5">
                         <div class="flex items-center">
@@ -98,7 +94,6 @@
                     </div>
                 </div>
 
-                <!-- Ventas del Día -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden shadow-xl shadow-purple-500/10 rounded-xl border border-purple-500/20">
                     <div class="p-5">
                         <div class="flex items-center">
@@ -128,7 +123,6 @@
                 </div>
             </div>
 
-            <!-- Acciones Rápidas -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20">
                 <div class="px-4 py-5 sm:p-6">
                     <h3 class="text-lg leading-6 font-medium text-white mb-4">Acciones Rápidas</h3>
@@ -165,7 +159,6 @@
                 </div>
             </div>
 
-            <!-- Pedidos Recientes -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20">
                 <div class="px-4 py-5 sm:p-6">
                     <div class="flex justify-between items-center mb-4">
@@ -189,7 +182,6 @@
                 </div>
             </div>
 
-            <!-- Productos Más Vendidos -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20">
                 <div class="px-4 py-5 sm:p-6">
                     <h3 class="text-lg leading-6 font-medium text-white mb-4">Productos Más Vendidos</h3>

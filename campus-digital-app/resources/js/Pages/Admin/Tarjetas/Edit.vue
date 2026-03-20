@@ -1,7 +1,6 @@
 <template>
     <AuthLayout>
         <div class="max-w-2xl mx-auto space-y-6">
-            <!-- Header -->
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
@@ -38,7 +37,6 @@
                   class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-cyan-500/10 rounded-xl border border-cyan-500/20 overflow-hidden">
                 <div class="p-6 space-y-6">
 
-                    <!-- UID -->
                     <div>
                         <label for="uid" class="block text-sm font-medium text-white mb-2">
                             UID de la Tarjeta <span class="text-red-400">*</span>
@@ -69,7 +67,6 @@
                     </div>
 
 
-            <!-- PIN -->
             <div>
                 <label for="pin" class="block text-sm font-medium text-white mb-2">
                     Nuevo PIN
