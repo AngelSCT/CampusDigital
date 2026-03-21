@@ -21,6 +21,9 @@ use App\Http\Controllers\Api\SaldoMonederoApiController;
 use App\Http\Controllers\Api\SaldoMovimientoApiController;
 use App\Http\Controllers\Api\PedidoApiController;
 
+// RUTAS EXTRA CON UID Y EL PIN
+use App\Http\Controllers\Api\RfidApiController;
+
 Route::middleware('api.key')->group(function () {
 
     Route::apiResource('usuarios', UsuarioApiController::class);
@@ -78,4 +81,19 @@ Route::middleware('api.key')->group(function () {
     Route::delete('pedidos/{id}',                   [PedidoApiController::class, 'destroy']);
     Route::post  ('pedidos/{id}/estado',            [PedidoApiController::class, 'cambiarEstado']);
     Route::post  ('pedidos/{id}/confirmar-tarjeta', [PedidoApiController::class, 'confirmarConTarjeta']);
+});
+
+
+Route::prefix('rfid')->group(function () {
+
+    Route::post('/auth', [RfidApiController::class, 'auth']);
+
+    Route::middleware('api.key')->group(function () {
+        Route::post('/verificar',        [RfidApiController::class, 'verificar']);
+        Route::get ('/usuario/{uid}',    [RfidApiController::class, 'datosUsuario']);
+        Route::get ('/saldo/{uid}',      [RfidApiController::class, 'saldo']);
+        Route::get ('/historial/{uid}',  [RfidApiController::class, 'historial']);
+        Route::get ('/pedidos/{uid}',    [RfidApiController::class, 'pedidosPendientes']);
+        Route::get ('/lecturas/{uid}',   [RfidApiController::class, 'lecturas']);
+    });
 });

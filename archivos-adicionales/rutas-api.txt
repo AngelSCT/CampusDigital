@@ -363,3 +363,51 @@ POST /api/pedidos/{id}/confirmar-tarjeta
 {
     "tarjeta_lectura_id": 5
 }
+
+
+
+RFID — AUTENTICACIÓN Y CONSULTA POR TARJETA
+
+POST    http://localhost:8000/api/rfid/auth                         NOTA: NO REQUIERE APIKEY
+POST    http://localhost:8000/api/rfid/verificar
+GET     http://localhost:8000/api/rfid/usuario/{uid}
+GET     http://localhost:8000/api/rfid/saldo/{uid}
+GET     http://localhost:8000/api/rfid/historial/{uid}
+GET     http://localhost:8000/api/rfid/historial/{uid}?tipo=abono
+GET     http://localhost:8000/api/rfid/historial/{uid}?tipo=cargo
+GET     http://localhost:8000/api/rfid/historial/{uid}?modulo=cafeteria
+GET     http://localhost:8000/api/rfid/historial/{uid}?modulo=copias
+GET     http://localhost:8000/api/rfid/historial/{uid}?modulo=souvenirs
+GET     http://localhost:8000/api/rfid/historial/{uid}?modulo=recarga
+GET     http://localhost:8000/api/rfid/historial/{uid}?per_page=5
+GET     http://localhost:8000/api/rfid/pedidos/{uid}
+GET     http://localhost:8000/api/rfid/pedidos/{uid}?estado=listo
+GET     http://localhost:8000/api/rfid/pedidos/{uid}?estado=entregado
+GET     http://localhost:8000/api/rfid/pedidos/{uid}?estado=cancelado
+GET     http://localhost:8000/api/rfid/pedidos/{uid}?modulo=cafeteria
+GET     http://localhost:8000/api/rfid/pedidos/{uid}?modulo=copias
+GET     http://localhost:8000/api/rfid/pedidos/{uid}?modulo=souvenirs
+GET     http://localhost:8000/api/rfid/pedidos/{uid}?estado=listo&modulo=cafeteria
+GET     http://localhost:8000/api/rfid/pedidos/{uid}?estado=listo&modulo=copias
+GET     http://localhost:8000/api/rfid/lecturas/{uid}
+GET     http://localhost:8000/api/rfid/lecturas/{uid}?modulo=cafeteria
+GET     http://localhost:8000/api/rfid/lecturas/{uid}?modulo=acceso
+GET     http://localhost:8000/api/rfid/lecturas/{uid}?tipo_lectura=acceso
+GET     http://localhost:8000/api/rfid/lecturas/{uid}?tipo_lectura=consumo
+GET     http://localhost:8000/api/rfid/lecturas/{uid}?tipo_lectura=consulta_saldo
+GET     http://localhost:8000/api/rfid/lecturas/{uid}?tipo_lectura=confirmacion_entrega
+GET     http://localhost:8000/api/rfid/lecturas/{uid}?desde=2026-01-01&hasta=2026-12-31
+GET     http://localhost:8000/api/rfid/lecturas/{uid}?per_page=10
+
+
+POST /api/rfid/auth
+{
+    "uid": "A1B2C3D4",
+    "pin": "1234"
+}
+
+POST /api/rfid/verificar
+{
+    "uid": "A1B2C3D4",
+    "pin": "1234"
+}

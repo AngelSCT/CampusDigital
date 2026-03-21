@@ -812,3 +812,123 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
 {
     "tarjeta_lectura_id": 5
 }
+
+
+
+--RFID — AUTENTICACIÓN Y CONSULTA POR TARJETA--
+
+
+POST http://localhost:8000/api/rfid/auth
+     // AUTENTICA UN USUARIO CON UID + PIN Y DEVUELVE SUS DATOS COMPLETOS
+       NO REQUIERE API KEY — ES PUBLICA COMO EL LOGIN NORMAL
+       ESTA SE DEBE USAR DESDE APPS EXTERNAS, O SISTEMAS DE TERCEROS
+       QUE NECESITEN VERIFICAR LA IDENTIDAD DE UN USUARIO POR TARJETA
+       DEVUELVE: datos del usuario, roles, estado de tarjeta y saldo actual
+       REQUIERE BODY JSON: { uid, pin }
+
+POST http://localhost:8000/api/rfid/verificar
+     // VERIFICA SI EL UID + PIN SON VALIDOS SIN EXPONER DATOS SENSIBLES
+       REQUIERE API KEY
+       ESTA SE DEBE USAR ANTES DE EJECUTAR UNA ACCION CRITICA (COBRO, ACCESO ESPECIAL)
+       CUANDO SOLO NECESITAS SABER SI LA TARJETA Y PIN SON CORRECTOS SIN MAS INFORMACION
+       DEVUELVE: { ok, valido, uid, estado }
+       REQUIERE BODY JSON: { uid, pin }
+
+GET  http://localhost:8000/api/rfid/usuario/{uid}
+     // TRAE EL PERFIL COMPLETO DEL USUARIO DUENO DE ESA TARJETA
+       REQUIERE API KEY
+       ESTA SE DEBE USAR EN  PANTALLAS QUE MUESTRAN DATOS DEL USUARIO AL PASAR TARJETA
+       NO REQUIERE PIN — SOLO EL UID ES SUFICIENTE PARA VER EL PERFIL
+       DEVUELVE: nombre, email, telefono, foto, roles, perfil, fecha de registro y datos de tarjeta
+
+GET  http://localhost:8000/api/rfid/saldo/{uid}
+     // CONSULTA RAPIDA DEL SALDO DEL MONEDERO POR UID DE TARJETA
+       REQUIERE API KEY
+       ESTA SE DEBE USAR EN PANTALLAS DEL LECTOR PARA MOSTRAR SALDO AL MOMENTO DEL ESCANEO
+       NO REQUIERE PIN — SOLO EL UID
+       DEVUELVE: nombre del usuario, saldo_disponible, saldo_retenido y monedero_id
+
+GET  http://localhost:8000/api/rfid/saldo/{uid}
+     // EJEMPLO CON UID REAL:
+GET  http://localhost:8000/api/rfid/saldo/A1B2C3D4
+     // DEVUELVE EL SALDO DEL DUENO DE LA TARJETA CON UID A1B2C3D4
+
+GET  http://localhost:8000/api/rfid/historial/{uid}
+     // HISTORIAL DE MOVIMIENTOS DEL MONEDERO POR UID DE TARJETA
+       REQUIERE API KEY
+       ESTA SE DEBE USAR EN PANTALLAS APPS QUE MUESTRAN EL ESTADO DE CUENTA AL PASAR TARJETA
+       SOPORTA FILTROS: tipo (abono/cargo), modulo (cafeteria, copias, etc.), per_page
+       DEVUELVE: lista paginada de movimientos con monto, saldo antes/despues, modulo y fecha
+
+GET  http://localhost:8000/api/rfid/historial/{uid}?tipo=cargo
+     // TRAE SOLO LOS CARGOS (CONSUMOS) DEL DUENO DE ESA TARJETA
+       ESTA SE DEBE USAR PARA MOSTRAR SOLO LOS GASTOS EN EL ESTADO DE CUENTA
+
+GET  http://localhost:8000/api/rfid/historial/{uid}?tipo=abono
+     // TRAE SOLO LOS ABONOS (RECARGAS) DEL DUENO DE ESA TARJETA
+
+GET  http://localhost:8000/api/rfid/historial/{uid}?modulo=cafeteria
+     // TRAE SOLO LOS MOVIMIENTOS EN CAFETERIA DEL DUENO DE ESA TARJETA
+       ESTA SE DEBE USAR PARA REPORTES DE CONSUMO POR AREA DESDE EL MODULO 4.9
+
+GET  http://localhost:8000/api/rfid/historial/{uid}?per_page=5
+     // TRAE SOLO 5 MOVIMIENTOS POR PAGINA
+
+GET  http://localhost:8000/api/rfid/pedidos/{uid}
+     // PEDIDOS ACTIVOS DEL USUARIO DUENO DE ESA TARJETA
+       REQUIERE API KEY
+       ESTA SE DEBE USAR EN EL LECTOR CUANDO EL USUARIO PASA LA TARJETA PARA RECOGER UN PEDIDO
+       POR DEFECTO DEVUELVE: creado, aceptado, en_proceso Y listo (los no entregados ni cancelados)
+       DEVUELVE: lista de pedidos con folio, estado, modulo, total, descripcion y fecha
+
+GET  http://localhost:8000/api/rfid/pedidos/{uid}?estado=listo
+     // TRAE SOLO LOS PEDIDOS LISTOS PARA RECOGER DEL DUENO DE ESA TARJETA
+       ESTA ES LA CONSULTA MAS UTIL EN EL LECTOR: MUESTRA LO QUE PUEDE RECOGER AHORA
+
+GET  http://localhost:8000/api/rfid/pedidos/{uid}?estado=entregado
+     // TRAE EL HISTORIAL DE PEDIDOS YA ENTREGADOS AL DUENO DE ESA TARJETA
+
+GET  http://localhost:8000/api/rfid/pedidos/{uid}?modulo=cafeteria
+     // TRAE SOLO LOS PEDIDOS DE CAFETERIA DEL DUENO DE ESA TARJETA
+       ESTA SE DEBE USAR EN EL LECTOR DE CAFETERIA PARA FILTRAR SOLO SUS PEDIDOS
+
+GET  http://localhost:8000/api/rfid/pedidos/{uid}?estado=listo&modulo=cafeteria
+     // COMBINACION: PEDIDOS LISTOS EN CAFETERIA PARA ESA TARJETA
+       ESTE ES EL FILTRO IDEAL PARA EL LECTOR EN EL PUNTO DE ENTREGA DE CAFETERIA
+
+GET  http://localhost:8000/api/rfid/lecturas/{uid}
+     // HISTORIAL DE LECTURAS (ACCESOS Y USOS) DE ESA TARJETA
+       REQUIERE API KEY
+       ESTA SE DEBE USAR PARA AUDITORIA DE UNA TARJETA ESPECIFICA
+       SOPORTA FILTROS: desde, hasta, modulo, tipo_lectura, per_page
+       DEVUELVE: lista paginada de lecturas con modulo, tipo, exito, detalle y fecha
+
+GET  http://localhost:8000/api/rfid/lecturas/{uid}?modulo=cafeteria
+     // TRAE SOLO LAS LECTURAS DE ESA TARJETA EN CAFETERIA
+       ESTA SE DEBE USAR PARA VER CUANTAS VECES USO LA TARJETA EN CAFETERIA
+
+GET  http://localhost:8000/api/rfid/lecturas/{uid}?tipo_lectura=acceso
+     // TRAE SOLO LAS LECTURAS DE TIPO ACCESO (ENTRADAS/SALIDAS) DE ESA TARJETA
+
+GET  http://localhost:8000/api/rfid/lecturas/{uid}?desde=2026-01-01&hasta=2026-12-31
+     // TRAE LAS LECTURAS DE ESA TARJETA EN UN RANGO DE FECHAS
+       ESTA SE DEBE USAR PARA REPORTES DE AUDITORIA POR PERIODO
+
+GET  http://localhost:8000/api/rfid/lecturas/{uid}?per_page=10
+     // TRAE 10 LECTURAS POR PAGINA
+
+
+--BODIES JSON PARA RFID--
+
+
+── POST /api/rfid/auth
+{
+    "uid": "8FE785CD",
+    "pin": "1234"
+}
+
+── POST /api/rfid/verificar
+{
+    "uid": "A1B2C3D4",
+    "pin": "1234"
+}
