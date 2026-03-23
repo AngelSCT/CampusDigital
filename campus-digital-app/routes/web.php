@@ -1,5 +1,6 @@
 <?php
 
+use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerfilController;
@@ -90,6 +91,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/usuarios-export', [ReporteController::class, 'exportUsuarios'])->name('usuarios.export');
             Route::get('/accesos-export', [ReporteController::class, 'exportAccesos'])->name('accesos.export');
             Route::get('/actividad-export', [ReporteController::class, 'exportActividad'])->name('actividad.export');
+        });
+
+        //MODULO 8
+        Route::get('/recargas/create', function(){
+            return Inertia::render('Recargas/Create');
         });
     });
 });
