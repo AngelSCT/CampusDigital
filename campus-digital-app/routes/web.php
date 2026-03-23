@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\UbicacionController;
 use App\Http\Controllers\Admin\EquipoActivoController;
 use App\Http\Controllers\Admin\MantenimientoPreventivoController;
 use App\Http\Controllers\Admin\TicketController;
+use App\Http\Controllers\Admin\AsignacionTecnicaController;
 
 
 Route::get('/', function () {
@@ -341,6 +342,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{ticket}',  [TicketController::class, 'show'])->name('show');
             Route::put('/{ticket}',  [TicketController::class, 'update'])->name('update');
             Route::delete('/{ticket}',[TicketController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('asignaciones-tecnicas')->name('asignaciones-tecnicas.')->group(function () {
+            Route::get('/',                       [AsignacionTecnicaController::class, 'index'])->name('index');
+            Route::post('/',                      [AsignacionTecnicaController::class, 'store'])->name('store');
+            Route::get('/{asignacionTecnica}',    [AsignacionTecnicaController::class, 'show'])->name('show');
+            Route::put('/{asignacionTecnica}',    [AsignacionTecnicaController::class, 'update'])->name('update');
+            Route::delete('/{asignacionTecnica}', [AsignacionTecnicaController::class, 'destroy'])->name('destroy');
         });
     });
 });
