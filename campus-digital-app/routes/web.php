@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\CategoriaTicketController;
 use App\Http\Controllers\Admin\UbicacionController;
 use App\Http\Controllers\Admin\EquipoActivoController;
 use App\Http\Controllers\Admin\MantenimientoPreventivoController;
+use App\Http\Controllers\Admin\TicketController;
 
 
 Route::get('/', function () {
@@ -332,6 +333,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{mantenimientoPreventivo}', [MantenimientoPreventivoController::class, 'show'])->name('show');
             Route::put('/{mantenimientoPreventivo}', [MantenimientoPreventivoController::class, 'update'])->name('update');
             Route::delete('/{mantenimientoPreventivo}',[MantenimientoPreventivoController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('tickets')->name('tickets.')->group(function () {
+            Route::get('/',          [TicketController::class, 'index'])->name('index');
+            Route::post('/',         [TicketController::class, 'store'])->name('store');
+            Route::get('/{ticket}',  [TicketController::class, 'show'])->name('show');
+            Route::put('/{ticket}',  [TicketController::class, 'update'])->name('update');
+            Route::delete('/{ticket}',[TicketController::class, 'destroy'])->name('destroy');
         });
     });
 });
