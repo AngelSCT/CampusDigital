@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\RolController;
 use App\Http\Controllers\Admin\PermisoController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\BitacoraController;
+use App\Http\Controllers\Recargas\RecargaController;
 
 // Ruta principal
 Route::get('/', function () {
@@ -94,8 +95,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         //MODULO 8
-        Route::get('/recargas/create', function(){
-            return Inertia::render('Recargas/Create');
+        Route::prefix('recargas')->group(function(){
+            Route::get('/', [RecargaController::class, 'index']);
+            Route::get('/dashboard', [RecargaController::class, 'dashboard'])->name('admin.recargas.dashboard');
+
+            Route::get('/create', [RecargaController::class, 'create'])->name('admin.recargas.create');
+            Route::post('/', [RecargaController::class, 'store']);
+
+            Route::delete('/{id}', [RecargaController::class, 'destroy'])->name('admin.recargas.destroy');
         });
-    });
+        });
 });
