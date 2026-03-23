@@ -19,6 +19,8 @@ use App\Http\Controllers\MiTarjetaController;
 use App\Http\Controllers\Archivos\ArchivoController;
 use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\CategoriaTicketController;
+use App\Http\Controllers\Admin\UbicacionController;
+use App\Http\Controllers\Admin\EquipoActivoController;
 
 
 Route::get('/', function () {
@@ -305,6 +307,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{categoriaTicket}',      [CategoriaTicketController::class, 'show'])->name('show');
             Route::put('/{categoriaTicket}',      [CategoriaTicketController::class, 'update'])->name('update');
             Route::delete('/{categoriaTicket}',   [CategoriaTicketController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('ubicaciones')->name('ubicaciones.')->group(function () {
+            Route::get('/',              [UbicacionController::class, 'index'])->name('index');
+            Route::post('/',             [UbicacionController::class, 'store'])->name('store');
+            Route::get('/{ubicacion}',   [UbicacionController::class, 'show'])->name('show');
+            Route::put('/{ubicacion}',   [UbicacionController::class, 'update'])->name('update');
+            Route::delete('/{ubicacion}',[UbicacionController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('equipos-activos')->name('equipos-activos.')->group(function () {
+            Route::get('/',                [EquipoActivoController::class, 'index'])->name('index');
+            Route::post('/',               [EquipoActivoController::class, 'store'])->name('store');
+            Route::get('/{equipoActivo}',  [EquipoActivoController::class, 'show'])->name('show');
+            Route::put('/{equipoActivo}',  [EquipoActivoController::class, 'update'])->name('update');
+            Route::delete('/{equipoActivo}',[EquipoActivoController::class, 'destroy'])->name('destroy');
         });
     });
 });
