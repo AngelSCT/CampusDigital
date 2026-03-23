@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\EquipoActivoController;
 use App\Http\Controllers\Admin\MantenimientoPreventivoController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\AsignacionTecnicaController;
+use App\Http\Controllers\Admin\InsumoController;
 
 
 Route::get('/', function () {
@@ -350,6 +351,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{asignacionTecnica}',    [AsignacionTecnicaController::class, 'show'])->name('show');
             Route::put('/{asignacionTecnica}',    [AsignacionTecnicaController::class, 'update'])->name('update');
             Route::delete('/{asignacionTecnica}', [AsignacionTecnicaController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('insumos')->name('insumos.')->group(function () {
+            Route::get('/',          [InsumoController::class, 'index'])->name('index');
+            Route::post('/',         [InsumoController::class, 'store'])->name('store');
+            Route::get('/{insumo}',  [InsumoController::class, 'show'])->name('show');
+            Route::put('/{insumo}',  [InsumoController::class, 'update'])->name('update');
+            Route::delete('/{insumo}',[InsumoController::class, 'destroy'])->name('destroy');
         });
     });
 });

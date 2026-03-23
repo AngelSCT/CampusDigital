@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\EquipoActivoApiController;
 use App\Http\Controllers\Api\MantenimientoPreventivoApiController;
 use App\Http\Controllers\Api\TicketApiController;
 use App\Http\Controllers\Api\AsignacionTecnicaApiController;
+use App\Http\Controllers\Api\InsumoApiController;
 
 // MODULO 4.10
 use App\Http\Controllers\Api\TarjetaUniversitariaApiController;
@@ -42,6 +43,7 @@ Route::middleware('api.key')->group(function () {
     Route::apiResource('mantenimientos-preventivos', MantenimientoPreventivoApiController::class);
     Route::apiResource('tickets', TicketApiController::class);
     Route::apiResource('asignaciones-tecnicas', AsignacionTecnicaApiController::class);
+    Route::apiResource('insumos', InsumoApiController::class);
 
     Route::apiResource('usuarios', UsuarioApiController::class);
     Route::post('usuarios/{id}/toggle-block', [UsuarioApiController::class, 'toggleBlock']);
