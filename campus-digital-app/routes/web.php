@@ -25,6 +25,8 @@ use App\Http\Controllers\Admin\MantenimientoPreventivoController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\AsignacionTecnicaController;
 use App\Http\Controllers\Admin\InsumoController;
+use App\Http\Controllers\Admin\GastoTicketController;
+use App\Http\Controllers\Admin\HistorialTicketController;
 
 
 Route::get('/', function () {
@@ -359,6 +361,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{insumo}',  [InsumoController::class, 'show'])->name('show');
             Route::put('/{insumo}',  [InsumoController::class, 'update'])->name('update');
             Route::delete('/{insumo}',[InsumoController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('gastos-ticket')->name('gastos-ticket.')->group(function () {
+            Route::get('/',               [GastoTicketController::class, 'index'])->name('index');
+            Route::post('/',              [GastoTicketController::class, 'store'])->name('store');
+            Route::get('/{gastoTicket}',  [GastoTicketController::class, 'show'])->name('show');
+            Route::put('/{gastoTicket}',  [GastoTicketController::class, 'update'])->name('update');
+            Route::delete('/{gastoTicket}',[GastoTicketController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('historial-tickets')->name('historial-tickets.')->group(function () {
+            Route::get('/',                    [HistorialTicketController::class, 'index'])->name('index');
+            Route::post('/',                   [HistorialTicketController::class, 'store'])->name('store');
+            Route::get('/{historialTicket}',   [HistorialTicketController::class, 'show'])->name('show');
+            Route::put('/{historialTicket}',   [HistorialTicketController::class, 'update'])->name('update');
+            Route::delete('/{historialTicket}',[HistorialTicketController::class, 'destroy'])->name('destroy');
         });
     });
 });
