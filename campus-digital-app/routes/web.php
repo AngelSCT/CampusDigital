@@ -18,6 +18,7 @@ use App\Http\Controllers\Auth\RfidLoginController;
 use App\Http\Controllers\MiTarjetaController;
 use App\Http\Controllers\Archivos\ArchivoController;
 use App\Http\Controllers\Admin\AreaController;
+use App\Http\Controllers\Admin\CategoriaTicketController;
 
 
 Route::get('/', function () {
@@ -296,6 +297,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{area}',    [AreaController::class, 'show'])->name('show');
             Route::put('/{area}',    [AreaController::class, 'update'])->name('update');
             Route::delete('/{area}', [AreaController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('categorias-ticket')->name('categorias-ticket.')->group(function () {
+            Route::get('/',                       [CategoriaTicketController::class, 'index'])->name('index');
+            Route::post('/',                      [CategoriaTicketController::class, 'store'])->name('store');
+            Route::get('/{categoriaTicket}',      [CategoriaTicketController::class, 'show'])->name('show');
+            Route::put('/{categoriaTicket}',      [CategoriaTicketController::class, 'update'])->name('update');
+            Route::delete('/{categoriaTicket}',   [CategoriaTicketController::class, 'destroy'])->name('destroy');
         });
     });
 });

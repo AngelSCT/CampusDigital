@@ -15,6 +15,9 @@ use App\Http\Controllers\Api\UsuarioPerfilApiController;
 use App\Http\Controllers\Api\UsuarioSesionApiController;
 use App\Http\Controllers\Api\BitacoraApiController;
 
+// MODULO TICKETS
+use App\Http\Controllers\Api\CategoriaTicketApiController;
+
 // MODULO 4.10
 use App\Http\Controllers\Api\TarjetaUniversitariaApiController;
 use App\Http\Controllers\Api\TarjetaLecturaApiController;
@@ -28,6 +31,7 @@ use App\Http\Controllers\Api\RfidApiController;
 Route::middleware('api.key')->group(function () {
 
     Route::apiResource('areas', AreaApiController::class);
+    Route::apiResource('categorias-ticket', CategoriaTicketApiController::class);
 
     Route::apiResource('usuarios', UsuarioApiController::class);
     Route::post('usuarios/{id}/toggle-block', [UsuarioApiController::class, 'toggleBlock']);
