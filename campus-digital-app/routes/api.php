@@ -5,6 +5,7 @@
 use Illuminate\Support\Facades\Route;
 
 // MODULO 4.1
+use App\Http\Controllers\Api\AreaApiController;
 use App\Http\Controllers\Api\UsuarioApiController;
 use App\Http\Controllers\Api\RolApiController;
 use App\Http\Controllers\Api\PermisoApiController;
@@ -13,6 +14,17 @@ use App\Http\Controllers\Api\UsuarioRolApiController;
 use App\Http\Controllers\Api\UsuarioPerfilApiController;
 use App\Http\Controllers\Api\UsuarioSesionApiController;
 use App\Http\Controllers\Api\BitacoraApiController;
+
+// MODULO TICKETS
+use App\Http\Controllers\Api\CategoriaTicketApiController;
+use App\Http\Controllers\Api\UbicacionApiController;
+use App\Http\Controllers\Api\EquipoActivoApiController;
+use App\Http\Controllers\Api\MantenimientoPreventivoApiController;
+use App\Http\Controllers\Api\TicketApiController;
+use App\Http\Controllers\Api\AsignacionTecnicaApiController;
+use App\Http\Controllers\Api\InsumoApiController;
+use App\Http\Controllers\Api\GastoTicketApiController;
+use App\Http\Controllers\Api\HistorialTicketApiController;
 
 // MODULO 4.10
 use App\Http\Controllers\Api\TarjetaUniversitariaApiController;
@@ -25,6 +37,17 @@ use App\Http\Controllers\Api\PedidoApiController;
 use App\Http\Controllers\Api\RfidApiController;
 
 Route::middleware('api.key')->group(function () {
+
+    Route::apiResource('areas', AreaApiController::class);
+    Route::apiResource('categorias-ticket', CategoriaTicketApiController::class);
+    Route::apiResource('ubicaciones', UbicacionApiController::class);
+    Route::apiResource('equipos-activos', EquipoActivoApiController::class);
+    Route::apiResource('mantenimientos-preventivos', MantenimientoPreventivoApiController::class);
+    Route::apiResource('tickets', TicketApiController::class);
+    Route::apiResource('asignaciones-tecnicas', AsignacionTecnicaApiController::class);
+    Route::apiResource('insumos', InsumoApiController::class);
+    Route::apiResource('gastos-ticket', GastoTicketApiController::class);
+    Route::apiResource('historial-tickets', HistorialTicketApiController::class);
 
     Route::apiResource('usuarios', UsuarioApiController::class);
     Route::post('usuarios/{id}/toggle-block', [UsuarioApiController::class, 'toggleBlock']);
