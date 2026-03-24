@@ -140,4 +140,24 @@ public function roles()
         ->wherePivotNull('deleted_at');
 }
 
+public function saldo()
+{
+    return $this->hasOne(Saldo::class);
+}
+
+public function recargas()
+{
+    return $this->hasMany(Recarga::class);
+}
+
+public function pagos()
+{
+    return $this->hasMany(Pago::class);
+}
+
+public function comprobantes()
+{
+    return $this->hasMany(Comprobante::class);
+}
+
 }

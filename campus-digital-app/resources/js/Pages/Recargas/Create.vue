@@ -10,49 +10,60 @@
                         Agrega saldo a tu monedero digital
                     </p>
                 </div>
-            </div>
 
-            <!-- CARD PRINCIPAL -->
-            <div class="stats-grid">
-                <div class="stat-card transition-all duration-700" :class="{
-                    'primary-card': estado === 'idle',
-                    'success-card': estado === 'success',
-                    'error-card': estado === 'error'
-                }">
-                    <div class="card-glow" :class="{
-                        'primary': estado === 'idle',
-                        'success': estado === 'success',
-                        'error': estado === 'error'
-                    }"></div>
-
-                    <!-- FORM -->
-                    <div class="content-body">
-
-                        <!-- MONTO -->
-                        <div style="margin-bottom: 1rem;">
-                            <label class="stat-label">Monto</label>
-                            <input v-model="monto" type="number" placeholder="Ingresa el monto" class="input-custom" />
+                <div class="stats-grid">
+                    <div class="stat-grid primary-card">
+                        <div class="content-card">
+                            <div class="stat-header">Saldo actual</div>
+                            <div class="stat-label"> $dinero</div>
                         </div>
+                        <div class="card-glow primary-card"></div>
+                    </div>
+                </div>
 
-                        <!-- MÉTODO -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <label class="stat-label">Método de pago</label>
-                            <select v-model="metodo" class="input-custom">
-                                <option value="tarjeta">Tarjeta</option>
-                                <option value="efectivo">Efectivo</option>
-                            </select>
+                <!-- CARD PRINCIPAL -->
+                <div class="stats-grid">
+                    <div class="stat-card transition-all duration-700" :class="{
+                        'primary-card': estado === 'idle',
+                        'success-card': estado === 'success',
+                        'error-card': estado === 'error'
+                    }">
+                        <div class="card-glow" :class="{
+                            'primary': estado === 'idle',
+                            'success': estado === 'success',
+                            'error': estado === 'error'
+                        }"></div>
+
+                        <!-- FORM -->
+                        <div class="content-body">
+
+                            <!-- MONTO -->
+                            <div style="margin-bottom: 1rem;">
+                                <label class="stat-label">Monto</label>
+                                <input v-model="monto" type="number" placeholder="Ingresa el monto"
+                                    class="input-custom" />
+                            </div>
+
+                            <!-- MÉTODO -->
+                            <div style="margin-bottom: 1.5rem;">
+                                <label class="stat-label">Método de pago</label>
+                                <select v-model="metodo" class="input-custom">
+                                    <option value="tarjeta">Tarjeta</option>
+                                    <option value="efectivo">Efectivo</option>
+                                </select>
+                            </div>
+
+                            <!-- BOTÓN -->
+                            <button @click="recargar" class="action-button primary-btn">
+                                {{ loading ? 'Procesando...' : 'Recargar saldo' }}
+                            </button>
+
+                            <!-- MENSAJE -->
+                            <div v-if="mensaje" class="feedback-msg">
+                                {{ mensaje }}
+                            </div>
+
                         </div>
-
-                        <!-- BOTÓN -->
-                        <button @click="recargar" class="action-button primary-btn">
-                            {{ loading ? 'Procesando...' : 'Recargar saldo' }}
-                        </button>
-
-                        <!-- MENSAJE -->
-                        <div v-if="mensaje" class="feedback-msg">
-                            {{ mensaje }}
-                        </div>
-
                     </div>
                 </div>
             </div>

@@ -4,15 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Recarga extends Model
+class Movimiento extends Model
 {
     public function user()
 {
     return $this->belongsTo(User::class);
 }
 
-public function comprobante()
+public function referencia()
 {
-    return $this->morphOne(Comprobante::class, 'referencia');
+    return $this->morphTo();
 }
 }
