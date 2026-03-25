@@ -160,4 +160,9 @@ public function comprobantes()
     return $this->hasMany(Comprobante::class);
 }
 
+public function movimientos()
+{
+    return $this->hasMany(Movimiento::class);
+}
+
 }

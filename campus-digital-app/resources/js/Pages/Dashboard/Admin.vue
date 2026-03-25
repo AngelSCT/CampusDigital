@@ -24,7 +24,7 @@
                         </div>
                         <span class="stat-label">Modulo 8 - Recargas</span>
                     </div>
-                    <a href= "/admin/recargas/dashboard" class="stat-link primary">
+                    <a href= "/modulo_8/" class="stat-link primary">
                         <span>Ir</span>
                         <svg class="link-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

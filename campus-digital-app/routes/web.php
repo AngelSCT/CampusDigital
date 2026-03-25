@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\RolController;
 use App\Http\Controllers\Admin\PermisoController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\BitacoraController;
-use App\Http\Controllers\Recargas\RecargaController;
+use App\Http\Controllers\Recargas\WalletController;
 
 // Ruta principal
 Route::get('/', function () {
@@ -93,16 +93,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/accesos-export', [ReporteController::class, 'exportAccesos'])->name('accesos.export');
             Route::get('/actividad-export', [ReporteController::class, 'exportActividad'])->name('actividad.export');
         });
+    });
+    
+    //MODULO 8
+    Route::prefix('modulo_8')->name('modulo_8.')->group(function () {
+        Route::get('/', [WalletController::class, 'index'])->name('index');
 
-        //MODULO 8
-        Route::prefix('recargas')->group(function(){
-            Route::get('/', [RecargaController::class, 'index']);
-            Route::get('/dashboard', [RecargaController::class, 'dashboard'])->name('admin.recargas.dashboard');
+        Route::get('/saldo', [WalletController::class, 'saldo'])->name('saldo');
 
-            Route::get('/create', [RecargaController::class, 'create'])->name('admin.recargas.create');
-            Route::post('/', [RecargaController::class, 'store']);
+        Route::get('/recargar', fn() => Inertia::render('Recargas/Recargar'))->name('recargar.form');
+        Route::post('/recargar', [WalletController::class, 'recargar'])->name('recargar');
 
-            Route::delete('/{id}', [RecargaController::class, 'destroy'])->name('admin.recargas.destroy');
-        });
-        });
+        Route::get('/recargar', fn() => Inertia::render('Recargas/Recargas'))
+        ->name('recargar.form');
+        Route::get('/pagar', [WalletController::class, 'pagar'])->name('pagar');
+        Route::get('/movimientos', [WalletController::class, 'movimientos'])->name('movimientos');
+        Route::get('/comprobantes', [WalletController::class, 'comprobantes'])->name('comprobantes');
+    });
 });

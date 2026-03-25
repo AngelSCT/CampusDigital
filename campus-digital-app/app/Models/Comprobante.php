@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Comprobante extends Model
 {
+
+    protected $fillable = [
+        'usuario_id',
+        'total'
+    ];
+
     public function user()
 {
     return $this->belongsTo(User::class);
