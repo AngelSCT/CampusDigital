@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\TarjetaReporteController;
 use App\Http\Controllers\TarjetaLecturaController;
 use App\Http\Controllers\Auth\RfidLoginController;
 use App\Http\Controllers\MiTarjetaController;
+use App\Http\Controllers\RecargaController;
 use App\Http\Controllers\Archivos\ArchivoController;
 use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\CategoriaTicketController;
@@ -108,6 +109,12 @@ Route::post('/simulador/limpiar-login', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // ── MONEDERO / RECARGAS ──────────────────────────────────────
+    Route::prefix('monedero')->name('monedero.')->group(function () {
+        Route::get('/recargas',  [RecargaController::class, 'index'])->name('recargas');
+        Route::post('/recargas', [RecargaController::class, 'store'])->name('recargas.store');
+    });
 
     Route::get('/sin-permiso', function () {
         return inertia('Errors/SinPermiso');
