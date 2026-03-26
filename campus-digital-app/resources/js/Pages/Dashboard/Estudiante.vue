@@ -31,7 +31,7 @@
                         </div>
                     </div>
                     <div class="bg-slate-900/50 px-5 py-3 border-t border-green-500/20">
-                        <a href="#" class="text-sm text-green-400 hover:text-green-300 transition-colors duration-200 flex items-center">
+                        <a href="route('monedero.recargas')" class="text-sm text-green-400 hover:text-green-300 transition-colors duration-200 flex items-center">
                             Recargar saldo 
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
