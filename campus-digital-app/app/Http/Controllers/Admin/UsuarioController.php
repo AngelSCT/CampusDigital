@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Usuario;
 use App\Models\Rol;
+use App\Services\WalletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -12,8 +13,9 @@ use Inertia\Inertia;
 
 class UsuarioController extends Controller
 {
+
     public function index(Request $request)
-    {
+    {        
         $query = Usuario::with(['roles']);
 
         // Filtros

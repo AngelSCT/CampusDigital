@@ -97,15 +97,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     //MODULO 8
     Route::prefix('modulo_8')->name('modulo_8.')->group(function () {
-        Route::get('/', [WalletController::class, 'index'])->name('index');
+        Route::get('/', [WalletController::class, 'index'])->name('recargar.index');
 
         Route::get('/saldo', [WalletController::class, 'saldo'])->name('saldo');
 
-        Route::get('/recargar', fn() => Inertia::render('Recargas/Recargar'))->name('recargar.form');
-        Route::post('/recargar', [WalletController::class, 'recargar'])->name('recargar');
-
-        Route::get('/recargar', fn() => Inertia::render('Recargas/Recargas'))
+        Route::get('/recargar', [WalletController::class, 'index'])
         ->name('recargar.form');
+
+    Route::post('/recargar', [WalletController::class, 'recargar'])
+        ->name('recargar');
+
         Route::get('/pagar', [WalletController::class, 'pagar'])->name('pagar');
         Route::get('/movimientos', [WalletController::class, 'movimientos'])->name('movimientos');
         Route::get('/comprobantes', [WalletController::class, 'comprobantes'])->name('comprobantes');

@@ -1,3 +1,11 @@
+<script setup>
+import AuthLayout from '@/Layouts/AuthLayout.vue';
+const props = defineProps({
+    saldo: Object,
+    movimientos: Array
+    });
+</script>
+
 <template>
     <AuthLayout>
         <div class="space-y-6">
@@ -25,13 +33,15 @@
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-white truncate">Saldo Disponible</dt>
-                                    <dd class="text-3xl font-semibold text-white">$0.00</dd>
+                                    <div class="stat-value-section">
+                <div class="stat-number">${{$props.saldo.saldo }}</div>
+            </div>
                                 </dl>
                             </div>
                         </div>
                     </div>
                     <div class="bg-slate-900/50 px-5 py-3 border-t border-green-500/20">
-                        <a href="#" class="text-sm text-green-400 hover:text-green-300 transition-colors duration-200 flex items-center">
+                        <a href="/modulo_8/recargar" class="text-sm text-green-400 hover:text-green-300 transition-colors duration-200 flex items-center">
                             Recargar saldo 
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -203,20 +213,51 @@
                         </a>
                     </div>
                     <div class="text-center py-12">
-                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-700/50 flex items-center justify-center">
-                            <svg class="h-8 w-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
-                        </div>
-                        <p class="mt-2 text-sm text-white">No hay movimientos recientes</p>
-                        <p class="text-xs text-slate-400 mt-1">Tus transacciones aparecerán aquí</p>
+                        <!-- Tabla -->
+    <div class="content-card">
+        <div class="content-header">
+            <h2 class="content-title">Historial de movimientos</h2>
+        </div>
+
+        <div class="content-body">
+            <div class="activity-table-wrapper">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="mov in movimientos" :key="mov.id">
+                            <td class="event-col">{{ mov.tipo }}</td>
+
+                            <td class="user-col">
+                                {{ mov.monto }}
+                            </td>
+
+                            <td>
+                                <span 
+                                    :class="mov.estado === 'exitoso' 
+                                    ? 'badge badge-success' 
+                                    : 'badge badge-error'">
+                                    {{ mov.estado }}
+                                </span>
+                            </td>
+
+                            <td class="date-col">{{ mov.created_at }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
                     </div>
                 </div>
             </div>
         </div>
     </AuthLayout>
 </template>
-
-<script setup>
-import AuthLayout from '@/Layouts/AuthLayout.vue';
-</script>

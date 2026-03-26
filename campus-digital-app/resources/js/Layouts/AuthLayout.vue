@@ -238,6 +238,11 @@ const isAdmin = computed(() => {
     return userRoles.value.includes('administrador');
 });
 
+const saldo = computed(() => {
+    const wallet = page.props.auth?.user.saldo;
+    return wallet.saldo;
+})
+
 // Methods
 function toggleUserMenu() {
     showUserMenu.value = !showUserMenu.value;

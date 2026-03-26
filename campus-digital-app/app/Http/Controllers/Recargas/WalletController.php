@@ -15,7 +15,7 @@ class WalletController extends Controller
 
         $movimientos = $service->movimientos(auth()->user());
 
-        return Inertia::render('Recargas/Index', [
+        return Inertia::render('Recargas/Recargas', [
             'saldo' => $saldo,
             'movimientos' => $movimientos,
         ]);

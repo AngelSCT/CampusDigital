@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 use App\Models\AccesoBitacora;
+use App\Services\WalletService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+        protected $walletService;
+
+    public function __construct(WalletService $walletService)
+    {
+        $this->walletService = $walletService;
+    }
     public function index(Request $request)
     {
         $user = $request->user();
@@ -60,7 +67,8 @@ class DashboardController extends Controller
     private function dashboardEstudiante($user)
     {
         return Inertia::render('Dashboard/Estudiante', [
-            // Aquí puedes agregar stats del estudiante cuando tengas los módulos
+                        'saldo' => $this->walletService->obtenerSaldo($user),
+                        'movimientos' => $this->walletService->movimientos($user)
         ]);
     }
 }
