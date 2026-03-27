@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CategoriaTicket;
 use App\Models\Area;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CategoriaTicketController extends Controller
 {
@@ -23,8 +24,11 @@ class CategoriaTicketController extends Controller
 
         $categorias = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
-        // TODO: return Inertia::render('Admin/CategoriasTicket/Index', [...])
-        return response()->json($categorias);
+        return Inertia::render('Admin/CategoriasTicket/Index', [
+            'categorias' => $categorias,
+            'areas'      => Area::orderBy('name_area')->get(['id_area', 'name_area']),
+            'filters'    => $request->only(['search', 'area']),
+        ]);
     }
 
     public function store(Request $request)
@@ -35,16 +39,17 @@ class CategoriaTicketController extends Controller
             'tiempo_sla_horas' => ['required', 'integer', 'min:1'],
         ]);
 
-        $categoria = CategoriaTicket::create($validated);
+        CategoriaTicket::create($validated);
 
-        // TODO: return redirect()->route('admin.categorias-ticket.index')->with('success', ...)
-        return response()->json($categoria->load('area'), 201);
+        return redirect()->route('admin.categorias-ticket.index')->with('success', 'Categoría creada correctamente.');
     }
 
     public function show(CategoriaTicket $categoriaTicket)
     {
-        // TODO: return Inertia::render('Admin/CategoriasTicket/Show', [...])
-        return response()->json($categoriaTicket->load('area'));
+        return Inertia::render('Admin/CategoriasTicket/Show', [
+            'categoria' => $categoriaTicket->load('area'),
+            'areas'     => Area::orderBy('name_area')->get(['id_area', 'name_area']),
+        ]);
     }
 
     public function update(Request $request, CategoriaTicket $categoriaTicket)
@@ -57,15 +62,13 @@ class CategoriaTicketController extends Controller
 
         $categoriaTicket->update($validated);
 
-        // TODO: return redirect()->route('admin.categorias-ticket.index')->with('success', ...)
-        return response()->json($categoriaTicket->fresh()->load('area'));
+        return redirect()->route('admin.categorias-ticket.index')->with('success', 'Categoría actualizada correctamente.');
     }
 
     public function destroy(CategoriaTicket $categoriaTicket)
     {
         $categoriaTicket->delete();
 
-        // TODO: return redirect()->route('admin.categorias-ticket.index')->with('success', ...)
-        return response()->json(['message' => 'Categoría eliminada correctamente.']);
+        return redirect()->route('admin.categorias-ticket.index')->with('success', 'Categoría eliminada correctamente.');
     }
 }
