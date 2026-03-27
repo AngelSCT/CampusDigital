@@ -132,6 +132,20 @@ window.route = (name, params) => {
         "admin.categorias-ticket.update": "/admin/categorias-ticket/:id",
         "admin.categorias-ticket.destroy": "/admin/categorias-ticket/:id",
 
+        //RUTAS DE UBICACIONES
+        "admin.ubicaciones.index": "/admin/ubicaciones",
+        "admin.ubicaciones.store": "/admin/ubicaciones",
+        "admin.ubicaciones.show": "/admin/ubicaciones/:id",
+        "admin.ubicaciones.update": "/admin/ubicaciones/:id",
+        "admin.ubicaciones.destroy": "/admin/ubicaciones/:id",
+
+        //RUTAS DE EQUIPOS ACTIVOS
+        "admin.equipos-activos.index": "/admin/equipos-activos",
+        "admin.equipos-activos.store": "/admin/equipos-activos",
+        "admin.equipos-activos.show": "/admin/equipos-activos/:id",
+        "admin.equipos-activos.update": "/admin/equipos-activos/:id",
+        "admin.equipos-activos.destroy": "/admin/equipos-activos/:id",
+
         //RUTAS DEL EXPLORADOR DE ARCHIVOS
         "archivos.index": "/archivos",
         "archivos.carpeta.crear": "/archivos/carpeta",
