@@ -7,6 +7,7 @@ use App\Models\AsignacionTecnica;
 use App\Models\Usuario;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AsignacionTecnicaController extends Controller
 {
@@ -24,8 +25,15 @@ class AsignacionTecnicaController extends Controller
 
         $asignaciones = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
-        // TODO: return Inertia::render('Admin/AsignacionesTecnicas/Index', [...])
-        return response()->json($asignaciones);
+        $tickets  = Ticket::orderBy('id_ticket', 'desc')->get(['id_ticket', 'estado', 'prioridad']);
+        $tecnicos = Usuario::orderBy('nombre')->get(['id', 'nombre', 'apellido', 'email']);
+
+        return Inertia::render('Admin/AsignacionesTecnicas/Index', [
+            'asignaciones' => $asignaciones,
+            'tickets'      => $tickets,
+            'tecnicos'     => $tecnicos,
+            'filters'      => $request->only(['ticket', 'tecnico']),
+        ]);
     }
 
     public function store(Request $request)
@@ -37,14 +45,22 @@ class AsignacionTecnicaController extends Controller
 
         $asignacion = AsignacionTecnica::create($validated);
 
-        // TODO: return redirect()->route('admin.asignaciones-tecnicas.index')->with('success', ...)
-        return response()->json($asignacion->load(['ticket', 'tecnico']), 201);
+        return redirect()->route('admin.asignaciones-tecnicas.index')
+            ->with('success', 'Asignación técnica creada correctamente.');
     }
 
     public function show(AsignacionTecnica $asignacionTecnica)
     {
-        // TODO: return Inertia::render('Admin/AsignacionesTecnicas/Show', [...])
-        return response()->json($asignacionTecnica->load(['ticket', 'tecnico']));
+        $asignacionTecnica->load(['ticket', 'tecnico']);
+
+        $tickets  = Ticket::orderBy('id_ticket', 'desc')->get(['id_ticket', 'estado', 'prioridad']);
+        $tecnicos = Usuario::orderBy('nombre')->get(['id', 'nombre', 'apellido', 'email']);
+
+        return Inertia::render('Admin/AsignacionesTecnicas/Show', [
+            'asignacion' => $asignacionTecnica,
+            'tickets'    => $tickets,
+            'tecnicos'   => $tecnicos,
+        ]);
     }
 
     public function update(Request $request, AsignacionTecnica $asignacionTecnica)
@@ -56,15 +72,15 @@ class AsignacionTecnicaController extends Controller
 
         $asignacionTecnica->update($validated);
 
-        // TODO: return redirect()->route('admin.asignaciones-tecnicas.index')->with('success', ...)
-        return response()->json($asignacionTecnica->fresh()->load(['ticket', 'tecnico']));
+        return redirect()->route('admin.asignaciones-tecnicas.show', $asignacionTecnica->id_asignacion)
+            ->with('success', 'Asignación técnica actualizada correctamente.');
     }
 
     public function destroy(AsignacionTecnica $asignacionTecnica)
     {
         $asignacionTecnica->delete();
 
-        // TODO: return redirect()->route('admin.asignaciones-tecnicas.index')->with('success', ...)
-        return response()->json(['message' => 'Asignación técnica eliminada correctamente.']);
+        return redirect()->route('admin.asignaciones-tecnicas.index')
+            ->with('success', 'Asignación técnica eliminada correctamente.');
     }
 }

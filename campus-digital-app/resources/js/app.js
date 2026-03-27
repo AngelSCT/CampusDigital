@@ -165,6 +165,15 @@ window.route = (name, params) => {
         "admin.mantenimientos-preventivos.destroy":
             "/admin/mantenimientos-preventivos/:id",
 
+        //RUTAS DE ASIGNACIONES TECNICAS
+        "admin.asignaciones-tecnicas.index": "/admin/asignaciones-tecnicas",
+        "admin.asignaciones-tecnicas.store": "/admin/asignaciones-tecnicas",
+        "admin.asignaciones-tecnicas.show": "/admin/asignaciones-tecnicas/:id",
+        "admin.asignaciones-tecnicas.update":
+            "/admin/asignaciones-tecnicas/:id",
+        "admin.asignaciones-tecnicas.destroy":
+            "/admin/asignaciones-tecnicas/:id",
+
         //RUTAS DEL EXPLORADOR DE ARCHIVOS
         "archivos.index": "/archivos",
         "archivos.carpeta.crear": "/archivos/carpeta",
