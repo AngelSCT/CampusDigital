@@ -16,6 +16,7 @@ class Area extends Model
 
     protected $fillable = [
         'name_area',
+        'nombre',
     ];
 
     protected $casts = [
@@ -23,4 +24,18 @@ class Area extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    protected $appends = [
+        'nombre',
+    ];
+
+    public function getNombreAttribute()
+    {
+        return $this->attributes['name_area'] ?? null;
+    }
+
+    public function setNombreAttribute($value)
+    {
+        $this->attributes['name_area'] = $value;
+    }
 }
