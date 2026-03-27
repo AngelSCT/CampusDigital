@@ -39,9 +39,10 @@ class Recarga extends Model
         return $this->belongsTo(Usuario::class, 'usuario_id');
     }
 
+    // Polimorfismo: esta recarga tiene movimientos asociados
     public function movimiento()
     {
-        return $this->belongsTo(Movimiento::class, 'saldo_movimiento_id');
+        return $this->morphMany(Movimiento::class, 'referenciable');
     }
 
     public function comprobante()

@@ -42,7 +42,7 @@
                     <div class="bg-gradient-to-br from-cyan-900/40 to-blue-900/40 border border-cyan-500/20 rounded-xl p-6 text-center">
                         <p class="text-xs text-cyan-400 uppercase tracking-wider mb-2">Saldo Disponible</p>
                         <p class="text-4xl font-bold text-white font-mono">
-                            ${{ formatMonto(monedero?.saldo_disponible ?? 0) }}
+                            ${{ formatMonto(monedero ?? 0) }}
                         </p>
                         <p class="text-xs text-slate-400 mt-2">Actualizado: {{ formatDateTime(new Date()) }}</p>
                     </div>
@@ -386,12 +386,14 @@ function procesarRecarga() {
     };
 
     router.post('/modulo_8/recargar', datosForm, {
-        onSuccess: () => {
+        onSuccess: (response) => {
             alertSuccess.value = `Recarga de $${form.monto} exitosa!`;
             form.monto = '';
             form.metodo_pago = 'tarjeta';
+            
+            // Actualizar el saldo localmente sin recargar
             setTimeout(() => {
-                router.reload();
+                window.location.reload(); // O simplemente: router.reload();
             }, 2000);
         },
         onError: (err) => {
@@ -413,7 +415,9 @@ function reintentar(id) {
     router.post(`/modulo_8/recargar/${id}/reintentar`, {}, {
         onSuccess: () => {
             alertSuccess.value = 'Reintento procesado. Revisa el estado de tu recarga.';
-            router.reload();
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
         },
         onError: () => {
             alertError.value = 'No se pudo reintentar el pago. Intenta más tarde.';

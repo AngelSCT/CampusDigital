@@ -27,8 +27,9 @@ class RecargaController extends Controller
     {
         $usuario = Auth::user();
 
-        // Obtener saldo del usuario
-        $saldo = $this->walletService->obtenerSaldo($usuario);
+        // Obtener saldo del usuario - ACTUALIZADO EN TIEMPO REAL
+        $saldo = \App\Models\Saldo::where('usuario_id', $usuario->id)->first();
+        $monedero = $saldo ? $saldo->saldo : 0;
 
         // Últimas 20 recargas del usuario
         $recargas = Recarga::where('usuario_id', $usuario->id)
@@ -45,7 +46,7 @@ class RecargaController extends Controller
         ];
 
         return Inertia::render('Monedero/Recargar', [
-            'monedero' => $saldo,
+            'monedero' => $monedero,  // ← CAMBIO: pasar el saldo directo
             'recargas' => $recargas,
             'limites' => $limites,
         ]);
@@ -106,7 +107,8 @@ class RecargaController extends Controller
 
             if ($recarga->estado === 'exitosa') {
                 return redirect()->route('modulo_8.recargar.form')
-                    ->with('success', "Recarga de \${$validated['monto']} realizada exitosamente. Folio: {$recarga->referencia}");
+                    ->with('success', "Recarga de \${$validated['monto']} realizada exitosamente. Folio: {$recarga->referencia}")
+                    ->with('saldo_actualizado', true);  // ← AGREGAR ESTO
             } else {
                 return redirect()->route('modulo_8.recargar.form')
                     ->with('error', "La recarga falló. Puedes reintentar. Folio: {$recarga->referencia}");
@@ -157,7 +159,8 @@ class RecargaController extends Controller
                 : "El reintento falló nuevamente. Intenta más tarde.";
 
             return redirect()->route('modulo_8.recargar.form')
-                ->with($recarga->estado === 'exitosa' ? 'success' : 'error', $mensaje);
+                ->with($recarga->estado === 'exitosa' ? 'success' : 'error', $mensaje)
+                ->with('saldo_actualizado', $recarga->estado === 'exitosa');  // ← AGREGAR ESTO
 
         } catch (\Exception $e) {
             return back()->withErrors(['recarga' => $e->getMessage()]);
@@ -176,16 +179,16 @@ class RecargaController extends Controller
         if (!$saldo) {
             $saldo = \App\Models\Saldo::create([
                 'usuario_id' => $usuario->id,
-                'saldo' => 0, // ← CAMBIO: usar 'saldo' en lugar de 'saldo_disponible'
+                'saldo' => 0,
             ]);
         }
 
         // Incrementar saldo
-        $saldo->saldo += $recarga->monto; // ← CAMBIO
+        $saldo->saldo += $recarga->monto;
         $saldo->save();
 
-        // Crear movimiento
-        \App\Models\Movimiento::create([
+        // Crear movimiento con todos los datos necesarios
+        $movimiento = \App\Models\Movimiento::create([
             'usuario_id' => $usuario->id,
             'tipo' => 'recarga',
             'monto' => $recarga->monto,
@@ -194,8 +197,9 @@ class RecargaController extends Controller
             'referencia_id' => $recarga->id,
         ]);
 
+        // Vincular la recarga al movimiento
         $recarga->update([
-            'saldo_movimiento_id' => $saldo->id,
+            'saldo_movimiento_id' => $movimiento->id,
         ]);
     }
 
