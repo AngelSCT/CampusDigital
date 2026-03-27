@@ -153,7 +153,7 @@
                             </h2>
                             <div class="flex gap-2">
                                 <button
-                                    v-for="estado in ['todos', 'exitoso', 'fallido']"
+                                    v-for="estado in ['todos', 'exitosa', 'fallida']"
                                     :key="estado"
                                     @click="filtroEstado = estado"
                                     type="button"
@@ -182,16 +182,16 @@
                             >
                                 <!-- Ícono Estado -->
                                 <div 
-                                    :class="r.estado === 'exitoso'
+                                    :class="r.estado === 'exitosa'
                                         ? 'bg-green-500/20 text-green-400'
-                                        : r.estado === 'fallido'
+                                        : r.estado === 'fallida'
                                             ? 'bg-red-500/20 text-red-400'
                                             : 'bg-yellow-500/20 text-yellow-400'"
                                     class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                                 >
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path v-if="r.estado === 'exitoso'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        <path v-else-if="r.estado === 'fallido'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        <path v-if="r.estado === 'exitosa'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        <path v-else-if="r.estado === 'fallida'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                         <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                 </div>
@@ -215,15 +215,15 @@
 
                                 <!-- Monto -->
                                 <p 
-                                    :class="r.estado === 'exitoso' ? 'text-green-400' : 'text-slate-500'"
+                                    :class="r.estado === 'exitosa' ? 'text-green-400' : 'text-slate-500'"
                                     class="text-sm font-bold font-mono whitespace-nowrap"
                                 >
-                                    {{ r.estado === 'exitoso' ? '+' : '' }}${{ formatMonto(r.monto) }}
+                                    {{ r.estado === 'exitosa' ? '+' : '' }}${{ formatMonto(r.monto) }}
                                 </p>
 
                                 <!-- Acciones -->
                                 <button 
-                                    v-if="r.estado === 'exitoso'"
+                                    v-if="r.estado === 'exitosa'"
                                     @click="descargarComprobante(r.id)"
                                     type="button"
                                     class="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-700/50 rounded-lg transition-all duration-200"
@@ -231,6 +231,24 @@
                                 >
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                </button>
+
+                                <!-- Botón Reintentar (US3) -->
+                                <button
+                                    v-if="r.estado === 'fallida'"
+                                    @click="reintentar(r.id)"
+                                    :disabled="reintentando === r.id"
+                                    type="button"
+                                    class="p-2 text-slate-400 hover:text-yellow-400 hover:bg-slate-700/50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title="Reintentar pago"
+                                >
+                                    <svg v-if="reintentando === r.id" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                                    </svg>
+                                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                     </svg>
                                 </button>
                             </div>
@@ -273,6 +291,7 @@ const form = reactive({
 });
 
 const procesando = ref(false);
+const reintentando = ref(null);
 const errors = reactive({});
 const filtroEstado = ref('todos');
 const alertSuccess = ref('');
@@ -285,7 +304,6 @@ const recargasFiltradas = computed(() => {
 });
 
 onMounted(() => {
-    // Validar límites al cargar
     validarLimites();
 });
 
@@ -293,14 +311,14 @@ function validarLimites() {
     const hoy = new Date();
     const recargasHoy = (props.recargas || []).filter(r => {
         const fechaRecarga = new Date(r.created_at);
-        return fechaRecarga.toDateString() === hoy.toDateString() && r.estado === 'exitoso';
+        return fechaRecarga.toDateString() === hoy.toDateString() && r.estado === 'exitosa';
     });
 
     if (recargasHoy.length >= props.limites.max_recargas_dia) {
         alertWarning.value = `Has alcanzado el límite de ${props.limites.max_recargas_dia} recargas por día.`;
     }
 
-    const ultimaRecarga = (props.recargas || []).filter(r => r.estado === 'exitoso')[0];
+    const ultimaRecarga = (props.recargas || []).filter(r => r.estado === 'exitosa')[0];
     if (ultimaRecarga) {
         const fechaUltima = new Date(ultimaRecarga.created_at);
         const ahora = new Date();
@@ -339,7 +357,7 @@ function procesarRecarga() {
     const hoy = new Date();
     const recargasHoy = (props.recargas || []).filter(r => {
         const fechaRecarga = new Date(r.created_at);
-        return fechaRecarga.toDateString() === hoy.toDateString() && r.estado === 'exitoso';
+        return fechaRecarga.toDateString() === hoy.toDateString() && r.estado === 'exitosa';
     });
 
     if (recargasHoy.length >= props.limites.max_recargas_dia) {
@@ -347,7 +365,7 @@ function procesarRecarga() {
         return;
     }
 
-    const ultimaRecarga = (props.recargas || []).filter(r => r.estado === 'exitoso')[0];
+    const ultimaRecarga = (props.recargas || []).filter(r => r.estado === 'exitosa')[0];
     if (ultimaRecarga) {
         const fechaUltima = new Date(ultimaRecarga.created_at);
         const ahora = new Date();
@@ -386,6 +404,26 @@ function procesarRecarga() {
     });
 }
 
+// US3 - Reintentar pago fallido
+function reintentar(id) {
+    reintentando.value = id;
+    alertSuccess.value = '';
+    alertError.value = '';
+
+    router.post(`/modulo_8/recargar/${id}/reintentar`, {}, {
+        onSuccess: () => {
+            alertSuccess.value = 'Reintento procesado. Revisa el estado de tu recarga.';
+            router.reload();
+        },
+        onError: () => {
+            alertError.value = 'No se pudo reintentar el pago. Intenta más tarde.';
+        },
+        onFinish: () => {
+            reintentando.value = null;
+        }
+    });
+}
+
 function descargarComprobante(id) {
     window.location.href = route('modulo_8.comprobante', { id });
 }
@@ -413,8 +451,8 @@ function metodoLabel(m) {
 }
 
 function badgeClass(estado) {
-    if (estado === 'exitoso') return 'bg-green-500/20 text-green-400 border-green-500/20';
-    if (estado === 'fallido') return 'bg-red-500/20 text-red-400 border-red-500/20';
+    if (estado === 'exitosa') return 'bg-green-500/20 text-green-400 border-green-500/20';
+    if (estado === 'fallida') return 'bg-red-500/20 text-red-400 border-red-500/20';
     return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/20';
 }
 </script>
