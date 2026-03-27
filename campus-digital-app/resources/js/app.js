@@ -153,6 +153,18 @@ window.route = (name, params) => {
         "admin.tickets.update": "/admin/tickets/:id",
         "admin.tickets.destroy": "/admin/tickets/:id",
 
+        //RUTAS DE MANTENIMIENTOS PREVENTIVOS
+        "admin.mantenimientos-preventivos.index":
+            "/admin/mantenimientos-preventivos",
+        "admin.mantenimientos-preventivos.store":
+            "/admin/mantenimientos-preventivos",
+        "admin.mantenimientos-preventivos.show":
+            "/admin/mantenimientos-preventivos/:id",
+        "admin.mantenimientos-preventivos.update":
+            "/admin/mantenimientos-preventivos/:id",
+        "admin.mantenimientos-preventivos.destroy":
+            "/admin/mantenimientos-preventivos/:id",
+
         //RUTAS DEL EXPLORADOR DE ARCHIVOS
         "archivos.index": "/archivos",
         "archivos.carpeta.crear": "/archivos/carpeta",
