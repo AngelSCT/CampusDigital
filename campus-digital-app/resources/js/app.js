@@ -146,6 +146,13 @@ window.route = (name, params) => {
         "admin.equipos-activos.update": "/admin/equipos-activos/:id",
         "admin.equipos-activos.destroy": "/admin/equipos-activos/:id",
 
+        //RUTAS DE TICKETS
+        "admin.tickets.index": "/admin/tickets",
+        "admin.tickets.store": "/admin/tickets",
+        "admin.tickets.show": "/admin/tickets/:id",
+        "admin.tickets.update": "/admin/tickets/:id",
+        "admin.tickets.destroy": "/admin/tickets/:id",
+
         //RUTAS DEL EXPLORADOR DE ARCHIVOS
         "archivos.index": "/archivos",
         "archivos.carpeta.crear": "/archivos/carpeta",
