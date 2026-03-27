@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Area;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AreaController extends Controller
 {
@@ -18,8 +19,10 @@ class AreaController extends Controller
 
         $areas = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
-        // TODO: return Inertia::render('Admin/Areas/Index', [...])
-        return response()->json($areas);
+        return Inertia::render('Admin/Areas/Index', [
+            'areas'   => $areas,
+            'filters' => $request->only(['search']),
+        ]);
     }
 
     public function store(Request $request)
@@ -28,16 +31,16 @@ class AreaController extends Controller
             'name_area' => ['required', 'string', 'max:120', 'unique:area,name_area'],
         ]);
 
-        $area = Area::create($validated);
+        Area::create($validated);
 
-        // TODO: return redirect()->route('admin.areas.index')->with('success', ...)
-        return response()->json($area, 201);
+        return redirect()->route('admin.areas.index')->with('success', 'Área creada correctamente.');
     }
 
     public function show(Area $area)
     {
-        // TODO: return Inertia::render('Admin/Areas/Show', ['area' => $area])
-        return response()->json($area);
+        return Inertia::render('Admin/Areas/Show', [
+            'area' => $area,
+        ]);
     }
 
     public function update(Request $request, Area $area)
@@ -48,15 +51,13 @@ class AreaController extends Controller
 
         $area->update($validated);
 
-        // TODO: return redirect()->route('admin.areas.index')->with('success', ...)
-        return response()->json($area);
+        return redirect()->route('admin.areas.index')->with('success', 'Área actualizada correctamente.');
     }
 
     public function destroy(Area $area)
     {
         $area->delete();
 
-        // TODO: return redirect()->route('admin.areas.index')->with('success', ...)
-        return response()->json(['message' => 'Área eliminada correctamente.']);
+        return redirect()->route('admin.areas.index')->with('success', 'Área eliminada correctamente.');
     }
 }
