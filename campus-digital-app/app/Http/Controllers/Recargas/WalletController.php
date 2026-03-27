@@ -11,13 +11,15 @@ class WalletController extends Controller
 {
     public function index(Request $request, WalletService $service)
     {
-        $saldo = $service->obtenerSaldo(auth()->user());
-
-        $movimientos = $service->movimientos(auth()->user());
+        $user        = auth()->user();
+        $saldo       = $service->obtenerSaldo($user);
+        $movimientos = $service->movimientos($user);
+        $stats       = $service->estadisticas($user, $movimientos);
 
         return Inertia::render('Recargas/Index', [
-            'saldo' => $saldo,
-            'movimientos' => $movimientos,
+            'saldo'        => $saldo,
+            'movimientos'  => $movimientos,
+            'estadisticas' => $stats,
         ]);
     }
 
@@ -75,6 +77,22 @@ class WalletController extends Controller
     {
         return response()->json(
             $service->comprobantes($request->user())
+        );
+    }
+
+    /**
+     * Devuelve las estadísticas del dashboard en formato JSON.
+     * Endpoint: GET /modulo_8/estadisticas
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function estadisticas(Request $request, WalletService $service)
+    {
+        $user        = $request->user();
+        $movimientos = $service->movimientos($user);
+
+        return response()->json(
+            $service->estadisticas($user, $movimientos)
         );
     }
 }

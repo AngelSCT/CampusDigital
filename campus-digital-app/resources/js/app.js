@@ -64,6 +64,18 @@ window.route = (name, params) => {
         'admin.bitacora.actividad': '/admin/bitacora/actividad',
         'admin.bitacora.export-accesos': '/admin/bitacora/export-accesos',
         'admin.bitacora.export-actividad': '/admin/bitacora/export-actividad',
+
+        // Módulo 8 — Recargas y estado de cuenta
+        'modulo_8.index':             '/modulo_8',
+        'modulo_8.saldo':             '/modulo_8/saldo',
+        'modulo_8.recargar.form':     '/modulo_8/recargar',
+        'modulo_8.recargar':          '/modulo_8/recargar',
+        'modulo_8.recargar.reintentar': '/modulo_8/recargar/:id/reintentar',
+        'modulo_8.comprobante':       '/modulo_8/recargar/:id/comprobante',
+        'modulo_8.pagar':             '/modulo_8/pagar',
+        'modulo_8.movimientos':       '/modulo_8/movimientos',
+        'modulo_8.comprobantes':      '/modulo_8/comprobantes',
+        'modulo_8.estadisticas':      '/modulo_8/estadisticas',
     };
     
     let url = routes[name] || '/';

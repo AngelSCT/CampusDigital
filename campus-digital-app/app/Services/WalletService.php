@@ -87,4 +87,38 @@ class WalletService
             ->latest('fecha')
             ->get();
     }
+
+    /**
+     * 📊 Estadísticas del dashboard
+     * Calcula saldo, conteos de exitosos/fallidos/pendientes y monto total recargado.
+     *
+     * @param  mixed  $user
+     * @param  \Illuminate\Support\Collection|null  $movimientos
+     * @return array{saldo_actual: float, exitosos: int, fallidos: int, pendientes: int, total_movimientos: int, monto_total_recargado: float}
+     */
+    public function estadisticas($user, $movimientos = null)
+    {
+        if ($movimientos === null) {
+            $movimientos = $this->movimientos($user);
+        }
+
+        $saldo = $this->obtenerSaldo($user);
+
+        $exitosos  = $movimientos->filter(fn ($m) => in_array($m->estado, ['exitosa', 'exitoso']))->count();
+        $fallidos  = $movimientos->filter(fn ($m) => in_array($m->estado, ['fallida', 'fallido']))->count();
+        $pendientes = $movimientos->filter(fn ($m) => $m->estado === 'pendiente')->count();
+
+        $montoTotalRecargado = $movimientos
+            ->filter(fn ($m) => $m->tipo === 'recarga' && in_array($m->estado, ['exitosa', 'exitoso']))
+            ->sum('monto');
+
+        return [
+            'saldo_actual'          => (float) $saldo->saldo,
+            'exitosos'              => $exitosos,
+            'fallidos'              => $fallidos,
+            'pendientes'            => $pendientes,
+            'total_movimientos'     => $movimientos->count(),
+            'monto_total_recargado' => (float) $montoTotalRecargado,
+        ];
+    }
 }

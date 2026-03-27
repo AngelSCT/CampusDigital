@@ -113,5 +113,6 @@ Route::middleware(['auth', 'verified'])->prefix('modulo_8')->name('modulo_8.')->
     Route::post('/pagar', [\App\Http\Controllers\Recargas\WalletController::class, 'pagar'])->name('pagar');
     Route::get('/movimientos', [\App\Http\Controllers\Recargas\WalletController::class, 'movimientos'])->name('movimientos');
     Route::get('/comprobantes', [\App\Http\Controllers\Recargas\WalletController::class, 'comprobantes'])->name('comprobantes');
+    Route::get('/estadisticas', [\App\Http\Controllers\Recargas\WalletController::class, 'estadisticas'])->name('estadisticas');
 });
 });

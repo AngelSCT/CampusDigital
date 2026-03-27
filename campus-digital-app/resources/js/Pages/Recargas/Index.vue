@@ -1,616 +1,249 @@
 <script setup>
-import { computed } from 'vue';
+import { ref } from 'vue';
+import { router } from '@inertiajs/vue3';
+import AuthLayout from '@/Layouts/AuthLayout.vue';
+import StatCard from '@/Components/Recargas/StatCard.vue';
+import TransactionTable from '@/Components/Recargas/TransactionTable.vue';
+import QuickActions from '@/Components/Recargas/QuickActions.vue';
+import { useTransactions } from '@/composables/useTransactions.js';
+import { useBalance } from '@/composables/useBalance.js';
+import { validateAmount, validateRequired } from '@/utils/validators.js';
 
 const props = defineProps({
-    saldo: Object,
-    movimientos: Array
-})
+    saldo:         { type: Object, default: null },
+    movimientos:   { type: Array,  default: () => [] },
+    estadisticas:  { type: Object, default: null },
+});
 
-// puedes calcular aquí
-const exitosos = computed(() => 
-    props.movimientos.filter(m => m.estado === 'exitosa').length
-)
+// ── Composables ────────────────────────────────────────────────
+const { formattedBalance, fetchBalance, saldoNumerico } = useBalance(props.saldo);
 
-const fallidos = computed(() => 
-    props.movimientos.filter(m => m.estado === 'fallida').length
-)
+const {
+    movimientosPaginados,
+    movimientosFiltrados,
+    totalPaginas,
+    paginacion,
+    loading,
+    estadisticas,
+    setFiltro,
+    limpiarFiltros,
+    cambiarPagina,
+    fetchMovimientos,
+} = useTransactions(props.movimientos);
+
+// ── Refresco de datos ───────────────────────────────────────────
+const refreshing = ref(false);
+
+async function refrescarDatos() {
+    refreshing.value = true;
+    await Promise.all([fetchBalance(), fetchMovimientos()]);
+    refreshing.value = false;
+}
+
+// ── Modal de pago rápido ────────────────────────────────────────
+const pagoModal    = ref(false);
+const pagoForm     = ref({ monto: '', concepto: '' });
+const pagoError    = ref('');
+const pagoLoading  = ref(false);
+
+function abrirPago() {
+    pagoForm.value  = { monto: '', concepto: '' };
+    pagoError.value = '';
+    pagoModal.value = true;
+}
+
+function cerrarPago() {
+    if (!pagoLoading.value) pagoModal.value = false;
+}
+
+function confirmarPago() {
+    pagoError.value = '';
+
+    const montoResult = validateAmount(pagoForm.value.monto);
+    if (!montoResult.valid) { pagoError.value = montoResult.error; return; }
+
+    const conceptoResult = validateRequired(pagoForm.value.concepto, 'El concepto');
+    if (!conceptoResult.valid) { pagoError.value = conceptoResult.error; return; }
+
+    pagoLoading.value = true;
+    router.post('/modulo_8/pagar', {
+        monto:    pagoForm.value.monto,
+        concepto: pagoForm.value.concepto,
+    }, {
+        onSuccess: () => { pagoModal.value = false; },
+        onError:   (errors) => { pagoError.value = errors.monto || errors.concepto || 'Error al procesar el pago.'; },
+        onFinish:  () => { pagoLoading.value = false; },
+    });
+}
 </script>
 
 <template>
-<div class="dashboard-container">
+    <AuthLayout>
+        <div class="space-y-6" id="historial">
 
-    <!-- Header -->
-    <div class="dashboard-header">
-        <h1 class="dashboard-title">Dashboard</h1>
-        <p class="dashboard-subtitle">Resumen de movimientos del sistema</p>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-grid">
-
-        <!-- Saldo -->
-        <div class="stat-card primary-card">
-            <div class="card-glow primary"></div>
-
-            <div class="stat-header">
-                <div class="stat-icon-box primary">
-                    💰
-                </div>
-                <span class="stat-label">Saldo</span>
+            <!-- ── Encabezado ── -->
+            <div>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                    Estado de Cuenta
+                </h1>
+                <p class="mt-1 text-sm text-slate-400">Resumen de tus movimientos y saldo disponible</p>
             </div>
 
-            <div class="stat-value-section">
-                <div class="stat-number">${{ props.saldo.saldo }}</div>
+            <!-- ── Tarjetas de estadísticas ── -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                <!-- Saldo disponible -->
+                <StatCard
+                    label="Saldo disponible"
+                    subtitle="Monedero universitario"
+                    :value="saldoNumerico"
+                    prefix="$"
+                    :decimals="2"
+                    icon="💰"
+                    variant="primary"
+                />
+
+                <!-- Movimientos exitosos -->
+                <StatCard
+                    label="Movimientos exitosos"
+                    :subtitle="`de ${estadisticas.total} en total`"
+                    :value="estadisticas.exitosos"
+                    icon="✅"
+                    variant="success"
+                />
+
+                <!-- Movimientos fallidos -->
+                <StatCard
+                    label="Movimientos fallidos"
+                    :subtitle="estadisticas.pendientes > 0 ? `${estadisticas.pendientes} pendiente(s)` : null"
+                    :value="estadisticas.fallidos"
+                    icon="❌"
+                    variant="danger"
+                />
+
             </div>
+
+            <!-- ── Acciones rápidas ── -->
+            <QuickActions
+                :loading="refreshing"
+                @pagar="abrirPago"
+                @actualizar="refrescarDatos"
+            />
+
+            <!-- ── Tabla de movimientos ── -->
+            <TransactionTable
+                :movimientos="movimientosPaginados"
+                :loading="loading"
+                :total-filtrados="movimientosFiltrados.length"
+                :pagina-actual="paginacion.paginaActual"
+                :total-paginas="totalPaginas"
+                @filtrar="({ key, value }) => setFiltro(key, value)"
+                @limpiar-filtros="limpiarFiltros"
+                @cambiar-pagina="cambiarPagina"
+            />
+
         </div>
 
-        <!-- Exitosos -->
-        <div class="stat-card success-card">
-            <div class="card-glow success"></div>
+        <!-- ── Modal pago rápido ── -->
+        <transition
+            enter-active-class="transition ease-out duration-200"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition ease-in duration-150"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+        >
+            <div
+                v-if="pagoModal"
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm"
+                @click.self="cerrarPago"
+            >
+                <transition
+                    enter-active-class="transition ease-out duration-200"
+                    enter-from-class="opacity-0 scale-95"
+                    enter-to-class="opacity-100 scale-100"
+                    leave-active-class="transition ease-in duration-150"
+                    leave-from-class="opacity-100 scale-100"
+                    leave-to-class="opacity-0 scale-95"
+                >
+                    <div v-if="pagoModal" class="w-full max-w-md bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
 
-            <div class="stat-header">
-                <div class="stat-icon-box success">
-                    ✔
-                </div>
-                <span class="stat-label">Movimientos exitosos</span>
+                        <!-- Cabecera modal -->
+                        <div class="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                            <h3 class="text-base font-semibold text-white">Realizar pago</h3>
+                            <button @click="cerrarPago" class="text-slate-400 hover:text-white transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Cuerpo modal -->
+                        <div class="px-6 py-5 space-y-4">
+                            <!-- Saldo disponible -->
+                            <div class="p-3 rounded-xl bg-slate-700/40 border border-slate-600/40 text-center">
+                                <p class="text-xs text-slate-400 mb-1">Saldo disponible</p>
+                                <p class="text-2xl font-bold text-white font-mono">{{ formattedBalance }}</p>
+                            </div>
+
+                            <!-- Error -->
+                            <p v-if="pagoError" class="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                                {{ pagoError }}
+                            </p>
+
+                            <!-- Campo monto -->
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1.5">Monto a pagar</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+                                    <input
+                                        v-model="pagoForm.monto"
+                                        type="number"
+                                        min="1"
+                                        placeholder="0.00"
+                                        class="w-full pl-7 pr-4 py-2.5 bg-slate-700/50 border border-slate-600 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Campo concepto -->
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1.5">Concepto</label>
+                                <input
+                                    v-model="pagoForm.concepto"
+                                    type="text"
+                                    maxlength="100"
+                                    placeholder="Ej: Cafetería, Biblioteca..."
+                                    class="w-full px-4 py-2.5 bg-slate-700/50 border border-slate-600 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Acciones modal -->
+                        <div class="px-6 py-4 border-t border-slate-700 flex gap-3 justify-end">
+                            <button
+                                @click="cerrarPago"
+                                :disabled="pagoLoading"
+                                class="px-4 py-2 text-sm text-slate-300 border border-slate-600 rounded-lg hover:bg-slate-700/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                @click="confirmarPago"
+                                :disabled="pagoLoading"
+                                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-blue-600 to-blue-700 border border-transparent rounded-lg hover:from-blue-500 hover:to-blue-600 transition-all shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <svg v-if="pagoLoading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                                </svg>
+                                {{ pagoLoading ? 'Procesando...' : 'Confirmar pago' }}
+                            </button>
+                        </div>
+                    </div>
+                </transition>
             </div>
+        </transition>
 
-            <div class="stat-value-section">
-                <div class="stat-number">{{ exitosos }}</div>
-            </div>
-        </div>
-
-        <!-- Fallidos -->
-        <div class="stat-card error-card">
-            <div class="card-glow error"></div>
-
-            <div class="stat-header">
-                <div class="stat-icon-box error">
-                    ✖
-                </div>
-                <span class="stat-label">Movimientos fallidos</span>
-            </div>
-
-            <div class="stat-value-section">
-                <div class="stat-number">{{ fallidos }}</div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Acciones rápidas -->
-    <div class="section">
-        <h2 class="section-title">Acciones rápidas</h2>
-
-        <div class="quick-grid">
-            <a href="/modulo_8/recargar" class="quick-card success">
-                <span>➕ Recargar saldo</span>
-            </a>
-
-            <router-link to="/pago" class="quick-card primary">
-                <span>💳 Realizar pago</span>
-            </router-link>
-        </div>
-    </div>
-
-    <!-- Tabla -->
-    <div class="content-card">
-        <div class="content-header">
-            <h2 class="content-title">Historial de movimientos</h2>
-        </div>
-
-        <div class="content-body">
-            <div class="activity-table-wrapper">
-                <table class="activity-table">
-                    <thead>
-                        <tr>
-                            <th>Tipo</th>
-                            <th>Monto</th>
-                            <th>Estado</th>
-                            <th>Fecha</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr v-for="mov in movimientos" :key="mov.id">
-                            <td class="event-col">{{ mov.tipo }}</td>
-
-                            <td class="user-col">
-                                {{ mov.monto }}
-                            </td>
-
-                            <td>
-                                <span 
-                                    :class="mov.estado === 'exitoso' 
-                                    ? 'badge badge-success' 
-                                    : 'badge badge-error'">
-                                    {{ mov.estado }}
-                                </span>
-                            </td>
-
-                            <td class="date-col">{{ mov.created_at }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-</div>
+    </AuthLayout>
 </template>
-
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap');
-
-.dashboard-container {
-    font-family: 'Inter', sans-serif;
-    padding: 2rem;
-    min-height: 100vh;
-    background: #0f172a;
-}
-
-/* Header */
-.dashboard-header {
-    margin-bottom: 2.5rem;
-}
-
-.dashboard-title {
-    font-size: 2.25rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.5rem;
-}
-
-.dashboard-subtitle {
-    font-family: 'Roboto', sans-serif;
-    color: #ffffff;
-    font-size: 1rem;
-}
-
-/* Stats Grid */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2.5rem;
-}
-
-.stat-card {
-    position: relative;
-    background: #1e293b;
-    border: 1px solid;
-    border-radius: 1.25rem;
-    padding: 1.75rem;
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, currentColor 0%, transparent 100%);
-}
-
-.stat-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-.primary-card {
-    border-color: rgba(30, 64, 175, 0.5);
-    color: #3b82f6;
-}
-
-.success-card {
-    border-color: rgba(22, 163, 74, 0.5);
-    color: #22c55e;
-}
-
-.error-card {
-    border-color: rgba(220, 38, 38, 0.5);
-    color: #ef4444;
-}
-
-.card-glow {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    opacity: 0.03;
-    pointer-events: none;
-}
-
-.card-glow.primary {
-    background: radial-gradient(circle, #1E40AF 0%, transparent 70%);
-}
-
-.card-glow.success {
-    background: radial-gradient(circle, #16A34A 0%, transparent 70%);
-}
-
-.card-glow.error {
-    background: radial-gradient(circle, #DC2626 0%, transparent 70%);
-}
-
-.stat-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.stat-icon-box {
-    width: 56px;
-    height: 56px;
-    border-radius: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.stat-icon-box.primary {
-    background: linear-gradient(135deg, #1E40AF 0%, #3b82f6 100%);
-    box-shadow: 0 8px 20px rgba(30, 64, 175, 0.4);
-}
-
-.stat-icon-box.success {
-    background: linear-gradient(135deg, #16A34A 0%, #22c55e 100%);
-    box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4);
-}
-
-.stat-icon-box.error {
-    background: linear-gradient(135deg, #DC2626 0%, #ef4444 100%);
-    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
-}
-
-.stat-icon {
-    width: 32px;
-    height: 32px;
-    color: white;
-}
-
-.stat-label {
-    font-family: 'Roboto', sans-serif;
-    color: #ffffff;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.stat-value-section {
-    margin-bottom: 1.5rem;
-}
-
-.stat-number {
-    font-size: 3rem;
-    font-weight: 800;
-    color: #ffffff;
-    line-height: 1;
-}
-
-.stat-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.stat-link span {
-    color: currentColor;
-}
-
-.link-arrow {
-    width: 18px;
-    height: 18px;
-    transition: transform 0.2s ease;
-}
-
-.stat-link:hover .link-arrow {
-    transform: translateX(4px);
-}
-
-/* Section */
-.section {
-    margin-bottom: 2.5rem;
-}
-
-.section-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 1.25rem;
-}
-
-/* Quick Grid */
-.quick-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1rem;
-}
-
-.quick-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: #1e293b;
-    border: 1px solid;
-    border-radius: 1rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.quick-card:hover {
-    transform: translateX(8px);
-}
-
-.quick-card.primary {
-    border-color: rgba(30, 64, 175, 0.4);
-}
-
-.quick-card.primary:hover {
-    border-color: #1E40AF;
-    background: linear-gradient(135deg, rgba(30, 64, 175, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
-}
-
-.quick-card.success {
-    border-color: rgba(22, 163, 74, 0.4);
-}
-
-.quick-card.success:hover {
-    border-color: #16A34A;
-    background: linear-gradient(135deg, rgba(22, 163, 74, 0.15) 0%, rgba(34, 197, 94, 0.1) 100%);
-}
-
-.quick-card.warning {
-    border-color: rgba(245, 158, 11, 0.4);
-}
-
-.quick-card.warning:hover {
-    border-color: #F59E0B;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.1) 100%);
-}
-
-.quick-card.secondary {
-    border-color: rgba(100, 116, 139, 0.4);
-}
-
-.quick-card.secondary:hover {
-    border-color: #64748B;
-    background: linear-gradient(135deg, rgba(100, 116, 139, 0.15) 0%, rgba(148, 163, 184, 0.1) 100%);
-}
-
-.quick-icon {
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-}
-
-.quick-card.primary .quick-icon {
-    color: #3b82f6;
-}
-
-.quick-card.success .quick-icon {
-    color: #22c55e;
-}
-
-.quick-card.warning .quick-icon {
-    color: #fbbf24;
-}
-
-.quick-card.secondary .quick-icon {
-    color: #94a3b8;
-}
-
-.quick-card span {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #ffffff;
-}
-
-/* Content Grid */
-.content-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-    gap: 1.5rem;
-}
-
-.content-card {
-    background: #1e293b;
-    border: 1px solid rgba(30, 64, 175, 0.3);
-    border-radius: 1.25rem;
-    overflow: hidden;
-}
-
-.content-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid rgba(30, 64, 175, 0.2);
-}
-
-.content-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #ffffff;
-}
-
-.content-body {
-    padding: 1.5rem;
-}
-
-/* Roles List */
-.roles-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.role-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.25rem;
-    background: #0f172a;
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    border-radius: 0.875rem;
-    transition: all 0.2s ease;
-}
-
-.role-row:hover {
-    background: #1e293b;
-    border-color: rgba(59, 130, 246, 0.4);
-    transform: translateX(4px);
-}
-
-.role-name {
-    font-family: 'Roboto', sans-serif;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #3b82f6;
-    text-transform: capitalize;
-}
-
-.role-stats {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-}
-
-.role-count {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: #ffffff;
-}
-
-.role-label {
-    font-size: 0.8125rem;
-    color: #ffffff;
-}
-
-/* Activity Table */
-.activity-table-wrapper {
-    overflow-x: auto;
-}
-
-.activity-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.activity-table thead {
-    background: #0f172a;
-}
-
-.activity-table th {
-    padding: 1rem;
-    text-align: left;
-    font-family: 'Roboto', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #ffffff;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.activity-table tbody tr {
-    border-bottom: 1px solid rgba(30, 64, 175, 0.15);
-    transition: background 0.2s ease;
-}
-
-.activity-table tbody tr:hover {
-    background: #0f172a;
-}
-
-.activity-table td {
-    padding: 1rem;
-    font-size: 0.9rem;
-}
-
-.user-col {
-    color: #ffffff;
-    font-weight: 500;
-}
-
-.event-col {
-    color: #ffffff;
-}
-
-.date-col {
-    color: #ffffff;
-    font-size: 0.8125rem;
-}
-
-.badge {
-    display: inline-flex;
-    padding: 0.375rem 0.875rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.025em;
-}
-
-.badge-success {
-    background: rgba(22, 163, 74, 0.2);
-    color: #86efac;
-    border: 1px solid rgba(34, 197, 94, 0.4);
-}
-
-.badge-error {
-    background: rgba(220, 38, 38, 0.2);
-    color: #fca5a5;
-    border: 1px solid rgba(239, 68, 68, 0.4);
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-    .content-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .dashboard-container {
-        padding: 1.5rem 1rem;
-    }
-
-    .dashboard-title {
-        font-size: 1.875rem;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .quick-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .stat-number {
-        font-size: 2.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .dashboard-title {
-        font-size: 1.5rem;
-    }
-
-    .stat-number {
-        font-size: 2rem;
-    }
-
-    .content-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
