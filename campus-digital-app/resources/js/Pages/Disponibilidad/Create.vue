@@ -1,0 +1,69 @@
+<template>
+    <div class="crud-theme">
+        <div class="crud-shell max-w-3xl">
+            <div class="crud-topbar">
+                <h1 class="crud-title">Crear disponibilidad</h1>
+                <a href="/disponibilidad" class="crud-btn-secondary">Volver</a>
+            </div>
+
+            <form @submit.prevent="submit" class="crud-card space-y-3">
+                <div>
+                    <label class="crud-label">Producto</label>
+                    <select v-model="form.id_catalogo" class="crud-select">
+                        <option disabled value="">Selecciona producto</option>
+                        <option v-for="c in catalogo" :key="c.id_catalogo" :value="c.id_catalogo">
+                            {{ c.nombre }}
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="crud-label">Dia</label>
+                    <select v-model="form.dia_semana" class="crud-select">
+                        <option disabled value="">Selecciona dia</option>
+                        <option>Lunes</option>
+                        <option>Martes</option>
+                        <option>Miercoles</option>
+                        <option>Jueves</option>
+                        <option>Viernes</option>
+                        <option>Sabado</option>
+                        <option>Domingo</option>
+                    </select>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="crud-label">Hora inicio</label>
+                        <input type="time" v-model="form.hora_inicio" class="crud-input" />
+                    </div>
+                    <div>
+                        <label class="crud-label">Hora fin</label>
+                        <input type="time" v-model="form.hora_fin" class="crud-input" />
+                    </div>
+                </div>
+
+                <button class="crud-btn-primary">Guardar</button>
+            </form>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { reactive } from 'vue';
+import { router } from '@inertiajs/vue3';
+
+const props = defineProps({
+    catalogo: Array
+});
+
+const form = reactive({
+    id_catalogo: '',
+    dia_semana: '',
+    hora_inicio: '',
+    hora_fin: ''
+});
+
+function submit() {
+    router.post('/disponibilidad', form);
+}
+</script>

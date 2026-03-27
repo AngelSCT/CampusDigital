@@ -218,6 +218,20 @@ class DashboardController extends Controller
                 'usuarios_nuevos_ayer'   => $usuariosNuevosAyer,
                 'resumen_24h'            => $resumen24h,
             ],
+            'top' => DB::table('movimientos')
+                ->join('catalogo', 'movimientos.id_catalogo', '=', 'catalogo.id_catalogo')
+                ->select('catalogo.nombre', DB::raw('SUM(movimientos.cantidad) as total'))
+                ->groupBy('catalogo.nombre')
+                ->orderByDesc('total')
+                ->limit(5)
+                ->get(),
+            'categorias' => DB::table('movimientos')
+                ->join('catalogo', 'movimientos.id_catalogo', '=', 'catalogo.id_catalogo')
+                ->join('categorias', 'catalogo.id_categoria', '=', 'categorias.id_categoria')
+                ->select('categorias.nombre', DB::raw('SUM(movimientos.cantidad) as total'))
+                ->groupBy('categorias.nombre')
+                ->orderByDesc('total')
+                ->get(),
         ]);
     }
 
