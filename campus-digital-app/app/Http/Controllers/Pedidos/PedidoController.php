@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Pedido;
 use App\Models\PedidoHistorial;
 use App\Models\ActividadBitacora;
+use App\Support\MaquinaEstadosPedido;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class PedidoController extends Controller
@@ -105,46 +107,40 @@ class PedidoController extends Controller
             'notas'  => ['nullable', 'string', 'max:500'],
         ]);
 
-        // Transiciones válidas
-        $transiciones = [
-            'creado'     => ['aceptado', 'cancelado'],
-            'aceptado'   => ['en_proceso', 'cancelado'],
-            'en_proceso' => ['listo', 'cancelado'],
-            'listo'      => ['entregado', 'cancelado'],
-            'entregado'  => [],
-            'cancelado'  => [],
-        ];
-
-        $permitidos = $transiciones[$pedido->estado] ?? [];
-        if (!in_array($request->estado, $permitidos)) {
-            return back()->withErrors(['error' => "No se puede pasar de '{$pedido->estado}' a '{$request->estado}'."]);
+        // ✅ Validación de transición centralizada
+        if (!MaquinaEstadosPedido::puedeTransicionar($pedido->estado, $request->estado)) {
+            return back()->withErrors([
+                'error' => "No se puede pasar de '{$pedido->estado}' a '{$request->estado}'."
+            ]);
         }
 
         $estadoAnterior = $pedido->estado;
 
-        $pedido->update([
-            'estado'              => $request->estado,
-            'operador_usuario_id' => $usuario->id,
-            'notas'               => $request->notas ?? $pedido->notas,
-        ]);
+        // ✅ Todo envuelto en transacción: si algo falla, se hace rollback de todo
+        DB::transaction(function () use ($pedido, $request, $usuario, $estadoAnterior) {
+            $pedido->update([
+                'estado'              => $request->estado,
+                'operador_usuario_id' => $usuario->id,
+                'notas'               => $request->notas ?? $pedido->notas,
+            ]);
 
-        PedidoHistorial::create([
-            'pedido_id'       => $pedido->id,
-            'estado_anterior' => $estadoAnterior,
-            'estado_nuevo'    => $request->estado,
-            'usuario_id'      => $usuario->id,
-            'notas'           => $request->notas ?? '',
-        ]);
+            PedidoHistorial::create([
+                'pedido_id'       => $pedido->id,
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo'    => $request->estado,
+                'usuario_id'      => $usuario->id,
+                'notas'           => $request->notas ?? '',
+            ]);
 
-        // Bitácora
-        ActividadBitacora::create([
-            'usuario_id'  => $usuario->id,
-            'accion'      => 'pedido.estado_cambio',
-            'descripcion' => "Pedido {$pedido->numero_folio}: $estadoAnterior → {$request->estado}",
-            'modulo'      => 'pedidos',
-            'referencia_id' => $pedido->id,
-            'ip'          => $request->ip(),
-        ]);
+            ActividadBitacora::create([
+                'usuario_id'    => $usuario->id,
+                'accion'        => 'pedido.estado_cambio',
+                'descripcion'   => "Pedido {$pedido->numero_folio}: $estadoAnterior → {$request->estado}",
+                'modulo'        => 'pedidos',
+                'referencia_id' => $pedido->id,
+                'ip'            => $request->ip(),
+            ]);
+        });
 
         return back()->with('success', 'Estado actualizado correctamente.');
     }
@@ -159,7 +155,8 @@ class PedidoController extends Controller
             return back()->withErrors(['error' => 'Sin permiso.']);
         }
 
-        if (!in_array($pedido->estado, ['creado', 'aceptado'])) {
+        // ✅ Usa la máquina de estados (cancelar es una transición válida desde creado/aceptado)
+        if (!MaquinaEstadosPedido::puedeTransicionar($pedido->estado, 'cancelado')) {
             return back()->withErrors(['error' => 'Este pedido ya no puede cancelarse.']);
         }
 
@@ -168,24 +165,31 @@ class PedidoController extends Controller
         ]);
 
         $estadoAnterior = $pedido->estado;
-        $pedido->update(['estado' => 'cancelado', 'notas' => $request->motivo]);
 
-        PedidoHistorial::create([
-            'pedido_id'       => $pedido->id,
-            'estado_anterior' => $estadoAnterior,
-            'estado_nuevo'    => 'cancelado',
-            'usuario_id'      => $usuario->id,
-            'notas'           => 'Cancelado por usuario: ' . $request->motivo,
-        ]);
+        // ✅ Todo en transacción
+        DB::transaction(function () use ($pedido, $request, $usuario, $estadoAnterior) {
+            $pedido->update([
+                'estado' => 'cancelado',
+                'notas'  => $request->motivo,
+            ]);
 
-        ActividadBitacora::create([
-            'usuario_id'    => $usuario->id,
-            'accion'        => 'pedido.cancelado',
-            'descripcion'   => "Pedido {$pedido->numero_folio} cancelado. Motivo: {$request->motivo}",
-            'modulo'        => 'pedidos',
-            'referencia_id' => $pedido->id,
-            'ip'            => $request->ip(),
-        ]);
+            PedidoHistorial::create([
+                'pedido_id'       => $pedido->id,
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo'    => 'cancelado',
+                'usuario_id'      => $usuario->id,
+                'notas'           => 'Cancelado por usuario: ' . $request->motivo,
+            ]);
+
+            ActividadBitacora::create([
+                'usuario_id'    => $usuario->id,
+                'accion'        => 'pedido.cancelado',
+                'descripcion'   => "Pedido {$pedido->numero_folio} cancelado. Motivo: {$request->motivo}",
+                'modulo'        => 'pedidos',
+                'referencia_id' => $pedido->id,
+                'ip'            => $request->ip(),
+            ]);
+        });
 
         return redirect()->route('pedidos.index')->with('success', 'Pedido cancelado.');
     }

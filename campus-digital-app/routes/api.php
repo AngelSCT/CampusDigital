@@ -71,11 +71,20 @@ Route::middleware('api.key')->group(function () {
     Route::post('saldo-movimientos',      [SaldoMovimientoApiController::class, 'store']);
     Route::get ('saldo-movimientos/{id}', [SaldoMovimientoApiController::class, 'show']);
 
-    Route::get   ('pedidos',                        [PedidoApiController::class, 'index']);
-    Route::post  ('pedidos',                        [PedidoApiController::class, 'store']);
-    Route::get   ('pedidos/{id}',                   [PedidoApiController::class, 'show']);
-    Route::put   ('pedidos/{id}',                   [PedidoApiController::class, 'update']);
-    Route::delete('pedidos/{id}',                   [PedidoApiController::class, 'destroy']);
-    Route::post  ('pedidos/{id}/estado',            [PedidoApiController::class, 'cambiarEstado']);
-    Route::post  ('pedidos/{id}/confirmar-tarjeta', [PedidoApiController::class, 'confirmarConTarjeta']);
+    // ── Pedidos ──────────────────────────────────────────────────
+// Rutas FIJAS primero (antes de /{id}) para evitar que 'operador' se interprete como ID
+Route::get   ('pedidos/operador/cola',          [PedidoApiController::class, 'colaOperador']);
+
+// Rutas principales
+Route::get   ('pedidos',                        [PedidoApiController::class, 'index']);
+Route::post  ('pedidos',                        [PedidoApiController::class, 'store']);
+Route::get   ('pedidos/{id}',                   [PedidoApiController::class, 'show'])->whereNumber('id');
+Route::put   ('pedidos/{id}',                   [PedidoApiController::class, 'update'])->whereNumber('id');
+Route::delete('pedidos/{id}',                   [PedidoApiController::class, 'destroy'])->whereNumber('id');
+
+// Acciones sobre un pedido
+Route::get   ('pedidos/{id}/historial',         [PedidoApiController::class, 'historial'])->whereNumber('id');
+Route::post  ('pedidos/{id}/estado',            [PedidoApiController::class, 'cambiarEstado'])->whereNumber('id');
+Route::post  ('pedidos/{id}/cancelar',          [PedidoApiController::class, 'cancelar'])->whereNumber('id');
+Route::post  ('pedidos/{id}/confirmar-tarjeta', [PedidoApiController::class, 'confirmarConTarjeta'])->whereNumber('id');
 });

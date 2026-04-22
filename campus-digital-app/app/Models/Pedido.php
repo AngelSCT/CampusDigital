@@ -75,9 +75,25 @@ class Pedido extends Model
 
     public static function generarFolio(): string
     {
-        $fecha     = now()->format('Ymd');
-        $siguiente = static::whereDate('created_at', today())->count() + 1;
-        return sprintf('PED-%s-%04d', $fecha, $siguiente);
+        return \Illuminate\Support\Facades\DB::transaction(function () {
+            $fecha = now()->format('Ymd');
+            $prefijo = "PED-{$fecha}-";
+
+            // lockForUpdate evita que dos peticiones simultáneas lean el mismo "último folio"
+            $ultimo = static::where('numero_folio', 'like', "{$prefijo}%")
+                ->lockForUpdate()
+                ->orderByDesc('numero_folio')
+                ->first();
+
+            if ($ultimo) {
+                // Extrae el consecutivo del último folio (los últimos 4 dígitos)
+                $consecutivo = ((int) substr($ultimo->numero_folio, -4)) + 1;
+            } else {
+                $consecutivo = 1;
+            }
+
+            return sprintf('%s%04d', $prefijo, $consecutivo);
+        });
     }
 
     public function historial()
