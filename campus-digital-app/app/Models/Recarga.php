@@ -3,30 +3,92 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Recarga extends Model
 {
+    use SoftDeletes;
+
+    protected $table = 'recargas';
 
     protected $fillable = [
         'usuario_id',
         'monto',
         'metodo_pago',
-        'estado'
+        'estado',
+        'referencia_pago',
+        'razon_fallo',
+        'saldo_movimiento_id',
+        'meta_json',
     ];
 
-    public function user()
-{
-    return $this->belongsTo(User::class);
-}
+    protected $casts = [
+        'monto' => 'decimal:2',
+        'meta_json' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
 
-public function comprobante()
-{
-    return $this->morphOne(Comprobante::class, 'referencia');
-}
+    const ESTADOS = ['pendiente', 'exitoso', 'fallido'];
+    const METODOS = ['tarjeta', 'transferencia', 'efectivo', 'billetera_digital'];
 
-public function movimiento()
-{
-    return $this->morphOne(Movimiento::class, 'referencia');
-}
-}
+    // Relaciones
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'usuario_id');
+    }
 
+    // Polimorfismo: esta recarga tiene movimientos asociados
+    public function movimiento()
+    {
+        return $this->morphMany(Movimiento::class, 'referenciable');
+    }
+
+    public function comprobante()
+    {
+        return $this->morphOne(Comprobante::class, 'referencia');
+    }
+
+    // Scopes útiles
+    public function scopeExitosas($query)
+    {
+        return $query->where('estado', 'exitoso');
+    }
+
+    public function scopeFallidas($query)
+    {
+        return $query->where('estado', 'fallido');
+    }
+
+    public function scopeDelUsuario($query, $usuarioId)
+    {
+        return $query->where('usuario_id', $usuarioId);
+    }
+
+    public function scopeRecientes($query)
+    {
+        return $query->orderByDesc('created_at');
+    }
+
+    // Métodos helper
+    public function esExitosa()
+    {
+        return $this->estado === 'exitoso';
+    }
+
+    public function esFallida()
+    {
+        return $this->estado === 'fallido';
+    }
+
+    public function esPendiente()
+    {
+        return $this->estado === 'pendiente';
+    }
+
+    public function generarFolio()
+    {
+        return 'WEB-' . strtoupper(uniqid());
+    }
+}

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\PermisoController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\BitacoraController;
 use App\Http\Controllers\Recargas\WalletController;
+use App\Http\Controllers\Recargas\RecargaController;
 
 // Ruta principal
 Route::get('/', function () {
@@ -95,20 +96,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
     
-    //MODULO 8
-    Route::prefix('modulo_8')->name('modulo_8.')->group(function () {
-        Route::get('/', [WalletController::class, 'index'])->name('recargar.index');
+    //MODULO 8 - RECARGAS Y WALLET
+// MODULO 8 - RECARGAS Y WALLET
+Route::middleware(['auth', 'verified'])->prefix('modulo_8')->name('modulo_8.')->group(function () {
+    // Dashboard
+    Route::get('/', [\App\Http\Controllers\Recargas\WalletController::class, 'index'])->name('index');
+    Route::get('/saldo', [\App\Http\Controllers\Recargas\WalletController::class, 'saldo'])->name('saldo');
 
-        Route::get('/saldo', [WalletController::class, 'saldo'])->name('saldo');
+    // Recargas - RUTAS CORRECTAS
+    Route::get('/recargar', [\App\Http\Controllers\Recargas\RecargaController::class, 'mostrarFormulario'])->name('recargar.form');
+    Route::post('/recargar', [\App\Http\Controllers\Recargas\RecargaController::class, 'procesarRecarga'])->name('recargar');
+    Route::post('/recargar/{id}/reintentar', [\App\Http\Controllers\Recargas\RecargaController::class, 'reintentar'])->name('recargar.reintentar');
+    Route::get('/recargar/{id}/comprobante', [\App\Http\Controllers\Recargas\RecargaController::class, 'descargarComprobante'])->name('comprobante');
 
-        Route::get('/recargar', [WalletController::class, 'index'])
-        ->name('recargar.form');
-
-    Route::post('/recargar', [WalletController::class, 'recargar'])
-        ->name('recargar');
-
-        Route::get('/pagar', [WalletController::class, 'pagar'])->name('pagar');
-        Route::get('/movimientos', [WalletController::class, 'movimientos'])->name('movimientos');
-        Route::get('/comprobantes', [WalletController::class, 'comprobantes'])->name('comprobantes');
-    });
+    // Otros servicios
+    Route::post('/pagar', [\App\Http\Controllers\Recargas\WalletController::class, 'pagar'])->name('pagar');
+    Route::get('/movimientos', [\App\Http\Controllers\Recargas\WalletController::class, 'movimientos'])->name('movimientos');
+    Route::get('/comprobantes', [\App\Http\Controllers\Recargas\WalletController::class, 'comprobantes'])->name('comprobantes');
+});
 });

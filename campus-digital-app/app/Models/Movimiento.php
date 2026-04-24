@@ -6,19 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Movimiento extends Model
 {
+    protected $table = 'movimientos';
+
     protected $fillable = [
-    'usuario_id',
-    'tipo',
-    'monto',
-    'estado'];
+        'usuario_id',
+        'tipo',
+        'monto',
+        'estado',
+        'referencia_type',
+        'referencia_id',
+    ];
 
-    public function user()
-{
-    return $this->belongsTo(User::class);
-}
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class);
+    }
 
-public function referencia()
-{
-    return $this->morphTo();
-}
+    public function referenciable()
+    {
+        return $this->morphTo();
+    }
 }
