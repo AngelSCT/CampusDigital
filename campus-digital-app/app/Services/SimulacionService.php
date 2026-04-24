@@ -37,14 +37,18 @@ class SimulacionService
      */
     public function obtenerModulos(): array
     {
-        return array_map(fn ($config, $clave) => [
-            'clave' => $clave,
-            'label' => $config['label'],
-            'rango' => $config['cargo']
-                ? "\${$config['min']} - \${$config['max']}"
-                : 'Sin costo',
-            'cargo' => $config['cargo'],
-        ], self::MODULOS, array_keys(self::MODULOS));
+        $resultado = [];
+        foreach (self::MODULOS as $clave => $config) {
+            $resultado[] = [
+                'clave' => $clave,
+                'label' => $config['label'],
+                'rango' => $config['cargo']
+                    ? "\${$config['min']} - \${$config['max']}"
+                    : 'Sin costo',
+                'cargo' => $config['cargo'],
+            ];
+        }
+        return $resultado;
     }
 
     /**
@@ -78,7 +82,7 @@ class SimulacionService
         }
 
         // Generar monto aleatorio con centavos realistas
-        $montoEntero   = rand($config['min'], $config['max'] - 1);
+        $montoEntero   = rand($config['min'], $config['max']);
         $centavos      = rand(0, 99) / 100;
         $monto         = round($montoEntero + $centavos, 2);
         $concepto      = "Consumo en {$config['label']}";

@@ -166,7 +166,7 @@ class SimulacionDemoSeeder extends Seeder
             return $saldoActual;
         }
 
-        $monto = round(rand($config['min'], $config['max'] - 1) + rand(0, 99) / 100, 2);
+        $monto = round(rand($config['min'], $config['max']) + rand(0, 99) / 100, 2);
 
         // Solo generar cargo si hay saldo suficiente
         if ($saldoActual < $monto) {

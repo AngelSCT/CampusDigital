@@ -589,14 +589,17 @@ function procesarRecarga() {
 
     procesando.value = true;
 
+    // Capturar monto antes de limpiar el formulario para el mensaje de éxito
+    const montoEnviado = form.monto;
+
     router.post('/modulo_8/recargar', {
         monto:       form.monto,
         metodo_pago: form.metodo_pago,
     }, {
         onSuccess: () => {
-            form.monto       = '';
-            form.metodo_pago = 'tarjeta';
-            alertSuccess.value = `Recarga de $${form.monto || ''} procesada.`;
+            form.monto         = '';
+            form.metodo_pago   = 'tarjeta';
+            alertSuccess.value = `Recarga de $${montoEnviado} procesada.`;
             setTimeout(() => router.reload(), 1500);
         },
         onError: (err) => {

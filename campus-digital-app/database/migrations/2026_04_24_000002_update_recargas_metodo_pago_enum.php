@@ -21,7 +21,9 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Revertir solo si todos los valores existentes son válidos para el enum original
+        // Nota: No se puede revertir limpiamente a un enum de PostgreSQL si existen
+        // valores nuevos (transferencia, billetera_digital) en la base de datos.
+        // Si necesitas revertir, elimina primero los registros con esos valores.
         DB::statement("ALTER TABLE recargas ALTER COLUMN metodo_pago TYPE VARCHAR(50)");
     }
 };
