@@ -5,12 +5,12 @@
             <!-- Encabezado -->
             <div>
                 <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                    Recargar Saldo
+                    Monedero Universitario
                 </h1>
-                <p class="mt-1 text-sm text-slate-400">Carga dinero a tu monedero universitario</p>
+                <p class="mt-1 text-sm text-slate-400">Recarga saldo y simula consumos en los módulos del campus</p>
             </div>
 
-            <!-- Alertas -->
+            <!-- Alertas de resultado -->
             <div v-if="alertSuccess" class="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-400">
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -32,23 +32,49 @@
                 <span class="text-sm font-medium">{{ alertWarning }}</span>
             </div>
 
-            <!-- Grid Principal -->
+            <!-- Grid Principal: columna izquierda + derecha -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                <!-- Columna Izquierda: Formulario y Saldo -->
+                <!-- ══════════════════════════════════════════════════ -->
+                <!-- Columna Izquierda: Saldo, Recarga y Simulación   -->
+                <!-- ══════════════════════════════════════════════════ -->
                 <div class="lg:col-span-1 space-y-4">
 
                     <!-- Saldo Actual -->
                     <div class="bg-gradient-to-br from-cyan-900/40 to-blue-900/40 border border-cyan-500/20 rounded-xl p-6 text-center">
                         <p class="text-xs text-cyan-400 uppercase tracking-wider mb-2">Saldo Disponible</p>
                         <p class="text-4xl font-bold text-white font-mono">
-                            ${{ formatMonto(monedero ?? 0) }}
+                            ${{ formatMonto(saldoActual) }}
                         </p>
                         <p class="text-xs text-slate-400 mt-2">Actualizado: {{ formatDateTime(new Date()) }}</p>
                     </div>
 
-                    <!-- Formulario de Recarga -->
-                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                    <!-- Tabs: Recarga / Simulación -->
+                    <div class="flex gap-1 p-1 bg-slate-800/50 rounded-xl border border-slate-700">
+                        <button
+                            @click="tabActivo = 'recarga'"
+                            type="button"
+                            class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
+                            :class="tabActivo === 'recarga'
+                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                                : 'text-slate-400 hover:text-slate-300'"
+                        >
+                            💳 Recargar
+                        </button>
+                        <button
+                            @click="tabActivo = 'simular'"
+                            type="button"
+                            class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
+                            :class="tabActivo === 'simular'
+                                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                : 'text-slate-400 hover:text-slate-300'"
+                        >
+                            🏫 Simular
+                        </button>
+                    </div>
+
+                    <!-- ─── Panel Recarga ─── -->
+                    <div v-show="tabActivo === 'recarga'" class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
                         <div class="px-5 py-4 border-b border-slate-700">
                             <h2 class="text-sm font-semibold text-white flex items-center gap-2">
                                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,11 +91,11 @@
                                 <label class="block text-xs text-slate-400 mb-1.5">Monto a recargar</label>
                                 <div class="relative">
                                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
-                                    <input 
-                                        v-model.number="form.monto" 
-                                        type="number" 
-                                        min="1" 
-                                        max="5000" 
+                                    <input
+                                        v-model.number="form.monto"
+                                        type="number"
+                                        min="1"
+                                        max="5000"
                                         placeholder="0.00"
                                         class="w-full pl-7 pr-4 py-2.5 rounded-lg bg-slate-700/50 border border-slate-600 text-white text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-200"
                                         :class="{ 'border-red-500': errors.monto }"
@@ -79,10 +105,10 @@
 
                                 <!-- Montos Rápidos -->
                                 <div class="grid grid-cols-3 gap-2 mt-2">
-                                    <button 
-                                        v-for="m in montosRapidos" 
+                                    <button
+                                        v-for="m in montosRapidos"
                                         :key="m"
-                                        @click="form.monto = m" 
+                                        @click="form.monto = m"
                                         type="button"
                                         class="py-1.5 text-xs font-medium rounded-lg border transition-all duration-200"
                                         :class="form.monto == m
@@ -98,10 +124,10 @@
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1.5">Método de pago</label>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <button 
-                                        v-for="mp in metodosPago" 
+                                    <button
+                                        v-for="mp in metodosPago"
                                         :key="mp.value"
-                                        @click="form.metodo_pago = mp.value" 
+                                        @click="form.metodo_pago = mp.value"
                                         type="button"
                                         class="py-2.5 flex flex-col items-center gap-1 rounded-lg border text-xs font-medium transition-all duration-200"
                                         :class="form.metodo_pago === mp.value
@@ -116,8 +142,8 @@
                             </div>
 
                             <!-- Botón Recargar -->
-                            <button 
-                                @click="procesarRecarga" 
+                            <button
+                                @click="procesarRecarga"
                                 :disabled="procesando"
                                 class="w-full py-2.5 bg-gradient-to-br from-cyan-600 to-blue-700 border border-transparent rounded-lg text-sm font-semibold text-white hover:from-cyan-500 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/20 transition-all duration-200 flex items-center justify-center gap-2"
                             >
@@ -126,6 +152,58 @@
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
                                 </svg>
                                 {{ procesando ? 'Procesando...' : 'Realizar Recarga' }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ─── Panel Simulación de Módulos ─── -->
+                    <div v-show="tabActivo === 'simular'" class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                        <div class="px-5 py-4 border-b border-slate-700">
+                            <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+                                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+                                </svg>
+                                Simular Consumo
+                            </h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Simula el uso de tu tarjeta en los módulos del campus</p>
+                        </div>
+
+                        <div class="p-5 space-y-4">
+                            <!-- Selección de Módulo -->
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-2">Selecciona el módulo</label>
+                                <div class="space-y-2">
+                                    <button
+                                        v-for="mod in modulos"
+                                        :key="mod.clave"
+                                        @click="simForm.modulo = mod.clave"
+                                        type="button"
+                                        class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-xs font-medium transition-all duration-200"
+                                        :class="simForm.modulo === mod.clave
+                                            ? 'bg-purple-500/20 border-purple-500/40 text-purple-200'
+                                            : 'bg-slate-700/50 border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300'"
+                                    >
+                                        <span class="flex items-center gap-2">
+                                            <span>{{ moduloIcono(mod.clave) }}</span>
+                                            {{ mod.label }}
+                                        </span>
+                                        <span class="font-mono text-xs opacity-70">{{ mod.rango }}</span>
+                                    </button>
+                                </div>
+                                <p v-if="errors.modulo" class="text-xs text-red-400 mt-1">{{ errors.modulo }}</p>
+                            </div>
+
+                            <!-- Botón Simular -->
+                            <button
+                                @click="simularConsumo"
+                                :disabled="simulando"
+                                class="w-full py-2.5 bg-gradient-to-br from-purple-600 to-violet-700 border border-transparent rounded-lg text-sm font-semibold text-white hover:from-purple-500 hover:to-violet-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/20 transition-all duration-200 flex items-center justify-center gap-2"
+                            >
+                                <svg v-if="simulando" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                                </svg>
+                                {{ simulando ? 'Procesando...' : 'Simular Escaneo' }}
                             </button>
                         </div>
                     </div>
@@ -141,9 +219,37 @@
                     </div>
                 </div>
 
-                <!-- Columna Derecha: Historial -->
-                <div class="lg:col-span-2">
-                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                <!-- ══════════════════════════════════════════════════ -->
+                <!-- Columna Derecha: Historial de Recargas y Movimientos -->
+                <!-- ══════════════════════════════════════════════════ -->
+                <div class="lg:col-span-2 space-y-6">
+
+                    <!-- Tabs de historial -->
+                    <div class="flex gap-1 p-1 bg-slate-800/50 rounded-xl border border-slate-700">
+                        <button
+                            @click="historialTab = 'recargas'"
+                            type="button"
+                            class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
+                            :class="historialTab === 'recargas'
+                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                                : 'text-slate-400 hover:text-slate-300'"
+                        >
+                            Historial de Recargas
+                        </button>
+                        <button
+                            @click="historialTab = 'movimientos'"
+                            type="button"
+                            class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
+                            :class="historialTab === 'movimientos'
+                                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                : 'text-slate-400 hover:text-slate-300'"
+                        >
+                            Movimientos
+                        </button>
+                    </div>
+
+                    <!-- ─── Historial de Recargas ─── -->
+                    <div v-show="historialTab === 'recargas'" class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
                             <h2 class="text-base font-semibold text-white flex items-center gap-2">
                                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,13 +281,13 @@
                         </div>
 
                         <div v-else class="divide-y divide-slate-700/50">
-                            <div 
-                                v-for="r in recargasFiltradas" 
+                            <div
+                                v-for="r in recargasFiltradas"
                                 :key="r.id"
                                 class="flex items-center gap-4 px-6 py-4 hover:bg-slate-700/20 transition-colors duration-150"
                             >
                                 <!-- Ícono Estado -->
-                                <div 
+                                <div
                                     :class="r.estado === 'exitosa'
                                         ? 'bg-green-500/20 text-green-400'
                                         : r.estado === 'fallida'
@@ -202,7 +308,7 @@
                                         <p class="text-sm font-medium text-white">
                                             Recarga vía {{ metodoLabel(r.metodo_pago) }}
                                         </p>
-                                        <span 
+                                        <span
                                             :class="badgeClass(r.estado)"
                                             class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border capitalize"
                                         >
@@ -214,15 +320,15 @@
                                 </div>
 
                                 <!-- Monto -->
-                                <p 
+                                <p
                                     :class="r.estado === 'exitosa' ? 'text-green-400' : 'text-slate-500'"
                                     class="text-sm font-bold font-mono whitespace-nowrap"
                                 >
                                     {{ r.estado === 'exitosa' ? '+' : '' }}${{ formatMonto(r.monto) }}
                                 </p>
 
-                                <!-- Acciones -->
-                                <button 
+                                <!-- Descargar Comprobante -->
+                                <button
                                     v-if="r.estado === 'exitosa'"
                                     @click="descargarComprobante(r.id)"
                                     type="button"
@@ -234,7 +340,7 @@
                                     </svg>
                                 </button>
 
-                                <!-- Botón Reintentar (US3) -->
+                                <!-- Reintentar -->
                                 <button
                                     v-if="r.estado === 'fallida'"
                                     @click="reintentar(r.id)"
@@ -254,6 +360,88 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- ─── Historial de Movimientos (gastos + recargas) ─── -->
+                    <div v-show="historialTab === 'movimientos'" class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-700 flex items-center justify-between flex-wrap gap-2">
+                            <h2 class="text-base font-semibold text-white flex items-center gap-2">
+                                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                                Historial de Movimientos
+                            </h2>
+                            <!-- Filtro por módulo -->
+                            <div class="flex gap-1.5 flex-wrap">
+                                <button
+                                    v-for="f in filtrosModulo"
+                                    :key="f.valor"
+                                    @click="filtroMovimiento = f.valor"
+                                    type="button"
+                                    class="px-2.5 py-1 text-xs font-medium rounded-lg border transition-all duration-200"
+                                    :class="filtroMovimiento === f.valor
+                                        ? 'bg-purple-500/20 border-purple-500/40 text-purple-300'
+                                        : 'bg-slate-700/50 border-slate-600 text-slate-400 hover:border-slate-500'"
+                                >
+                                    {{ f.label }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div v-if="movimientosFiltrados.length === 0" class="px-6 py-12 text-center">
+                            <svg class="w-10 h-10 text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            <p class="text-slate-500 text-sm">Sin movimientos registrados</p>
+                        </div>
+
+                        <div v-else class="divide-y divide-slate-700/50">
+                            <div
+                                v-for="m in movimientosFiltrados"
+                                :key="m.id"
+                                class="flex items-center gap-4 px-6 py-4 hover:bg-slate-700/20 transition-colors duration-150"
+                            >
+                                <!-- Ícono Módulo -->
+                                <div
+                                    :class="m.tipo === 'recarga'
+                                        ? 'bg-green-500/20 text-green-400'
+                                        : 'bg-purple-500/20 text-purple-400'"
+                                    class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg"
+                                >
+                                    {{ moduloIcono(m.modulo || m.tipo) }}
+                                </div>
+
+                                <!-- Info -->
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-white truncate">
+                                        {{ m.concepto || (m.tipo === 'recarga' ? 'Recarga de saldo' : 'Consumo') }}
+                                    </p>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <p class="text-xs text-slate-400">{{ formatDateTime(m.created_at) }}</p>
+                                        <span
+                                            v-if="m.modulo && m.modulo !== 'recarga'"
+                                            class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-slate-700 text-slate-300"
+                                        >
+                                            {{ moduloLabel(m.modulo) }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Monto y saldo resultante -->
+                                <div class="text-right">
+                                    <p
+                                        :class="m.tipo === 'recarga' ? 'text-green-400' : 'text-red-400'"
+                                        class="text-sm font-bold font-mono whitespace-nowrap"
+                                    >
+                                        {{ m.tipo === 'recarga' ? '+' : '-' }}${{ formatMonto(m.monto) }}
+                                    </p>
+                                    <p v-if="m.saldo_nuevo !== null && m.saldo_nuevo !== undefined" class="text-xs text-slate-500 mt-0.5">
+                                        Saldo: ${{ formatMonto(m.saldo_nuevo) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -265,193 +453,256 @@ import { ref, computed, reactive, onMounted } from 'vue';
 import { router } from '@inertiajs/vue3';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 
+// ─── Props del servidor ───────────────────────────────────────────────────────
 const props = defineProps({
-    monedero: { type: Object, default: null },
-    recargas: { type: Array, default: () => [] },
-    limites: { type: Object, default: () => ({
-        monto_minimo: 1,
-        monto_maximo: 5000,
-        max_recargas_dia: 3,
-        intervalo_minutos: 5
-    }) }
+    monedero:    { type: [Number, String], default: 0 },
+    recargas:    { type: Array,  default: () => [] },
+    movimientos: { type: Array,  default: () => [] },
+    modulos:     { type: Array,  default: () => [] },
+    limites: {
+        type: Object,
+        default: () => ({
+            monto_minimo:      1,
+            monto_maximo:      5000,
+            max_recargas_dia:  3,
+            intervalo_minutos: 5,
+        }),
+    },
+    simulacionOk: { type: Object, default: null },
 });
 
-const montosRapidos = [50, 100, 200, 300, 500, 1000];
+// ─── Estado local ─────────────────────────────────────────────────────────────
+const saldoActual    = ref(Number(props.monedero ?? 0));
+const tabActivo      = ref('recarga');    // 'recarga' | 'simular'
+const historialTab   = ref('recargas');   // 'recargas' | 'movimientos'
+const filtroEstado   = ref('todos');
+const filtroMovimiento = ref('todos');
 
-const metodosPago = [
-    { value: 'tarjeta', label: 'Tarjeta', icon: '💳' },
-    { value: 'transferencia', label: 'Transferencia', icon: '🏦' },
-    { value: 'efectivo', label: 'Efectivo', icon: '💵' },
-    { value: 'billetera_digital', label: 'Billetera', icon: '📱' },
-];
+const procesando     = ref(false);
+const simulando      = ref(false);
+const reintentando   = ref(null);
+const errors         = reactive({});
+const alertSuccess   = ref('');
+const alertError     = ref('');
+const alertWarning   = ref('');
 
+// Datos de formularios
 const form = reactive({
-    monto: '',
+    monto:       '',
     metodo_pago: 'tarjeta',
 });
 
-const procesando = ref(false);
-const reintentando = ref(null);
-const errors = reactive({});
-const filtroEstado = ref('todos');
-const alertSuccess = ref('');
-const alertError = ref('');
-const alertWarning = ref('');
+const simForm = reactive({
+    modulo: props.modulos[0]?.clave ?? 'cafeteria',
+});
 
+// ─── Constantes de UI ─────────────────────────────────────────────────────────
+const montosRapidos = [50, 100, 200, 300, 500, 1000];
+
+const metodosPago = [
+    { value: 'tarjeta',           label: 'Tarjeta',       icon: '💳' },
+    { value: 'transferencia',     label: 'Transferencia', icon: '🏦' },
+    { value: 'efectivo',          label: 'Efectivo',      icon: '💵' },
+    { value: 'billetera_digital', label: 'Billetera',     icon: '📱' },
+];
+
+const filtrosModulo = computed(() => {
+    const base = [{ valor: 'todos', label: 'Todos' }];
+    const modulos = [...new Set(
+        props.movimientos
+            .map(m => m.modulo)
+            .filter(Boolean)
+    )];
+    modulos.forEach(mod => base.push({ valor: mod, label: moduloLabel(mod) }));
+    return base;
+});
+
+// ─── Computed ─────────────────────────────────────────────────────────────────
 const recargasFiltradas = computed(() => {
     if (filtroEstado.value === 'todos') return props.recargas || [];
     return (props.recargas || []).filter(r => r.estado === filtroEstado.value);
 });
 
+const movimientosFiltrados = computed(() => {
+    if (filtroMovimiento.value === 'todos') return props.movimientos || [];
+    return (props.movimientos || []).filter(m => m.modulo === filtroMovimiento.value);
+});
+
+// ─── Ciclo de vida ────────────────────────────────────────────────────────────
 onMounted(() => {
+    // Mostrar resultado de simulación previa si viene del servidor
+    if (props.simulacionOk) {
+        const s = props.simulacionOk;
+        alertSuccess.value = `✓ ${s.mensaje} — Cobrado: $${formatMonto(s.monto)} | Nuevo saldo: $${formatMonto(s.saldo_nuevo)}`;
+        saldoActual.value  = Number(s.saldo_nuevo);
+        tabActivo.value    = 'simular';
+        historialTab.value = 'movimientos';
+    }
+
     validarLimites();
 });
 
+// ─── Validaciones de límites ──────────────────────────────────────────────────
 function validarLimites() {
     const hoy = new Date();
     const recargasHoy = (props.recargas || []).filter(r => {
-        const fechaRecarga = new Date(r.created_at);
-        return fechaRecarga.toDateString() === hoy.toDateString() && r.estado === 'exitosa';
+        const f = new Date(r.created_at);
+        return f.toDateString() === hoy.toDateString() && r.estado === 'exitosa';
     });
 
     if (recargasHoy.length >= props.limites.max_recargas_dia) {
         alertWarning.value = `Has alcanzado el límite de ${props.limites.max_recargas_dia} recargas por día.`;
+        return;
     }
 
-    const ultimaRecarga = (props.recargas || []).filter(r => r.estado === 'exitosa')[0];
-    if (ultimaRecarga) {
-        const fechaUltima = new Date(ultimaRecarga.created_at);
-        const ahora = new Date();
-        const minutosDiferencia = Math.floor((ahora - fechaUltima) / 60000);
-        
-        if (minutosDiferencia < props.limites.intervalo_minutos) {
-            alertWarning.value = `Espera ${props.limites.intervalo_minutos - minutosDiferencia} minuto(s) antes de recargar nuevamente.`;
+    const ultima = (props.recargas || []).find(r => r.estado === 'exitosa');
+    if (ultima) {
+        const mins = Math.floor((new Date() - new Date(ultima.created_at)) / 60000);
+        if (mins < props.limites.intervalo_minutos) {
+            alertWarning.value = `Espera ${props.limites.intervalo_minutos - mins} minuto(s) antes de recargar nuevamente.`;
         }
     }
 }
 
+// ─── Acciones ─────────────────────────────────────────────────────────────────
+
+/** Procesa una recarga de saldo */
 function procesarRecarga() {
-    errors.monto = '';
+    errors.monto       = '';
     errors.metodo_pago = '';
     alertSuccess.value = '';
-    alertError.value = '';
+    alertError.value   = '';
     alertWarning.value = '';
 
-    // Validaciones
     if (!form.monto || form.monto < props.limites.monto_minimo) {
         errors.monto = `El monto debe ser mayor a $${props.limites.monto_minimo}`;
         return;
     }
-
     if (form.monto > props.limites.monto_maximo) {
         errors.monto = `El monto no puede exceder $${props.limites.monto_maximo}`;
         return;
     }
-
     if (!form.metodo_pago) {
         errors.metodo_pago = 'Selecciona un método de pago';
         return;
     }
 
-    // Validar límites
-    const hoy = new Date();
-    const recargasHoy = (props.recargas || []).filter(r => {
-        const fechaRecarga = new Date(r.created_at);
-        return fechaRecarga.toDateString() === hoy.toDateString() && r.estado === 'exitosa';
-    });
-
-    if (recargasHoy.length >= props.limites.max_recargas_dia) {
-        alertError.value = `Has alcanzado el límite de ${props.limites.max_recargas_dia} recargas por día.`;
-        return;
-    }
-
-    const ultimaRecarga = (props.recargas || []).filter(r => r.estado === 'exitosa')[0];
-    if (ultimaRecarga) {
-        const fechaUltima = new Date(ultimaRecarga.created_at);
-        const ahora = new Date();
-        const minutosDiferencia = Math.floor((ahora - fechaUltima) / 60000);
-        
-        if (minutosDiferencia < props.limites.intervalo_minutos) {
-            alertError.value = `Debes esperar ${props.limites.intervalo_minutos} minutos entre recargas.`;
-            return;
-        }
-    }
-
-    // Procesar - ESTA ES LA PARTE CORRECTA
     procesando.value = true;
-    
-    const datosForm = {
-        monto: form.monto,
-        metodo_pago: form.metodo_pago
-    };
 
-    router.post('/modulo_8/recargar', datosForm, {
-        onSuccess: (response) => {
-            alertSuccess.value = `Recarga de $${form.monto} exitosa!`;
-            form.monto = '';
+    router.post('/modulo_8/recargar', {
+        monto:       form.monto,
+        metodo_pago: form.metodo_pago,
+    }, {
+        onSuccess: () => {
+            form.monto       = '';
             form.metodo_pago = 'tarjeta';
-            
-            // Actualizar el saldo localmente sin recargar
-            setTimeout(() => {
-                window.location.reload(); // O simplemente: router.reload();
-            }, 2000);
+            alertSuccess.value = `Recarga de $${form.monto || ''} procesada.`;
+            setTimeout(() => router.reload(), 1500);
         },
         onError: (err) => {
-            console.error('Error:', err);
             alertError.value = Object.values(err)[0] || 'Error al procesar la recarga.';
         },
         onFinish: () => {
             procesando.value = false;
-        }
+        },
     });
 }
 
-// US3 - Reintentar pago fallido
+/** Simula un consumo en el módulo seleccionado */
+function simularConsumo() {
+    errors.modulo      = '';
+    alertSuccess.value = '';
+    alertError.value   = '';
+
+    if (!simForm.modulo) {
+        errors.modulo = 'Selecciona un módulo';
+        return;
+    }
+
+    simulando.value = true;
+
+    router.post('/modulo_8/simular', { modulo: simForm.modulo }, {
+        onError: (err) => {
+            alertError.value = err.simulacion || err.modulo || 'No se pudo completar la simulación.';
+        },
+        onFinish: () => {
+            simulando.value = false;
+        },
+    });
+}
+
+/** Reintenta un pago fallido */
 function reintentar(id) {
     reintentando.value = id;
     alertSuccess.value = '';
-    alertError.value = '';
+    alertError.value   = '';
 
     router.post(`/modulo_8/recargar/${id}/reintentar`, {}, {
         onSuccess: () => {
             alertSuccess.value = 'Reintento procesado. Revisa el estado de tu recarga.';
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+            setTimeout(() => router.reload(), 1500);
         },
         onError: () => {
             alertError.value = 'No se pudo reintentar el pago. Intenta más tarde.';
         },
         onFinish: () => {
             reintentando.value = null;
-        }
+        },
     });
 }
 
+/** Descarga el comprobante HTML de una recarga */
 function descargarComprobante(id) {
     window.location.href = route('modulo_8.comprobante', { id });
 }
 
+// ─── Helpers de formato ───────────────────────────────────────────────────────
+
 function formatMonto(v) {
-    return Number(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return Number(v || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 function formatDateTime(d) {
     if (!d) return '-';
     return new Date(d).toLocaleString('es-MX', {
         day: '2-digit', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
+        hour: '2-digit', minute: '2-digit',
     });
 }
 
 function metodoLabel(m) {
     const labels = {
-        tarjeta: 'Tarjeta',
-        transferencia: 'Transferencia',
-        efectivo: 'Efectivo',
-        billetera_digital: 'Billetera Digital'
+        tarjeta:           'Tarjeta',
+        transferencia:     'Transferencia',
+        efectivo:          'Efectivo',
+        billetera_digital: 'Billetera Digital',
     };
     return labels[m] || m;
+}
+
+function moduloLabel(clave) {
+    const labels = {
+        cafeteria:  'Cafetería',
+        copias:     'Copias',
+        souvenirs:  'Souvenirs',
+        biblioteca: 'Biblioteca',
+        acceso:     'Acceso',
+        recarga:    'Recarga',
+    };
+    return labels[clave] || clave;
+}
+
+function moduloIcono(clave) {
+    const iconos = {
+        cafeteria:  '🍽️',
+        copias:     '🖨️',
+        souvenirs:  '🛍️',
+        biblioteca: '📚',
+        acceso:     '🚪',
+        recarga:    '💳',
+        pago:       '💸',
+    };
+    return iconos[clave] || '💰';
 }
 
 function badgeClass(estado) {

@@ -5,7 +5,9 @@ import AuthLayout from '@/Components/AuthLayout.vue';
 
 const monto = ref('')
 const props = defineProps({
-    saldo: Object
+    saldo:       { type: Object, default: null },
+    movimientos: { type: Array,  default: () => [] },
+    modulos:     { type: Array,  default: () => [] },
 });
 
 const enviar = () => {
@@ -16,7 +18,7 @@ const enviar = () => {
 
     router.post('/modulo_8/recargar', {
         monto: monto.value,
-        metodo_pago: 'Tarjeta'
+        metodo_pago: 'tarjeta'
     }, {
         onSuccess: () => {
             alert('Recarga exitosa')
@@ -59,7 +61,7 @@ const enviar = () => {
 
         <div class="stat-value-section">
             <p class="stat-number">
-                ${{ $props.saldo.saldo }}
+                ${{ $props.saldo?.saldo ?? 0 }}
             </p>
         </div>
 

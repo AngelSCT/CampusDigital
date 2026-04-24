@@ -4,101 +4,121 @@ namespace App\Http\Controllers\Recargas;
 
 use App\Http\Controllers\Controller;
 use App\Models\Recarga;
-use App\Models\Usuario;
+use App\Models\Saldo;
+use App\Models\Movimiento;
+use App\Services\SimulacionService;
 use App\Services\WalletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
+/**
+ * RecargaController
+ *
+ * Gestiona las recargas de saldo al monedero universitario.
+ * Maneja estados de transacción (pendiente, exitosa, fallida) y permite
+ * reintentar pagos fallidos con historial completo.
+ */
 class RecargaController extends Controller
 {
-    protected $walletService;
-
-    public function __construct(WalletService $walletService)
-    {
-        $this->walletService = $walletService;
-    }
+    public function __construct(
+        private readonly WalletService $walletService,
+        private readonly SimulacionService $simulacionService
+    ) {}
 
     /**
-     * Mostrar formulario de recarga
+     * Mostrar formulario de recarga con saldo actual, historial de recargas,
+     * historial de movimientos y módulos disponibles para simular.
      */
     public function mostrarFormulario()
     {
         $usuario = Auth::user();
 
-        // Obtener saldo del usuario - ACTUALIZADO EN TIEMPO REAL
-        $saldo = \App\Models\Saldo::where('usuario_id', $usuario->id)->first();
-        $monedero = $saldo ? $saldo->saldo : 0;
+        // Saldo actual en tiempo real
+        $saldo    = Saldo::where('usuario_id', $usuario->id)->first();
+        $monedero = $saldo ? (float) $saldo->saldo : 0;
 
-        // Últimas 20 recargas del usuario
+        // Últimas 20 recargas del usuario (ordenadas por fecha)
         $recargas = Recarga::where('usuario_id', $usuario->id)
             ->orderByDesc('created_at')
             ->limit(20)
             ->get();
 
-        // Límites configurables
+        // Últimos 30 movimientos del usuario (gastos y recargas)
+        $movimientos = Movimiento::where('usuario_id', $usuario->id)
+            ->orderByDesc('created_at')
+            ->limit(30)
+            ->get();
+
+        // Módulos disponibles para simular
+        $modulos = $this->simulacionService->obtenerModulos();
+
+        // Límites de recarga configurables
         $limites = [
-            'monto_minimo' => 1,
-            'monto_maximo' => 5000,
-            'max_recargas_dia' => 3,
-            'intervalo_minutos' => 5
+            'monto_minimo'      => 1,
+            'monto_maximo'      => 5000,
+            'max_recargas_dia'  => 3,
+            'intervalo_minutos' => 5,
         ];
 
+        // Flash messages de simulación previa
+        $simulacionOk  = session('simulacion_ok');
+        $simulacionErr = session('errors') ? session('errors')->first('simulacion') : null;
+
         return Inertia::render('Monedero/Recargar', [
-            'monedero' => $monedero,  // ← CAMBIO: pasar el saldo directo
-            'recargas' => $recargas,
-            'limites' => $limites,
+            'monedero'     => $monedero,
+            'recargas'     => $recargas,
+            'movimientos'  => $movimientos,
+            'modulos'      => $modulos,
+            'limites'      => $limites,
+            'simulacionOk' => $simulacionOk,
         ]);
     }
 
     /**
-     * Procesar recarga
-     * CRITERIO 2.1: Registra estados: pendiente, exitoso, fallido
-     * CRITERIO 2.4: Guarda fecha, hora y método de pago
+     * Procesar recarga.
+     * Estados: pendiente → exitosa | fallida
+     * Solo los pagos exitosos incrementan el saldo disponible.
      */
     public function procesarRecarga(Request $request)
     {
         $usuario = Auth::user();
 
-        // Validar entrada
         $validated = $request->validate([
-            'monto' => 'required|numeric|min:1|max:5000',
-            'metodo_pago' => 'required|in:tarjeta,efectivo',
+            'monto'       => 'required|numeric|min:1|max:5000',
+            'metodo_pago' => 'required|in:tarjeta,transferencia,efectivo,billetera_digital',
         ]);
 
-        // Validar límites
+        // Validar límites antes de procesar
         $validacion = $this->validarLimites($usuario);
         if ($validacion['error']) {
             return back()->withErrors(['recarga' => $validacion['mensaje']]);
         }
 
         try {
-            $recarga = DB::transaction(function () use ($usuario, $validated, $request) {
+            $recarga = DB::transaction(function () use ($usuario, $validated) {
 
-                // PASO 1: Crear registro de recarga en estado PENDIENTE
+                // Crear registro en estado pendiente
                 $recarga = Recarga::create([
-                    'usuario_id' => $usuario->id,
-                    'monto' => $validated['monto'],
+                    'usuario_id'  => $usuario->id,
+                    'monto'       => $validated['monto'],
                     'metodo_pago' => $validated['metodo_pago'],
-                    'estado' => 'pendiente', // CRITERIO 2.1: Estado pendiente
-                    'referencia' => 'WEB-' . strtoupper(uniqid()),
+                    'estado'      => 'pendiente',
+                    'referencia'  => 'WEB-' . strtoupper(uniqid()),
                 ]);
 
-                // PASO 2: Simular procesamiento de pago
-                // En producción aquí iría la integración con la pasarela de pago
+                // Simular procesamiento de pago (80% de éxito)
+                // En producción: integración con pasarela de pago real
                 $pagoExitoso = $this->procesarPago($validated['metodo_pago']);
 
                 if ($pagoExitoso) {
-                    // CRITERIO 2.2: Solo los exitosos generan abono
                     $this->procesarAbonoExitoso($recarga, $usuario);
-
-                    $recarga->update(['estado' => 'exitosa']); // CRITERIO 2.1: Estado exitoso
+                    $recarga->update(['estado' => 'exitosa']);
                 } else {
-                    // CRITERIO 2.3: Los fallidos permiten reintento
                     $recarga->update([
-                        'estado' => 'fallida', // CRITERIO 2.1: Estado fallido
-                        'razon_fallo' => 'Pago rechazado por la entidad financiera'
+                        'estado'      => 'fallida',
+                        'razon_fallo' => 'Pago rechazado por la entidad financiera',
                     ]);
                 }
 
@@ -107,8 +127,7 @@ class RecargaController extends Controller
 
             if ($recarga->estado === 'exitosa') {
                 return redirect()->route('modulo_8.recargar.form')
-                    ->with('success', "Recarga de \${$validated['monto']} realizada exitosamente. Folio: {$recarga->referencia}")
-                    ->with('saldo_actualizado', true);  // ← AGREGAR ESTO
+                    ->with('success', "Recarga de \${$validated['monto']} realizada exitosamente. Folio: {$recarga->referencia}");
             } else {
                 return redirect()->route('modulo_8.recargar.form')
                     ->with('error', "La recarga falló. Puedes reintentar. Folio: {$recarga->referencia}");
@@ -116,51 +135,46 @@ class RecargaController extends Controller
 
         } catch (\Exception $e) {
             return back()->withErrors([
-                'recarga' => 'Error al procesar la recarga: ' . $e->getMessage()
+                'recarga' => 'Error al procesar la recarga: ' . $e->getMessage(),
             ]);
         }
     }
 
     /**
-     * Reintentar un pago fallido
-     * CRITERIO 2.3: Los pagos fallidos permiten reintento
+     * Reintentar un pago fallido.
+     * Solo aplicable a recargas en estado 'fallida' del usuario autenticado.
      */
     public function reintentar($id)
     {
         $recarga = Recarga::findOrFail($id);
 
-        // Solo se puede reintentar si es fallida y pertenece al usuario
         if ($recarga->usuario_id !== Auth::id() || $recarga->estado !== 'fallida') {
             abort(403, 'No puedes reintentar esta recarga');
         }
 
         try {
             DB::transaction(function () use ($recarga) {
-                // Cambiar a pendiente y reintentar
                 $recarga->update(['estado' => 'pendiente']);
 
-                // Simular pago nuevamente
                 $pagoExitoso = $this->procesarPago($recarga->metodo_pago);
 
                 if ($pagoExitoso) {
-                    // CRITERIO 2.2: Procesar abono solo si es exitoso
                     $this->procesarAbonoExitoso($recarga, $recarga->usuario);
                     $recarga->update(['estado' => 'exitosa']);
                 } else {
                     $recarga->update([
-                        'estado' => 'fallida',
-                        'razon_fallo' => 'Reintento fallido. Pago rechazado nuevamente.'
+                        'estado'      => 'fallida',
+                        'razon_fallo' => 'Reintento fallido. Pago rechazado nuevamente.',
                     ]);
                 }
             });
 
             $mensaje = $recarga->estado === 'exitosa'
-                ? "Reintento exitoso. Se acreditó ${$recarga->monto}"
-                : "El reintento falló nuevamente. Intenta más tarde.";
+                ? "Reintento exitoso. Se acreditaron \${$recarga->monto}"
+                : 'El reintento falló nuevamente. Intenta más tarde.';
 
             return redirect()->route('modulo_8.recargar.form')
-                ->with($recarga->estado === 'exitosa' ? 'success' : 'error', $mensaje)
-                ->with('saldo_actualizado', $recarga->estado === 'exitosa');  // ← AGREGAR ESTO
+                ->with($recarga->estado === 'exitosa' ? 'success' : 'error', $mensaje);
 
         } catch (\Exception $e) {
             return back()->withErrors(['recarga' => $e->getMessage()]);
@@ -168,53 +182,7 @@ class RecargaController extends Controller
     }
 
     /**
-     * Procesar abono exitoso
-     * CRITERIO 2.2: Solo los pagos exitosos generan abono
-     */
-    private function procesarAbonoExitoso($recarga, $usuario)
-    {
-        // Obtener o crear saldo
-        $saldo = \App\Models\Saldo::where('usuario_id', $usuario->id)->first();
-
-        if (!$saldo) {
-            $saldo = \App\Models\Saldo::create([
-                'usuario_id' => $usuario->id,
-                'saldo' => 0,
-            ]);
-        }
-
-        // Incrementar saldo
-        $saldo->saldo += $recarga->monto;
-        $saldo->save();
-
-        // Crear movimiento con todos los datos necesarios
-        $movimiento = \App\Models\Movimiento::create([
-            'usuario_id' => $usuario->id,
-            'tipo' => 'recarga',
-            'monto' => $recarga->monto,
-            'estado' => 'exitosa',
-            'referencia_type' => 'App\\Models\\Recarga',
-            'referencia_id' => $recarga->id,
-        ]);
-
-        // Vincular la recarga al movimiento
-        $recarga->update([
-            'saldo_movimiento_id' => $movimiento->id,
-        ]);
-    }
-
-    /**
-     * Simular procesamiento de pago
-     * En producción, aquí iría la integración con pasarela de pago
-     */
-    private function procesarPago($metodo)
-    {
-        // 80% de probabilidad de éxito (simula pagos reales)
-        return rand(1, 100) <= 80;
-    }
-
-    /**
-     * Descargar comprobante
+     * Descargar comprobante HTML de una recarga exitosa.
      */
     public function descargarComprobante($id)
     {
@@ -229,19 +197,65 @@ class RecargaController extends Controller
         }
 
         $usuario = $recarga->usuario;
-        $html = $this->generarHTML($recarga, $usuario);
+        $html    = $this->generarHTML($recarga, $usuario);
 
         return response($html)
             ->header('Content-Type', 'text/html; charset=utf-8')
             ->header('Content-Disposition', "attachment; filename=\"comprobante-{$recarga->referencia}.html\"");
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Métodos privados
+    // ─────────────────────────────────────────────────────────────────────────
+
     /**
-     * Validar límites
+     * Procesa el abono al saldo cuando una recarga es exitosa.
+     * Usa lockForUpdate() para garantizar atomicidad.
      */
-    private function validarLimites($usuario)
+    private function procesarAbonoExitoso(Recarga $recarga, $usuario): void
     {
-        // Máximo 3 recargas por día
+        $saldo = Saldo::where('usuario_id', $usuario->id)
+            ->lockForUpdate()
+            ->firstOrCreate(
+                ['usuario_id' => $usuario->id],
+                ['saldo' => 0]
+            );
+
+        $saldoAnterior = (float) $saldo->saldo;
+        $saldo->saldo += $recarga->monto;
+        $saldo->save();
+
+        // Registrar movimiento de tipo recarga
+        $movimiento = Movimiento::create([
+            'usuario_id'      => $usuario->id,
+            'tipo'            => 'recarga',
+            'monto'           => $recarga->monto,
+            'estado'          => 'exitosa',
+            'modulo'          => 'recarga',
+            'concepto'        => "Recarga de saldo vía {$recarga->metodo_pago}",
+            'saldo_anterior'  => $saldoAnterior,
+            'saldo_nuevo'     => (float) $saldo->saldo,
+            'referencia_type' => Recarga::class,
+            'referencia_id'   => $recarga->id,
+        ]);
+
+        $recarga->update(['saldo_movimiento_id' => $movimiento->id]);
+    }
+
+    /**
+     * Simula el procesamiento del pago con 80% de probabilidad de éxito.
+     * En producción, se reemplaza por integración real con pasarela de pago.
+     */
+    private function procesarPago(string $metodo): bool
+    {
+        return rand(1, 100) <= 80;
+    }
+
+    /**
+     * Valida los límites de recarga del usuario (max por día, intervalo mínimo).
+     */
+    private function validarLimites($usuario): array
+    {
         $recargasHoy = Recarga::where('usuario_id', $usuario->id)
             ->where('estado', 'exitosa')
             ->whereDate('created_at', today())
@@ -249,12 +263,11 @@ class RecargaController extends Controller
 
         if ($recargasHoy >= 3) {
             return [
-                'error' => true,
-                'mensaje' => 'Has alcanzado el límite de 3 recargas por día.'
+                'error'   => true,
+                'mensaje' => 'Has alcanzado el límite de 3 recargas por día.',
             ];
         }
 
-        // Mínimo 5 minutos entre recargas
         $ultimaRecarga = Recarga::where('usuario_id', $usuario->id)
             ->where('estado', 'exitosa')
             ->latest('created_at')
@@ -263,8 +276,8 @@ class RecargaController extends Controller
         if ($ultimaRecarga && $ultimaRecarga->created_at->diffInMinutes(now()) < 5) {
             $minutosRestantes = 5 - $ultimaRecarga->created_at->diffInMinutes(now());
             return [
-                'error' => true,
-                'mensaje' => "Espera {$minutosRestantes} minuto(s) antes de recargar nuevamente."
+                'error'   => true,
+                'mensaje' => "Espera {$minutosRestantes} minuto(s) antes de recargar nuevamente.",
             ];
         }
 
@@ -272,14 +285,16 @@ class RecargaController extends Controller
     }
 
     /**
-     * Generar HTML comprobante
+     * Genera el HTML del comprobante de recarga.
      */
-    private function generarHTML($recarga, $usuario)
+    private function generarHTML(Recarga $recarga, $usuario): string
     {
         $metodoLabel = match ($recarga->metodo_pago) {
-            'tarjeta' => 'Tarjeta de Crédito/Débito',
-            'efectivo' => 'Efectivo',
-            default => $recarga->metodo_pago
+            'tarjeta'           => 'Tarjeta de Crédito/Débito',
+            'transferencia'     => 'Transferencia Bancaria',
+            'efectivo'          => 'Efectivo',
+            'billetera_digital' => 'Billetera Digital',
+            default             => $recarga->metodo_pago,
         };
 
         $fecha = $recarga->created_at->format('d/m/Y H:i:s');
@@ -334,3 +349,4 @@ class RecargaController extends Controller
         ";
     }
 }
+
