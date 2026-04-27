@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\BitacoraController;
 use App\Http\Controllers\Recargas\WalletController;
 use App\Http\Controllers\Recargas\RecargaController;
 use App\Http\Controllers\Recargas\ReportesController;
+use App\Http\Controllers\Modulo8\ConciliacionController;
 
 // Ruta principal
 Route::get('/', function () {
@@ -105,16 +106,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Recargas
         Route::get('/recargar', [RecargaController::class, 'mostrarFormulario'])->name('recargar.form');
         Route::post('/recargar', [RecargaController::class, 'procesarRecarga'])->name('recargar');
-        Route::post('/recargar/{id}/reintentar', [RecargaController::class, 'reintentar'])->name('recargar.reintentar');
+        Route::post('/recargar/{id}/reintentar', [ConciliacionController::class, 'reintentar'])->name('recargar.reintentar');
         Route::get('/recargar/{id}/comprobante', [RecargaController::class, 'descargarComprobante'])->name('comprobante');
         
-        // Reportes
+        // Reportes (Inertia pages)
         Route::prefix('reportes')->name('reportes.')->group(function () {
             Route::get('/historial', [ReportesController::class, 'historialRecargas'])->name('historial');
             Route::get('/fallidos', [ReportesController::class, 'pagosFallidos'])->name('fallidos');
-            Route::get('/conciliacion', [ReportesController::class, 'conciliacionPeriodo'])->name('conciliacion');
+            Route::get('/conciliacion', [ConciliacionController::class, 'conciliacion'])->name('conciliacion');
         });
-        
+
+        // JSON API endpoints (conciliación, historial, estadísticas, detalle)
+        Route::get('/recargas/historial', [ConciliacionController::class, 'historial'])->name('recargas.historial');
+        Route::get('/estadisticas/periodo', [ConciliacionController::class, 'estadisticasPeriodo'])->name('estadisticas.periodo');
+        Route::get('/recargas/{id}', [ConciliacionController::class, 'detalleRecarga'])->name('recargas.detalle');
+
         // Wallet services
         Route::get('/saldo', [WalletController::class, 'saldo'])->name('saldo');
         Route::post('/pagar', [WalletController::class, 'pagar'])->name('pagar');
