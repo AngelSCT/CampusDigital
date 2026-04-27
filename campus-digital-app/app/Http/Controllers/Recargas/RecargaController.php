@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Recargas;
 use App\Http\Controllers\Controller;
 use App\Models\Recarga;
 use App\Models\Usuario;
+use App\Models\Saldo;
+use App\Models\Movimiento;
 use App\Services\WalletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,15 +29,26 @@ class RecargaController extends Controller
     {
         $usuario = Auth::user();
 
-        // Obtener saldo del usuario - ACTUALIZADO EN TIEMPO REAL
-        $saldo = \App\Models\Saldo::where('usuario_id', $usuario->id)->first();
-        $monedero = $saldo ? $saldo->saldo : 0;
+        // Obtener saldo del usuario
+        $saldo = Saldo::where('usuario_id', $usuario->id)->first();
+        $monedero = $saldo ? floatval($saldo->saldo) : 0;
 
         // Últimas 20 recargas del usuario
         $recargas = Recarga::where('usuario_id', $usuario->id)
             ->orderByDesc('created_at')
             ->limit(20)
-            ->get();
+            ->get()
+            ->map(function ($recarga) {
+                return [
+                    'id' => $recarga->id,
+                    'monto' => floatval($recarga->monto),
+                    'metodo_pago' => $recarga->metodo_pago,
+                    'estado' => $recarga->estado,
+                    'referencia' => $recarga->referencia,
+                    'razon_fallo' => $recarga->razon_fallo,
+                    'created_at' => $recarga->created_at->format('Y-m-d H:i:s'),
+                ];
+            });
 
         // Límites configurables
         $limites = [
@@ -46,7 +59,7 @@ class RecargaController extends Controller
         ];
 
         return Inertia::render('Monedero/Recargar', [
-            'monedero' => $monedero,  // ← CAMBIO: pasar el saldo directo
+            'monedero' => $monedero,
             'recargas' => $recargas,
             'limites' => $limites,
         ]);
@@ -54,8 +67,6 @@ class RecargaController extends Controller
 
     /**
      * Procesar recarga
-     * CRITERIO 2.1: Registra estados: pendiente, exitoso, fallido
-     * CRITERIO 2.4: Guarda fecha, hora y método de pago
      */
     public function procesarRecarga(Request $request)
     {
@@ -64,7 +75,7 @@ class RecargaController extends Controller
         // Validar entrada
         $validated = $request->validate([
             'monto' => 'required|numeric|min:1|max:5000',
-            'metodo_pago' => 'required|in:tarjeta,efectivo',
+            'metodo_pago' => 'required|in:tarjeta,transferencia,efectivo,billetera_digital',
         ]);
 
         // Validar límites
@@ -74,30 +85,28 @@ class RecargaController extends Controller
         }
 
         try {
-            $recarga = DB::transaction(function () use ($usuario, $validated, $request) {
+            $recarga = DB::transaction(function () use ($usuario, $validated) {
 
                 // PASO 1: Crear registro de recarga en estado PENDIENTE
                 $recarga = Recarga::create([
                     'usuario_id' => $usuario->id,
                     'monto' => $validated['monto'],
                     'metodo_pago' => $validated['metodo_pago'],
-                    'estado' => 'pendiente', // CRITERIO 2.1: Estado pendiente
+                    'estado' => 'pendiente',
                     'referencia' => 'WEB-' . strtoupper(uniqid()),
                 ]);
 
-                // PASO 2: Simular procesamiento de pago
-                // En producción aquí iría la integración con la pasarela de pago
+                // PASO 2: Simular procesamiento de pago (80% éxito)
                 $pagoExitoso = $this->procesarPago($validated['metodo_pago']);
 
                 if ($pagoExitoso) {
-                    // CRITERIO 2.2: Solo los exitosos generan abono
+                    // Solo los exitosos generan abono
                     $this->procesarAbonoExitoso($recarga, $usuario);
-
-                    $recarga->update(['estado' => 'exitosa']); // CRITERIO 2.1: Estado exitoso
+                    $recarga->update(['estado' => 'exitosa']);
                 } else {
-                    // CRITERIO 2.3: Los fallidos permiten reintento
+                    // Los fallidos permiten reintento
                     $recarga->update([
-                        'estado' => 'fallida', // CRITERIO 2.1: Estado fallido
+                        'estado' => 'fallida',
                         'razon_fallo' => 'Pago rechazado por la entidad financiera'
                     ]);
                 }
@@ -107,8 +116,7 @@ class RecargaController extends Controller
 
             if ($recarga->estado === 'exitosa') {
                 return redirect()->route('modulo_8.recargar.form')
-                    ->with('success', "Recarga de \${$validated['monto']} realizada exitosamente. Folio: {$recarga->referencia}")
-                    ->with('saldo_actualizado', true);  // ← AGREGAR ESTO
+                    ->with('success', "Recarga de \${$validated['monto']} realizada exitosamente. Folio: {$recarga->referencia}");
             } else {
                 return redirect()->route('modulo_8.recargar.form')
                     ->with('error', "La recarga falló. Puedes reintentar. Folio: {$recarga->referencia}");
@@ -123,7 +131,6 @@ class RecargaController extends Controller
 
     /**
      * Reintentar un pago fallido
-     * CRITERIO 2.3: Los pagos fallidos permiten reintento
      */
     public function reintentar($id)
     {
@@ -143,7 +150,6 @@ class RecargaController extends Controller
                 $pagoExitoso = $this->procesarPago($recarga->metodo_pago);
 
                 if ($pagoExitoso) {
-                    // CRITERIO 2.2: Procesar abono solo si es exitoso
                     $this->procesarAbonoExitoso($recarga, $recarga->usuario);
                     $recarga->update(['estado' => 'exitosa']);
                 } else {
@@ -155,12 +161,11 @@ class RecargaController extends Controller
             });
 
             $mensaje = $recarga->estado === 'exitosa'
-                ? "Reintento exitoso. Se acreditó ${$recarga->monto}"
+                ? "Reintento exitoso. Se acreditó \${$recarga->monto}"
                 : "El reintento falló nuevamente. Intenta más tarde.";
 
             return redirect()->route('modulo_8.recargar.form')
-                ->with($recarga->estado === 'exitosa' ? 'success' : 'error', $mensaje)
-                ->with('saldo_actualizado', $recarga->estado === 'exitosa');  // ← AGREGAR ESTO
+                ->with($recarga->estado === 'exitosa' ? 'success' : 'error', $mensaje);
 
         } catch (\Exception $e) {
             return back()->withErrors(['recarga' => $e->getMessage()]);
@@ -169,15 +174,14 @@ class RecargaController extends Controller
 
     /**
      * Procesar abono exitoso
-     * CRITERIO 2.2: Solo los pagos exitosos generan abono
      */
     private function procesarAbonoExitoso($recarga, $usuario)
     {
         // Obtener o crear saldo
-        $saldo = \App\Models\Saldo::where('usuario_id', $usuario->id)->first();
+        $saldo = Saldo::where('usuario_id', $usuario->id)->first();
 
         if (!$saldo) {
-            $saldo = \App\Models\Saldo::create([
+            $saldo = Saldo::create([
                 'usuario_id' => $usuario->id,
                 'saldo' => 0,
             ]);
@@ -187,8 +191,8 @@ class RecargaController extends Controller
         $saldo->saldo += $recarga->monto;
         $saldo->save();
 
-        // Crear movimiento con todos los datos necesarios
-        $movimiento = \App\Models\Movimiento::create([
+        // Crear movimiento
+        $movimiento = Movimiento::create([
             'usuario_id' => $usuario->id,
             'tipo' => 'recarga',
             'monto' => $recarga->monto,
@@ -204,12 +208,10 @@ class RecargaController extends Controller
     }
 
     /**
-     * Simular procesamiento de pago
-     * En producción, aquí iría la integración con pasarela de pago
+     * Simular procesamiento de pago (80% éxito)
      */
     private function procesarPago($metodo)
     {
-        // 80% de probabilidad de éxito (simula pagos reales)
         return rand(1, 100) <= 80;
     }
 
@@ -278,7 +280,9 @@ class RecargaController extends Controller
     {
         $metodoLabel = match ($recarga->metodo_pago) {
             'tarjeta' => 'Tarjeta de Crédito/Débito',
+            'transferencia' => 'Transferencia Bancaria',
             'efectivo' => 'Efectivo',
+            'billetera_digital' => 'Billetera Digital',
             default => $recarga->metodo_pago
         };
 
@@ -289,7 +293,7 @@ class RecargaController extends Controller
             <html lang='es'>
             <head>
                 <meta charset='UTF-8'>
-                <title>Comprobante</title>
+                <title>Comprobante de Recarga</title>
                 <style>
                     body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
                     .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
@@ -310,6 +314,10 @@ class RecargaController extends Controller
                         <div class='row'>
                             <span class='label'>Nombre</span>
                             <span class='value'>{$usuario->nombre} {$usuario->apellido}</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Email</span>
+                            <span class='value'>{$usuario->email}</span>
                         </div>
                         <div class='row'>
                             <span class='label'>Monto</span>
