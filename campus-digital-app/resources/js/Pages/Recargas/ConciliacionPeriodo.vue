@@ -193,6 +193,8 @@ const props = defineProps({
 const localFechaInicio = ref(props.fecha_inicio);
 const localFechaFin    = ref(props.fecha_fin);
 
+const MS_PER_DAY = 864e5;
+
 const tasaExito = computed(() => {
     if (!props.stats || props.stats.total_recargas === 0) return 0;
     return Math.round((props.stats.exitosas / props.stats.total_recargas) * 100);
@@ -203,9 +205,9 @@ const rangosRapidos = computed(() => {
     const fmt  = (d) => d.toISOString().slice(0, 10);
     return [
         { label: 'Hoy',          inicio: fmt(hoy),                                 fin: fmt(hoy) },
-        { label: 'Últimos 7 días',  inicio: fmt(new Date(hoy - 6 * 864e5)),           fin: fmt(hoy) },
-        { label: 'Últimos 30 días', inicio: fmt(new Date(hoy - 29 * 864e5)),          fin: fmt(hoy) },
-        { label: 'Últimos 90 días', inicio: fmt(new Date(hoy - 89 * 864e5)),          fin: fmt(hoy) },
+        { label: 'Últimos 7 días',  inicio: fmt(new Date(hoy - 6 * MS_PER_DAY)),    fin: fmt(hoy) },
+        { label: 'Últimos 30 días', inicio: fmt(new Date(hoy - 29 * MS_PER_DAY)),   fin: fmt(hoy) },
+        { label: 'Últimos 90 días', inicio: fmt(new Date(hoy - 89 * MS_PER_DAY)),   fin: fmt(hoy) },
     ];
 });
 

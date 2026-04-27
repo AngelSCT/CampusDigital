@@ -229,6 +229,7 @@ class ConciliacionController extends Controller
             DB::transaction(function () use ($recarga, $usuario) {
                 $recarga->update(['estado' => 'pendiente', 'razon_fallo' => null]);
 
+                // TODO: Replace with actual payment gateway integration
                 $pagoExitoso = rand(1, 100) <= 80;
 
                 if ($pagoExitoso) {
@@ -249,7 +250,7 @@ class ConciliacionController extends Controller
                         'tipo'             => 'recarga',
                         'monto'            => $recarga->monto,
                         'estado'           => 'exitosa',
-                        'referencia_type'  => 'App\\Models\\Recarga',
+                        'referencia_type'  => Recarga::class,
                         'referencia_id'    => $recarga->id,
                     ]);
 
