@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Saldo extends Model
 {
-    public function user()
+    public function usuario()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Usuario::class, 'usuario_id');
     }
 
     protected $fillable = [

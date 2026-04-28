@@ -22,8 +22,8 @@ class Movimiento extends Model
         return $this->belongsTo(Usuario::class);
     }
 
-    public function referenciable()
+    public function referencia()
     {
-        return $this->morphTo();
+        return $this->morphTo(__FUNCTION__, 'referencia_type', 'referencia_id');
     }
 }

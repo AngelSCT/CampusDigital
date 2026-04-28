@@ -69,7 +69,7 @@ class ReportesController extends Controller
             $query->whereDate('created_at', '>=', now()->subDays($dias));
         }
 
-        $recargas = $query->paginate(15);
+        $recargas = $query->get();
 
         $stats = [
             'total_fallidas' => Recarga::where('usuario_id', $usuario->id)->where('estado', 'fallida')->count(),

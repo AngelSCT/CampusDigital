@@ -16,7 +16,7 @@ class Recarga extends Model
         'monto',
         'metodo_pago',
         'estado',
-        'referencia_pago',
+        'referencia',
         'razon_fallo',
         'saldo_movimiento_id',
         'meta_json',
@@ -30,7 +30,7 @@ class Recarga extends Model
         'deleted_at' => 'datetime',
     ];
 
-    const ESTADOS = ['pendiente', 'exitoso', 'fallido'];
+    const ESTADOS = ['pendiente', 'exitosa', 'fallida'];
     const METODOS = ['tarjeta', 'transferencia', 'efectivo', 'billetera_digital'];
 
     // Relaciones
@@ -42,7 +42,7 @@ class Recarga extends Model
     // Polimorfismo: esta recarga tiene movimientos asociados
     public function movimiento()
     {
-        return $this->morphMany(Movimiento::class, 'referenciable');
+        return $this->morphMany(Movimiento::class, 'referencia');
     }
 
     public function comprobante()
@@ -53,12 +53,12 @@ class Recarga extends Model
     // Scopes útiles
     public function scopeExitosas($query)
     {
-        return $query->where('estado', 'exitoso');
+        return $query->where('estado', 'exitosa');
     }
 
     public function scopeFallidas($query)
     {
-        return $query->where('estado', 'fallido');
+        return $query->where('estado', 'fallida');
     }
 
     public function scopeDelUsuario($query, $usuarioId)
@@ -74,12 +74,12 @@ class Recarga extends Model
     // Métodos helper
     public function esExitosa()
     {
-        return $this->estado === 'exitoso';
+        return $this->estado === 'exitosa';
     }
 
     public function esFallida()
     {
-        return $this->estado === 'fallido';
+        return $this->estado === 'fallida';
     }
 
     public function esPendiente()

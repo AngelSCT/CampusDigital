@@ -197,7 +197,7 @@ class RecargaController extends Controller
             'tipo' => 'recarga',
             'monto' => $recarga->monto,
             'estado' => 'exitosa',
-            'referencia_type' => 'App\\Models\\Recarga',
+            'referencia_type' => Recarga::class,
             'referencia_id' => $recarga->id,
         ]);
 

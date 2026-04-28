@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\Recarga;
-use App\Models\Pago;
 use App\Models\Saldo;
+use App\Models\Movimiento;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
@@ -22,49 +22,71 @@ class WalletService
     }
 
     /**
-     * ➕ Recargar saldo
+     * ➕ Recargar saldo (simulado — listo para integración con API externa)
+     * TODO: Cuando se integre la API del equipo de pagos, reemplazar la lógica
+     *       de simulación por: Http::post(config('api.pagos_url').'/recargas', $data)
      */
     public function recargar($user, array $data)
     {
         return DB::transaction(function () use ($user, $data) {
             $data['metodo_pago'] = strtolower($data['metodo_pago']);
+
+            // Crear registro en estado pendiente
             $recarga = Recarga::create([
                 'usuario_id' => $user->id,
                 'monto' => $data['monto'],
                 'metodo_pago' => $data['metodo_pago'],
-                'estado' => 'exitosa'
+                'estado' => 'pendiente',
+                'referencia' => 'WEB-' . strtoupper(uniqid()),
             ]);
 
-            // 🔥 Aquí NO hacemos nada más
-            // El observer se encarga de todo
+            // Simular procesamiento de pago (80% éxito)
+            $pagoExitoso = random_int(1, 100) <= 80;
+
+            if ($pagoExitoso) {
+                $this->procesarAbonoExitoso($recarga, $user);
+                $recarga->update(['estado' => 'exitosa']);
+            } else {
+                $recarga->update([
+                    'estado' => 'fallida',
+                    'razon_fallo' => 'Pago rechazado por la entidad financiera',
+                ]);
+            }
 
             return $recarga;
         });
     }
 
     /**
-     * 💳 Realizar pago
+     * 💳 Realizar pago (simulado — listo para integración con API de módulo de pagos)
+     * TODO: Integrar con API de otro módulo cuando esté disponible
      */
     public function pagar($user, array $data)
     {
         return DB::transaction(function () use ($user, $data) {
 
-            $saldo = Saldo::firstOrCreate(['user_id' => $user->id]);
+            $saldo = Saldo::firstOrCreate(
+                ['usuario_id' => $user->id],
+                ['saldo' => 0]
+            );
 
             if ($saldo->saldo < $data['monto']) {
                 throw new Exception("Saldo insuficiente");
             }
 
-            $pago = Pago::create([
-                'user_id' => $user->id,
+            // Descontar saldo
+            $saldo->saldo -= $data['monto'];
+            $saldo->save();
+
+            // Registrar movimiento de pago
+            $movimiento = Movimiento::create([
+                'usuario_id' => $user->id,
+                'tipo' => 'pago',
                 'monto' => $data['monto'],
-                'concepto' => $data['concepto'],
-                'estado' => 'completado'
+                'estado' => 'exitosa',
             ]);
 
-            // 🔥 Observer hace lo demás
-
-            return $pago;
+            return $movimiento;
         });
     }
 
@@ -73,7 +95,7 @@ class WalletService
      */
     public function movimientos($user)
     {
-        return $user->movimientos()
+        return Movimiento::where('usuario_id', $user->id)
             ->latest()
             ->get();
     }
@@ -83,8 +105,37 @@ class WalletService
      */
     public function comprobantes($user)
     {
-        return $user->comprobantes()
+        return \App\Models\Comprobante::where('usuario_id', $user->id)
             ->latest('fecha')
             ->get();
+    }
+
+    /**
+     * Procesar abono exitoso en el saldo
+     */
+    private function procesarAbonoExitoso($recarga, $usuario)
+    {
+        $saldo = Saldo::where('usuario_id', $usuario->id)->first();
+
+        if (!$saldo) {
+            $saldo = Saldo::create([
+                'usuario_id' => $usuario->id,
+                'saldo' => 0,
+            ]);
+        }
+
+        $saldo->saldo += $recarga->monto;
+        $saldo->save();
+
+        $movimiento = Movimiento::create([
+            'usuario_id' => $usuario->id,
+            'tipo' => 'recarga',
+            'monto' => $recarga->monto,
+            'estado' => 'exitosa',
+            'referencia_type' => Recarga::class,
+            'referencia_id' => $recarga->id,
+        ]);
+
+        $recarga->update(['saldo_movimiento_id' => $movimiento->id]);
     }
 }
