@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\AsignacionTecnicaController;
 use App\Http\Controllers\Admin\InsumoController;
 use App\Http\Controllers\Admin\GastoTicketController;
 use App\Http\Controllers\Admin\HistorialTicketController;
+use App\Http\Controllers\Recargas\ReportesController;
 
 
 Route::get('/', function () {
@@ -114,6 +115,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('monedero')->name('monedero.')->group(function () {
         Route::get('/recargas',  [RecargaController::class, 'index'])->name('recargas');
         Route::post('/recargas', [RecargaController::class, 'store'])->name('recargas.store');
+    });
+
+    // ── MÓDULO 8: DASHBOARD Y REPORTES DE RECARGAS ───────────────
+    Route::prefix('modulo_8')->name('modulo_8.')->group(function () {
+        Route::get('/',                   [ReportesController::class, 'dashboard'])->name('index');
+        Route::prefix('reportes')->name('reportes.')->group(function () {
+            Route::get('/historial',      [ReportesController::class, 'historialRecargas'])->name('historial');
+            Route::get('/fallidos',       [ReportesController::class, 'pagosFallidos'])->name('fallidos');
+            Route::get('/conciliacion',   [ReportesController::class, 'conciliacionPeriodo'])->name('conciliacion');
+        });
     });
 
     Route::get('/sin-permiso', function () {

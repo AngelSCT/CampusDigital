@@ -186,18 +186,34 @@ window.route = (name, params) => {
         "archivos.marcar-visto": "/archivos/:id/marcar-visto",
         "archivos.desmarcar-visto": "/archivos/:id/desmarcar-visto",
         "archivos.nota": "/archivos/:id/nota",
+
+        // ── MÓDULO 8: Dashboard y Reportes de Recargas ──────────
+        "modulo_8.index":                    "/modulo_8",
+        "modulo_8.reportes.historial":       "/modulo_8/reportes/historial",
+        "modulo_8.reportes.fallidos":        "/modulo_8/reportes/fallidos",
+        "modulo_8.reportes.conciliacion":    "/modulo_8/reportes/conciliacion",
+
+        // Monedero (recargar saldo)
+        "monedero.recargas":       "/monedero/recargas",
+        "monedero.recargas.store": "/monedero/recargas",
     };
 
     let url = routes[name] || "/";
 
-    if (params) {
-        if (typeof params === "object") {
-            Object.keys(params).forEach((key) => {
-                url = url.replace(`:${key}`, params[key]);
-            });
-        } else {
-            url = url.replace(":id", params);
-        }
+    if (params && typeof params === "object") {
+        const queryParams = {};
+        Object.keys(params).forEach((key) => {
+            const placeholder = `:${key}`;
+            if (url.includes(placeholder)) {
+                url = url.replace(placeholder, encodeURIComponent(params[key]));
+            } else {
+                queryParams[key] = params[key];
+            }
+        });
+        const qstr = new URLSearchParams(queryParams).toString();
+        if (qstr) url += "?" + qstr;
+    } else if (params) {
+        url = url.replace(":id", params);
     }
 
     return url;
