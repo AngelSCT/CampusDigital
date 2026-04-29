@@ -427,4 +427,10 @@ Route::middleware(['auth', 'role.cart.admin'])
         Route::post('solicitudes/{solicitud}/aprobar',         [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'aprobar']) ->name('solicitudes.aprobar');
         Route::post('solicitudes/{solicitud}/rechazar',        [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'rechazar'])->name('solicitudes.rechazar');
         Route::get('solicitudes/{folio}/token',                [\App\Http\Controllers\Admin\Cart\TokenEntregaController::class,'show'])    ->name('token.show');
+
+        Route::get('modulos',                                  [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'index'])              ->name('modulos.index');
+        Route::get('modulos/{modulo}',                         [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'show'])               ->name('modulos.show');
+        Route::post('modulos/{modulo}/revocar',                [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'revocarToken'])        ->name('modulos.revocar');
+        Route::post('modulos/{modulo}/forzar-refresh',         [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'forzarRefresh'])       ->name('modulos.forzar-refresh');
+        Route::get('bitacora',                                 [\App\Http\Controllers\Admin\Cart\BitacoraController::class,   'index'])              ->name('bitacora.index');
     });

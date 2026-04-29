@@ -28,11 +28,12 @@ class TokenEntregaController extends Controller
 
         $modulo = $solicitud->moduloCliente;
 
-        // Token de acceso inicial (par emitido por issuePair, replaces_jti = null).
+        // Busca el último access token ACTIVO del módulo.
+        // Funciona para el par inicial (issuePair) y para post-forzarRefresh (nuevo par activo).
         $accessTokenRecord = $modulo
             ? TokenModulo::where('modulo_id', $modulo->id)
                 ->where('tipo', TokenModulo::TIPO_ACCESS)
-                ->whereNull('replaces_jti')
+                ->where('estado', TokenModulo::ESTADO_ACTIVO)
                 ->latest('id')
                 ->first()
             : null;
@@ -42,13 +43,15 @@ class TokenEntregaController extends Controller
         $jwtPair = null;
 
         if (!$alreadyDelivered) {
-            $jwtPair = session('jwt_pair'); // disponible solo si venimos del redirect de aprobar
+            $jwtPair = session('jwt_pair');
 
             if ($jwtPair && $accessTokenRecord) {
-                // Primera entrega: marca entregado_at en el par inicial (access + refresh).
-                TokenModulo::where('modulo_id', $modulo->id)
-                    ->whereNull('replaces_jti')
-                    ->update(['entregado_at' => now()]);
+                // Marca entregado_at en el access activo y en su refresh compañero (pair_jti).
+                $accessTokenRecord->update(['entregado_at' => now()]);
+                if ($accessTokenRecord->pair_jti) {
+                    TokenModulo::where('jti', $accessTokenRecord->pair_jti)
+                        ->update(['entregado_at' => now()]);
+                }
             }
         }
 
