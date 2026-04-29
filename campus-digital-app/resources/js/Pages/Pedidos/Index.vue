@@ -133,10 +133,10 @@ const page = usePage()
                             </td>
                             <td class="px-4 py-3 text-gray-500 text-xs">{{ formatFecha(p.created_at) }}</td>
                             <td class="px-4 py-3 text-center">
-                                <Link :href="route('pedidos.show', p.id)"
+                                <a :href="`/pedidos/${p.id}`"
                                     class="text-purple-400 hover:text-purple-300 font-medium text-xs">
                                     Ver detalle →
-                                </Link>
+                                </a>
                             </td>
                         </tr>
                     </tbody>
