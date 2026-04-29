@@ -21,6 +21,17 @@ Route::get('/', function () {
 // Rutas protegidas por Autenticación
 Route::middleware(['auth', 'verified'])->group(function () {
 
+    Route::prefix('api/wallet')->group(function () {
+
+    Route::get('/saldo', [WalletController::class, 'saldo']);
+
+    Route::post('/pagar', [WalletController::class, 'pagar']);
+
+    Route::get('/movimientos', [WalletController::class, 'movimientos']);
+
+    });
+
+
     // Dashboard General
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

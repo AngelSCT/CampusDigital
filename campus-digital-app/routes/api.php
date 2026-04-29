@@ -10,7 +10,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('auth:sanctum')->prefix('wallet')->group(function () {
+// no middleware para pruebas locales -> debe ser cambiado a api.key
+
+Route::prefix('wallet')->group(function () {
 
     Route::get('/saldo', [WalletController::class, 'saldo']);
 
@@ -23,7 +25,7 @@ Route::middleware('auth:sanctum')->prefix('wallet')->group(function () {
     Route::get('/comprobantes', [WalletController::class, 'comprobantes']);
 });
 
-Route::middleware('auth:sanctum')->prefix('comprobantes')->group(function () {
+Route::prefix('comprobantes')->group(function () {
 
     Route::get('/', [ComprobanteController::class, 'index']);
     
