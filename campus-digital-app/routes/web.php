@@ -65,21 +65,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Operaciones de Recarga
         Route::get('/recargar', [RecargaController::class, 'mostrarFormulario'])->name('recargar.form');
+
         Route::post('/recargar', [RecargaController::class, 'procesarRecarga'])->name('recargar');
+
         Route::post('/recargar/{id}/reintentar', [RecargaController::class, 'reintentar'])->name('recargar.reintentar');
+
         Route::get('/recargar/{id}/comprobante', [RecargaController::class, 'descargarComprobante'])->name('comprobante');
 
         // Reportes del Módulo 8
         Route::prefix('reportes')->name('reportes.')->group(function () {
+
             Route::get('/historial', [ReportesController::class, 'historialRecargas'])->name('historial');
+
             Route::get('/fallidos', [ReportesController::class, 'pagosFallidos'])->name('fallidos');
+            
             Route::get('/conciliacion', [ReportesController::class, 'conciliacionPeriodo'])->name('conciliacion');
         });
-
-        // Servicios de Wallet
-        Route::get('/saldo', [WalletController::class, 'saldo'])->name('saldo');
-        Route::post('/pagar', [WalletController::class, 'pagar'])->name('pagar');
-        Route::get('/movimientos', [WalletController::class, 'movimientos'])->name('movimientos');
-        Route::get('/comprobantes', [WalletController::class, 'comprobantes'])->name('comprobantes');
     });
 });
