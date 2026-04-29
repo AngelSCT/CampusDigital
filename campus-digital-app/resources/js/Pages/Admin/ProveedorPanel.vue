@@ -11,6 +11,24 @@ const props = defineProps({
     tipos: Object,
 });
 
+const formatCurrency = (value) => {
+    return new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN',
+    }).format(value);
+};
+
+const formatFecha = (fecha) => {
+    if (!fecha) return '---';
+    return new Date(fecha).toLocaleDateString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+};
+
 const TIPO_ICONS = {
     cafeteria:  '☕',
     papeleria:  '📄',
@@ -106,22 +124,6 @@ const removerRepartidor = (id) => {
                 </div>
             </div>
 
-            <!-- Summary Metrics -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-4">
-                    <div class="text-sm font-bold text-yellow-400 uppercase mb-1">Pendientes (Total)</div>
-                    <div class="text-4xl font-bold text-white">{{ totalPendientes() }}</div>
-                </div>
-                <div class="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4">
-                    <div class="text-sm font-bold text-blue-400 uppercase mb-1">En Preparación</div>
-                    <div class="text-4xl font-bold text-white">{{ totalProceso() }}</div>
-                </div>
-                <div class="bg-green-500/10 border border-green-500/30 rounded-2xl p-4">
-                    <div class="text-sm font-bold text-green-400 uppercase mb-1">Listos para Entrega</div>
-                    <div class="text-4xl font-bold text-white">{{ totalListos() }}</div>
-                </div>
-            </div>
-
             <!-- Tabs & Search -->
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-slate-800">
                 <div class="flex gap-4">
@@ -156,19 +158,13 @@ const removerRepartidor = (id) => {
                                 </div>
                             </div>
                             <div class="flex gap-3 items-center flex-wrap">
-                                <div class="flex items-center gap-2 px-3 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-                                    <span class="text-sm text-yellow-300 font-bold">{{ tienda.pedidos_pendientes ?? 0 }} pendientes</span>
+                                <div class="flex items-center gap-2 px-3 py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                                    <span class="text-sm text-blue-300 font-bold">{{ tienda.operadores_count ?? 0 }} Operadores</span>
                                 </div>
-                                <div class="flex items-center gap-2 px-3 py-2 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-                                    <span class="text-sm text-blue-300 font-bold">{{ tienda.pedidos_proceso ?? 0 }} en cocina</span>
-                                </div>
-                                <div class="flex items-center gap-2 px-3 py-2 bg-green-500/10 border border-green-500/30 rounded-xl">
-                                    <span class="text-sm text-green-300 font-bold">{{ tienda.pedidos_listos ?? 0 }} listos</span>
-                                </div>
-                                <a :href="`/admin/proveedores/${tienda.id}`"
+                                <Link :href="route('admin.tiendas.manage')"
                                     class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-blue-600/20">
-                                    Ver Operativo →
-                                </a>
+                                    Gestionar Tienda →
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -183,7 +179,7 @@ const removerRepartidor = (id) => {
                         <tr>
                             <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase">Repartidor</th>
                             <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase">Contacto</th>
-                            <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase text-center">Entregas</th>
+                            <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase text-center">Tienda</th>
                             <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase text-right">Acciones</th>
                         </tr>
                     </thead>
@@ -201,7 +197,7 @@ const removerRepartidor = (id) => {
                                 <div class="text-xs text-slate-500">{{ repartidor.telefono || 'Sin tel' }}</div>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <span class="px-2 py-1 bg-slate-800 rounded-lg text-white font-bold">{{ repartidor.pedidos_entregados || 0 }}</span>
+                                <span class="px-2 py-1 bg-slate-800 rounded-lg text-white font-bold">{{ repartidor.tienda?.nombre || 'General' }}</span>
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <button @click="removerRepartidor(repartidor.id)" class="p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-all">🗑️</button>
@@ -214,7 +210,7 @@ const removerRepartidor = (id) => {
                 </table>
             </div>
 
-            <!-- Add Repartidor Modal (Inlined for consistency) -->
+            <!-- Add Repartidor Modal -->
             <transition name="fade">
                 <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
                     <div class="bg-slate-900 border border-slate-800 w-full max-w-xl rounded-[2.5rem] p-8 shadow-2xl">
@@ -241,93 +237,6 @@ const removerRepartidor = (id) => {
                     </div>
                 </div>
             </transition>
-            </transition>
-
-            <!-- Recent Orders Section -->
-            <div class="mt-12 bg-slate-900 border border-slate-800 rounded-[2.5rem] overflow-hidden shadow-2xl">
-                <div class="px-10 py-8 border-b border-slate-800 flex justify-between items-center bg-gradient-to-r from-slate-900 to-slate-800/50">
-                    <div>
-                        <h3 class="text-2xl font-black text-white italic tracking-tighter">Panel General de Pedidos</h3>
-                        <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Actividad consolidada de todas las unidades de negocio</p>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-2xl">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                        </span>
-                        <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest leading-none">Live Monitor</span>
-                    </div>
-                </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-950/30">
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Folio</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Unidad de Negocio</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Cliente</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Total</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Estatus</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Registro</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-800/30">
-                            <tr v-for="pedido in pedidosRecientes" :key="pedido.id" class="hover:bg-blue-500/[0.02] transition-colors group">
-                                <td class="px-8 py-6">
-                                    <span class="font-mono text-xs font-black text-blue-400 bg-blue-400/10 px-3 py-1.5 rounded-xl border border-blue-500/10">
-                                        #{{ pedido.numero_folio }}
-                                    </span>
-                                </td>
-                                <td class="px-8 py-6">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-2xl bg-slate-800 flex items-center justify-center text-xl shadow-inner border border-slate-700/50">
-                                            {{ TIPO_ICONS[pedido.tienda?.tipo] ?? '🏪' }}
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-black text-slate-200 tracking-tight">{{ pedido.tienda?.nombre }}</div>
-                                            <div class="text-[10px] text-slate-500 font-bold uppercase">{{ tipos[pedido.tienda?.tipo] }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-6">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-400">
-                                            {{ pedido.usuario?.nombre[0] }}
-                                        </div>
-                                        <div class="text-sm font-bold text-slate-300">
-                                            {{ pedido.usuario?.nombre }} {{ pedido.usuario?.apellido }}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-6">
-                                    <span class="text-sm font-black text-white">{{ formatCurrency(pedido.total) }}</span>
-                                </td>
-                                <td class="px-8 py-6">
-                                    <span :class="[
-                                        'px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border',
-                                        pedido.estado === 'creado' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
-                                        pedido.estado === 'aceptado' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                        pedido.estado === 'en_proceso' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
-                                        pedido.estado === 'listo' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'
-                                    ]">
-                                        {{ pedido.estado.replace('_', ' ') }}
-                                    </span>
-                                </td>
-                                <td class="px-8 py-6 text-right">
-                                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{{ formatFecha(pedido.created_at) }}</div>
-                                    <div class="text-[9px] text-slate-600 font-bold">Via {{ pedido.metodo_pago }}</div>
-                                </td>
-                            </tr>
-                            <tr v-if="pedidosRecientes.length === 0">
-                                <td colspan="6" class="px-8 py-20 text-center">
-                                    <div class="text-4xl mb-4 opacity-20">📭</div>
-                                    <div class="text-slate-500 font-black uppercase text-[10px] tracking-[0.2em]">Sin actividad reciente de pedidos</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </AuthLayout>
 </template>

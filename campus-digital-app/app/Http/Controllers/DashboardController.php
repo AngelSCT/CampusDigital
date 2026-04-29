@@ -19,6 +19,8 @@ class DashboardController extends Controller
             return $this->dashboardAdministrador($user);
         } elseif ($user->hasRole('proveedor_area')) {
             return $this->dashboardProveedor($user);
+        } elseif ($user->hasRole('repartidor')) {
+            return redirect()->route('repartidor.dashboard');
         } else {
             return $this->dashboardEstudiante($user);
         }
@@ -224,49 +226,25 @@ class DashboardController extends Controller
     private function dashboardProveedor($user)
     {
         $tienda = $user->tienda;
-        $hoy = now()->startOfDay();
+        if (!$tienda) {
+            return Inertia::render('Dashboard/Proveedor', [
+                'tienda' => null,
+                'stats' => ['productos' => 0, 'repartidores' => 0],
+            ]);
+        }
 
-        $pedidosPendientes = DB::table('pedido')
-            ->where('estado', 'creado')
-            ->whereNull('deleted_at')
+        $productosCount = \App\Models\Producto::where('tienda_id', $tienda->id)->count();
+        $repartidoresCount = \App\Models\Usuario::where('tienda_id', $tienda->id)
+            ->whereHas('roles', fn($q) => $q->where('nombre', 'repartidor'))
             ->count();
-
-        $pedidosEnProceso = DB::table('pedido')
-            ->whereIn('estado', ['aceptado', 'en_proceso'])
-            ->whereNull('deleted_at')
-            ->count();
-
-        $pedidosCompletadosHoy = DB::table('pedido')
-            ->where('estado', 'entregado')
-            ->whereDate('confirmado_at', $hoy)
-            ->whereNull('deleted_at')
-            ->count();
-
-        $ventasHoy = DB::table('pedido')
-            ->where('estado', 'entregado')
-            ->whereDate('confirmado_at', $hoy)
-            ->whereNull('deleted_at')
-            ->sum('total');
-
-        $pedidosRecientes = DB::table('pedido as p')
-            ->join('usuario as u', 'u.id', '=', 'p.usuario_id')
-            ->select('p.*', 'u.nombre as usuario_nombre', 'u.apellido as usuario_apellido')
-            ->whereNull('p.deleted_at')
-            ->orderByDesc('p.created_at')
-            ->limit(5)
-            ->get();
 
         return Inertia::render('Dashboard/Proveedor', [
-            'tienda'            => $user->tienda,
-            'tipos'             => \App\Models\Tienda::TIPOS,
-            'stats'             => [
-                'pedidos_pendientes'      => $pedidosPendientes,
-                'pedidos_en_proceso'      => $pedidosEnProceso,
-                'pedidos_completados_hoy' => $pedidosCompletadosHoy,
-                'ventas_hoy'              => (float)$ventasHoy,
-                'tiempo_avg'              => 0,
+            'tienda' => $tienda,
+            'tipos'  => \App\Models\Tienda::TIPOS,
+            'stats'  => [
+                'productos_count'    => $productosCount,
+                'repartidores_count' => $repartidoresCount,
             ],
-            'pedidos_recientes' => $pedidosRecientes,
         ]);
     }
 

@@ -16,7 +16,18 @@ use App\Http\Controllers\Admin\TarjetaReporteController;
 use App\Http\Controllers\TarjetaLecturaController;
 use App\Http\Controllers\Auth\RfidLoginController;
 use App\Http\Controllers\MiTarjetaController;
+use App\Http\Controllers\RecargaController;
 use App\Http\Controllers\Archivos\ArchivoController;
+use App\Http\Controllers\Admin\AreaController;
+use App\Http\Controllers\Admin\CategoriaTicketController;
+use App\Http\Controllers\Admin\UbicacionController;
+use App\Http\Controllers\Admin\EquipoActivoController;
+use App\Http\Controllers\Admin\MantenimientoPreventivoController;
+use App\Http\Controllers\Admin\TicketController;
+use App\Http\Controllers\Admin\AsignacionTecnicaController;
+use App\Http\Controllers\Admin\InsumoController;
+use App\Http\Controllers\Admin\GastoTicketController;
+use App\Http\Controllers\Admin\HistorialTicketController;
 use App\Http\Controllers\Proveedor\PedidoOperativoController;
 use App\Http\Controllers\Proveedor\ProductoController;
 use App\Http\Controllers\Api\PedidoApiController;
@@ -112,6 +123,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // ── MONEDERO / RECARGAS ──────────────────────────────────────
+    Route::prefix('monedero')->name('monedero.')->group(function () {
+        Route::get('/recargas',  [RecargaController::class, 'index'])->name('recargas');
+        Route::post('/recargas', [RecargaController::class, 'store'])->name('recargas.store');
+    });
+
     Route::get('/sin-permiso', function () {
         return inertia('Errors/SinPermiso');
     })->name('sin-permiso');
@@ -156,6 +173,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{archivo}/nota',                     [ArchivoController::class, 'agregarNota'])->middleware('permission:file.admin')->name('nota');
     });
 
+    // ── REPARTIDOR (INDIVIDUAL) ──────────────────────────────────
+    Route::middleware(['role:repartidor'])->prefix('repartidor')->name('repartidor.')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Repartidor\RepartidorDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/pedidos/{pedido}/estado', [\App\Http\Controllers\Repartidor\RepartidorDashboardController::class, 'actualizarEstado'])->name('pedido.estado');
+    });
+
+    Route::middleware(['role:proveedor_area'])->prefix('proveedor')->name('proveedor.')->group(function () {
+        Route::get('/operativo', [App\Http\Controllers\DashboardController::class, 'dashboardProveedor'])->name('operativo.index');
+        
+        // Inventario
+        Route::get('/inventario', [App\Http\Controllers\Proveedor\ProductoController::class, 'index'])->name('inventario.index');
+        Route::post('/inventario', [App\Http\Controllers\Proveedor\ProductoController::class, 'store'])->name('inventario.store');
+        Route::put('/inventario/{producto}', [App\Http\Controllers\Proveedor\ProductoController::class, 'update'])->name('inventario.update');
+        Route::delete('/inventario/{producto}', [App\Http\Controllers\Proveedor\ProductoController::class, 'destroy'])->name('inventario.destroy');
+
+        // Repartidores (Nuevo)
+        Route::get('/repartidores', [App\Http\Controllers\Proveedor\RepartidorProveedorController::class, 'index'])->name('repartidores.index');
+        Route::get('/api/usuarios/buscar', [App\Http\Controllers\Proveedor\RepartidorProveedorController::class, 'search'])->name('repartidores.search');
+        Route::post('/repartidores/asignar', [App\Http\Controllers\Proveedor\RepartidorProveedorController::class, 'asignar'])->name('repartidores.asignar');
+        Route::delete('/repartidores/{usuario}', [App\Http\Controllers\Proveedor\RepartidorProveedorController::class, 'desvincular'])->name('repartidores.destroy');
+
+        Route::get('/reportes', function() {
+            return Inertia::render('Proveedor/Reportes');
+        })->name('reportes.index');
+    });
+
 
     Route::middleware(['role:administrador'])->prefix('admin')->name('admin.')->group(function () {
         // Rutas de Tiendas
@@ -168,6 +211,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Rutas de Proveedores
         Route::get('/proveedores',         [AdminProveedorController::class, 'dashboard'])->name('proveedores.index');
         Route::get('/proveedores/gestion', [AdminProveedorController::class, 'index'])->name('proveedores.manage');
+        Route::get('/api/usuarios/buscar', [AdminProveedorController::class, 'buscarUsuarios'])->name('proveedores.search');
         Route::post('/proveedores/{usuario}/asignar', [AdminProveedorController::class, 'asignarTienda'])->name('proveedores.asignar');
 
         // Rutas de Repartidores
@@ -317,6 +361,86 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/usuarios-export',  [ReporteController::class, 'exportUsuarios'])->name('usuarios.export');
             Route::get('/accesos-export',   [ReporteController::class, 'exportAccesos'])->name('accesos.export');
             Route::get('/actividad-export', [ReporteController::class, 'exportActividad'])->name('actividad.export');
+        });
+
+        Route::prefix('areas')->name('areas.')->group(function () {
+            Route::get('/',          [AreaController::class, 'index'])->name('index');
+            Route::post('/',         [AreaController::class, 'store'])->name('store');
+            Route::get('/{area}',    [AreaController::class, 'show'])->name('show');
+            Route::put('/{area}',    [AreaController::class, 'update'])->name('update');
+            Route::delete('/{area}', [AreaController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('categorias-ticket')->name('categorias-ticket.')->group(function () {
+            Route::get('/',                       [CategoriaTicketController::class, 'index'])->name('index');
+            Route::post('/',                      [CategoriaTicketController::class, 'store'])->name('store');
+            Route::get('/{categoriaTicket}',      [CategoriaTicketController::class, 'show'])->name('show');
+            Route::put('/{categoriaTicket}',      [CategoriaTicketController::class, 'update'])->name('update');
+            Route::delete('/{categoriaTicket}',   [CategoriaTicketController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('ubicaciones')->name('ubicaciones.')->group(function () {
+            Route::get('/',              [UbicacionController::class, 'index'])->name('index');
+            Route::post('/',             [UbicacionController::class, 'store'])->name('store');
+            Route::get('/{ubicacion}',   [UbicacionController::class, 'show'])->name('show');
+            Route::put('/{ubicacion}',   [UbicacionController::class, 'update'])->name('update');
+            Route::delete('/{ubicacion}',[UbicacionController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('equipos-activos')->name('equipos-activos.')->group(function () {
+            Route::get('/',                [EquipoActivoController::class, 'index'])->name('index');
+            Route::post('/',               [EquipoActivoController::class, 'store'])->name('store');
+            Route::get('/{equipoActivo}',  [EquipoActivoController::class, 'show'])->name('show');
+            Route::put('/{equipoActivo}',  [EquipoActivoController::class, 'update'])->name('update');
+            Route::delete('/{equipoActivo}',[EquipoActivoController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('mantenimientos-preventivos')->name('mantenimientos-preventivos.')->group(function () {
+            Route::get('/',                          [MantenimientoPreventivoController::class, 'index'])->name('index');
+            Route::post('/',                         [MantenimientoPreventivoController::class, 'store'])->name('store');
+            Route::get('/{mantenimientoPreventivo}', [MantenimientoPreventivoController::class, 'show'])->name('show');
+            Route::put('/{mantenimientoPreventivo}', [MantenimientoPreventivoController::class, 'update'])->name('update');
+            Route::delete('/{mantenimientoPreventivo}',[MantenimientoPreventivoController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('tickets')->name('tickets.')->group(function () {
+            Route::get('/',          [TicketController::class, 'index'])->name('index');
+            Route::post('/',         [TicketController::class, 'store'])->name('store');
+            Route::get('/{ticket}',  [TicketController::class, 'show'])->name('show');
+            Route::put('/{ticket}',  [TicketController::class, 'update'])->name('update');
+            Route::delete('/{ticket}',[TicketController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('asignaciones-tecnicas')->name('asignaciones-tecnicas.')->group(function () {
+            Route::get('/',                       [AsignacionTecnicaController::class, 'index'])->name('index');
+            Route::post('/',                      [AsignacionTecnicaController::class, 'store'])->name('store');
+            Route::get('/{asignacionTecnica}',    [AsignacionTecnicaController::class, 'show'])->name('show');
+            Route::put('/{asignacionTecnica}',    [AsignacionTecnicaController::class, 'update'])->name('update');
+            Route::delete('/{asignacionTecnica}', [AsignacionTecnicaController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('insumos')->name('insumos.')->group(function () {
+            Route::get('/',          [InsumoController::class, 'index'])->name('index');
+            Route::post('/',         [InsumoController::class, 'store'])->name('store');
+            Route::get('/{insumo}',  [InsumoController::class, 'show'])->name('show');
+            Route::put('/{insumo}',  [InsumoController::class, 'update'])->name('update');
+            Route::delete('/{insumo}',[InsumoController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('gastos-ticket')->name('gastos-ticket.')->group(function () {
+            Route::get('/',               [GastoTicketController::class, 'index'])->name('index');
+            Route::post('/',              [GastoTicketController::class, 'store'])->name('store');
+            Route::get('/{gastoTicket}',  [GastoTicketController::class, 'show'])->name('show');
+            Route::put('/{gastoTicket}',  [GastoTicketController::class, 'update'])->name('update');
+            Route::delete('/{gastoTicket}',[GastoTicketController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('historial-tickets')->name('historial-tickets.')->group(function () {
+            Route::get('/',                    [HistorialTicketController::class, 'index'])->name('index');
+            Route::post('/',                   [HistorialTicketController::class, 'store'])->name('store');
+            Route::get('/{historialTicket}',   [HistorialTicketController::class, 'show'])->name('show');
+            Route::put('/{historialTicket}',   [HistorialTicketController::class, 'update'])->name('update');
+            Route::delete('/{historialTicket}',[HistorialTicketController::class, 'destroy'])->name('destroy');
         });
     });
 });

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Usuario;
 use App\Models\Tienda;
 use App\Models\Rol;
+use App\Models\Pedido;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -17,36 +18,18 @@ class AdminProveedorController extends Controller
         $tiendas = Tienda::withCount([
             'usuarios as operadores_count' => function($q) {
                 $q->whereHas('roles', fn($r) => $r->where('nombre', 'proveedor_area'));
-            },
-            'pedidos as pedidos_pendientes' => function($q) {
-                $q->where('estado', 'creado');
-            },
-            'pedidos as pedidos_proceso' => function($q) {
-                $q->whereIn('estado', ['aceptado', 'en_proceso']);
-            },
-            'pedidos as pedidos_listos' => function($q) {
-                $q->where('estado', 'listo');
             }
         ])->get();
 
         $repartidores = Usuario::whereHas('roles', function($q) {
                 $q->where('nombre', 'repartidor');
             })
-            ->withCount(['pedidosRepartidor as pedidos_entregados' => function($q) {
-                $q->where('estado', 'entregado');
-            }])
-            ->get();
-
-        $pedidosRecientes = Pedido::with(['usuario', 'tienda'])
-            ->whereIn('estado', ['creado', 'aceptado', 'en_proceso', 'listo'])
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
+            ->with(['tienda'])
             ->get();
 
         return Inertia::render('Admin/ProveedorPanel', [
             'tiendas'          => $tiendas,
             'repartidores'     => $repartidores,
-            'pedidosRecientes' => $pedidosRecientes,
             'tipos'            => Tienda::TIPOS
         ]);
     }
@@ -84,5 +67,19 @@ class AdminProveedorController extends Controller
         $usuario->update(['tienda_id' => $request->tienda_id]);
 
         return redirect()->back()->with('success', 'Tienda asignada correctamente.');
+    }
+
+    public function buscarUsuarios(Request $request)
+    {
+        $q = $request->input('q');
+        if (strlen($q) < 3) return response()->json([]);
+
+        $usuarios = Usuario::where('nombre', 'like', "%$q%")
+            ->orWhere('apellido', 'like', "%$q%")
+            ->orWhere('email', 'like', "%$q%")
+            ->limit(10)
+            ->get(['id', 'nombre', 'apellido', 'email']);
+
+        return response()->json($usuarios);
     }
 }

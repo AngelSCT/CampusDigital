@@ -159,4 +159,9 @@ public function carpetas()
     {
         return $this->hasMany(Pedido::class, 'repartidor_id');
     }
+
+    public function tienda()
+    {
+        return $this->belongsTo(Tienda::class, 'tienda_id');
+    }
 }
