@@ -17,11 +17,24 @@ use App\Http\Controllers\TarjetaLecturaController;
 use App\Http\Controllers\Auth\RfidLoginController;
 use App\Http\Controllers\MiTarjetaController;
 use App\Http\Controllers\Archivos\ArchivoController;
+use App\Http\Controllers\Proveedor\PedidoOperativoController;
+use App\Http\Controllers\Proveedor\ProductoController;
+use App\Http\Controllers\Api\PedidoApiController;
+use App\Http\Controllers\Api\ProviderApiController;
+use App\Http\Controllers\Admin\TiendaController;
+use App\Http\Controllers\Admin\AdminProveedorController;
+use App\Http\Controllers\Admin\RepartidorController;
+use App\Http\Controllers\Admin\RepartidorRoleController;
+use App\Http\Controllers\StoreManager\ManagerOperativoController;
 
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+Route::get('/login', function () {
+    return inertia('Auth/Login');
+})->name('login');
 
 
 Route::post('/auth/rfid-login', [RfidLoginController::class, 'login'])
@@ -143,7 +156,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{archivo}/nota',                     [ArchivoController::class, 'agregarNota'])->middleware('permission:file.admin')->name('nota');
     });
 
+
     Route::middleware(['role:administrador'])->prefix('admin')->name('admin.')->group(function () {
+        // Rutas de Tiendas
+        Route::get('/tiendas',           [TiendaController::class, 'dashboard'])->name('tiendas.index');
+        Route::get('/tiendas/gestion',   [TiendaController::class, 'index'])->name('tiendas.manage');
+        Route::post('/tiendas',          [TiendaController::class, 'store'])->name('tiendas.store');
+        Route::put('/tiendas/{tienda}',  [TiendaController::class, 'update'])->name('tiendas.update');
+        Route::delete('/tiendas/{tienda}', [TiendaController::class, 'destroy'])->name('tiendas.destroy');
+
+        // Rutas de Proveedores
+        Route::get('/proveedores',         [AdminProveedorController::class, 'dashboard'])->name('proveedores.index');
+        Route::get('/proveedores/gestion', [AdminProveedorController::class, 'index'])->name('proveedores.manage');
+        Route::post('/proveedores/{usuario}/asignar', [AdminProveedorController::class, 'asignarTienda'])->name('proveedores.asignar');
+
+        // Rutas de Repartidores
+        Route::get('/repartidores', [RepartidorController::class, 'index'])->name('repartidores.index');
+        Route::post('/repartidores/{usuario}/toggle', [RepartidorController::class, 'toggle'])->name('repartidores.toggle');
+
 
         Route::prefix('tarjetas')->name('tarjetas.')->group(function () {
 

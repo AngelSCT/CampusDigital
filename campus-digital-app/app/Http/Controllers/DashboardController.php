@@ -223,7 +223,51 @@ class DashboardController extends Controller
 
     private function dashboardProveedor($user)
     {
-        return Inertia::render('Dashboard/Proveedor', []);
+        $tienda = $user->tienda;
+        $hoy = now()->startOfDay();
+
+        $pedidosPendientes = DB::table('pedido')
+            ->where('estado', 'creado')
+            ->whereNull('deleted_at')
+            ->count();
+
+        $pedidosEnProceso = DB::table('pedido')
+            ->whereIn('estado', ['aceptado', 'en_proceso'])
+            ->whereNull('deleted_at')
+            ->count();
+
+        $pedidosCompletadosHoy = DB::table('pedido')
+            ->where('estado', 'entregado')
+            ->whereDate('confirmado_at', $hoy)
+            ->whereNull('deleted_at')
+            ->count();
+
+        $ventasHoy = DB::table('pedido')
+            ->where('estado', 'entregado')
+            ->whereDate('confirmado_at', $hoy)
+            ->whereNull('deleted_at')
+            ->sum('total');
+
+        $pedidosRecientes = DB::table('pedido as p')
+            ->join('usuario as u', 'u.id', '=', 'p.usuario_id')
+            ->select('p.*', 'u.nombre as usuario_nombre', 'u.apellido as usuario_apellido')
+            ->whereNull('p.deleted_at')
+            ->orderByDesc('p.created_at')
+            ->limit(5)
+            ->get();
+
+        return Inertia::render('Dashboard/Proveedor', [
+            'tienda'            => $user->tienda,
+            'tipos'             => \App\Models\Tienda::TIPOS,
+            'stats'             => [
+                'pedidos_pendientes'      => $pedidosPendientes,
+                'pedidos_en_proceso'      => $pedidosEnProceso,
+                'pedidos_completados_hoy' => $pedidosCompletadosHoy,
+                'ventas_hoy'              => (float)$ventasHoy,
+                'tiempo_avg'              => 0,
+            ],
+            'pedidos_recientes' => $pedidosRecientes,
+        ]);
     }
 
     private function dashboardEstudiante($user)

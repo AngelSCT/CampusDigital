@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\TarjetaLecturaApiController;
 use App\Http\Controllers\Api\SaldoMonederoApiController;
 use App\Http\Controllers\Api\SaldoMovimientoApiController;
 use App\Http\Controllers\Api\PedidoApiController;
+use App\Http\Controllers\Api\ProviderApiController;
 
 // RUTAS EXTRA CON UID Y EL PIN
 use App\Http\Controllers\Api\RfidApiController;
@@ -81,6 +82,10 @@ Route::middleware('api.key')->group(function () {
     Route::delete('pedidos/{id}',                   [PedidoApiController::class, 'destroy']);
     Route::post  ('pedidos/{id}/estado',            [PedidoApiController::class, 'cambiarEstado']);
     Route::post  ('pedidos/{id}/confirmar-tarjeta', [PedidoApiController::class, 'confirmarConTarjeta']);
+
+    // NUEVAS RUTAS PROVEEDOR (MODULO 4.9)
+    Route::get('proveedor/metrics', [ProviderApiController::class, 'getMetrics']);
+    Route::get('proveedor/reports', [ProviderApiController::class, 'getReports']);
 });
 
 
