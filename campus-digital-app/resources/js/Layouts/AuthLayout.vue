@@ -13,7 +13,7 @@
                             <a href="/dashboard" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
                                 Dashboard
                             </a>
-                            
+
                             <!-- Links de Administrador -->
                             <template v-if="isAdmin">
                                 <a href="/admin/usuarios" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
@@ -31,7 +31,7 @@
                             </template>
                         </div>
                     </div>
-                    
+
                     <!-- User Menu Desktop -->
                     <div class="hidden sm:ml-6 sm:flex sm:items-center">
                         <div class="ml-3 relative">
@@ -42,7 +42,7 @@
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </button>
-                            
+
                             <!-- Dropdown Menu -->
                             <transition
                                 enter-active-class="transition ease-out duration-200"
@@ -62,7 +62,7 @@
                                                 {{ rol }}
                                             </span>
                                         </div>
-                                        
+
                                         <!-- Mi Perfil -->
                                         <a href="/perfil" class="block px-4 py-2 text-sm text-white hover:bg-blue-500/10 hover:text-blue-400 flex items-center transition-all duration-200">
                                             <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,7 +70,7 @@
                                             </svg>
                                             Mi Perfil
                                         </a>
-                                        
+
                                         <!-- Cerrar Sesión -->
                                         <button @click="logout" type="button" class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center border-t border-blue-500/20 transition-all duration-200">
                                             <svg class="w-4 h-4 mr-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,7 +112,7 @@
                         <a href="/dashboard" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
                             Dashboard
                         </a>
-                        
+
                         <template v-if="isAdmin">
                             <a href="/admin/usuarios" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
                                 Usuarios
@@ -128,7 +128,7 @@
                             </a>
                         </template>
                     </div>
-                    
+
                     <!-- User section mobile -->
                     <div class="pt-4 pb-3 border-t border-blue-500/20">
                         <div class="flex items-center px-4">
@@ -239,8 +239,7 @@ const isAdmin = computed(() => {
 });
 
 const saldo = computed(() => {
-    const wallet = page.props.auth?.user.saldo;
-    return wallet.saldo;
+    return page.props.auth?.user?.saldo ?? 0;
 })
 
 // Methods

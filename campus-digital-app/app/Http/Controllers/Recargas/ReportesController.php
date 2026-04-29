@@ -89,8 +89,23 @@ class ReportesController extends Controller
     public function conciliacionPeriodo(Request $request)
     {
         $usuario = Auth::user();
-        $fecha_inicio = $request->get('fecha_inicio', now()->subDays(30)->format('Y-m-d'));
-        $fecha_fin = $request->get('fecha_fin', now()->format('Y-m-d'));
+
+        // CORRECCIÓN: Adaptamos para que reciba el 'periodo' que envía Vue o caiga a las fechas
+        $periodo = $request->get('periodo');
+
+        if ($periodo && $periodo !== 'todos') {
+            $fecha_inicio = now()->subDays(intval($periodo))->format('Y-m-d');
+            $fecha_fin = now()->format('Y-m-d');
+        } elseif ($periodo === 'todos') {
+            // Si es todos, buscamos la fecha de la primera recarga del usuario
+            $primera_recarga = Recarga::where('usuario_id', $usuario->id)->min('created_at');
+            $fecha_inicio = $primera_recarga ? date('Y-m-d', strtotime($primera_recarga)) : now()->format('Y-m-d');
+            $fecha_fin = now()->format('Y-m-d');
+        } else {
+            // Fallback original por si se entra sin periodo
+            $fecha_inicio = $request->get('fecha_inicio', now()->subDays(30)->format('Y-m-d'));
+            $fecha_fin = $request->get('fecha_fin', now()->format('Y-m-d'));
+        }
 
         // Recargas en el período
         $recargas = Recarga::where('usuario_id', $usuario->id)
@@ -130,6 +145,7 @@ class ReportesController extends Controller
             'resumen_metodos' => $resumen_metodos,
             'fecha_inicio' => $fecha_inicio,
             'fecha_fin' => $fecha_fin,
+            'periodo' => $periodo ?? '30' // Mandamos el periodo para mantener la coherencia
         ]);
     }
 
@@ -140,16 +156,20 @@ class ReportesController extends Controller
     {
         $usuario = Auth::user();
         $periodo = $request->get('periodo', '30');
-        $dias = intval($periodo) > 0 ? intval($periodo) : 30;
 
         // Saldo actual
         $saldo = Saldo::where('usuario_id', $usuario->id)->first();
         $saldo_actual = $saldo ? floatval($saldo->saldo) : 0;
 
-        // Recargas del período
-        $recargas_periodo = Recarga::where('usuario_id', $usuario->id)
-            ->whereDate('created_at', '>=', now()->subDays($dias))
-            ->get();
+        // CORRECCIÓN: Evitamos que 'todos' limite la búsqueda a 30 días
+        $query = Recarga::where('usuario_id', $usuario->id);
+
+        if ($periodo !== 'todos') {
+            $dias = intval($periodo);
+            $query->whereDate('created_at', '>=', now()->subDays($dias));
+        }
+
+        $recargas_periodo = $query->get();
 
         $stats = [
             'saldo_actual' => $saldo_actual,
@@ -157,7 +177,7 @@ class ReportesController extends Controller
             'exitosas_periodo' => $recargas_periodo->where('estado', 'exitosa')->count(),
             'fallidas_periodo' => $recargas_periodo->where('estado', 'fallida')->count(),
             'monto_total_periodo' => floatval($recargas_periodo->where('estado', 'exitosa')->sum('monto')),
-            'ratio_exito' => $recargas_periodo->count() > 0 
+            'ratio_exito' => $recargas_periodo->count() > 0
                 ? round(($recargas_periodo->where('estado', 'exitosa')->count() / $recargas_periodo->count()) * 100, 2)
                 : 0,
         ];
@@ -167,7 +187,7 @@ class ReportesController extends Controller
             return $grupo->count();
         })->toArray();
 
-        // Últimas 5 recargas
+        // Últimas 5 recargas (esta no se afecta por el periodo)
         $ultimas = Recarga::where('usuario_id', $usuario->id)
             ->orderByDesc('created_at')
             ->limit(5)

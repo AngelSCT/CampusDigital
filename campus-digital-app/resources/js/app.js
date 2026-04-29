@@ -64,20 +64,44 @@ window.route = (name, params) => {
         'admin.bitacora.actividad': '/admin/bitacora/actividad',
         'admin.bitacora.export-accesos': '/admin/bitacora/export-accesos',
         'admin.bitacora.export-actividad': '/admin/bitacora/export-actividad',
+
+        // Módulo 8 - Recargas
+        'modulo_8.index': '/modulo_8',
+        'modulo_8.recargar.form': '/modulo_8/recargar',
+        'modulo_8.recargar': '/modulo_8/recargar',
+        'modulo_8.recargar.reintentar': '/modulo_8/recargar/:id/reintentar',
+        'modulo_8.comprobante': '/modulo_8/recargar/:id/comprobante',
+        'modulo_8.reportes.historial': '/modulo_8/reportes/historial',
+        'modulo_8.reportes.fallidos': '/modulo_8/reportes/fallidos',
+        'modulo_8.reportes.conciliacion': '/modulo_8/reportes/conciliacion',
+        'modulo_8.saldo': '/modulo_8/saldo',
+        'modulo_8.pagar': '/modulo_8/pagar',
+        'modulo_8.movimientos': '/modulo_8/movimientos',
+        'modulo_8.comprobantes': '/modulo_8/comprobantes',
     };
-    
+
     let url = routes[name] || '/';
-    
+
     if (params) {
         if (typeof params === 'object') {
+            const queryParams = {};
+
             Object.keys(params).forEach(key => {
-                url = url.replace(`:${key}`, params[key]);
+                if (url.includes(`:${key}`)) {
+                    url = url.replace(`:${key}`, params[key]);
+                } else {
+                    queryParams[key] = params[key];
+                }
             });
+
+            const query = new URLSearchParams(queryParams).toString();
+            if (query) url = `${url}?${query}`;
+
         } else {
             url = url.replace(':id', params);
         }
     }
-    
+
     return url;
 };
 
@@ -87,12 +111,10 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         const app = createApp({ render: () => h(App, props) })
             .use(plugin);
-        
-        // Hacer route() disponible en todos los componentes
+
         app.config.globalProperties.route = window.route;
         app.directive('click-away', clickAway);
 
-        
         return app.mount(el);
     },
     progress: {

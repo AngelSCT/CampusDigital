@@ -2,7 +2,6 @@
     <AuthLayout>
         <div class="max-w-7xl mx-auto space-y-6">
 
-            <!-- Encabezado -->
             <div>
                 <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                     Dashboard de Recargas
@@ -10,12 +9,11 @@
                 <p class="mt-1 text-sm text-slate-400">Resumen de tu actividad en el monedero universitario</p>
             </div>
 
-            <!-- Selector de período -->
             <div class="flex gap-3 flex-wrap">
-                <button 
-                    v-for="p in periodos" 
+                <button
+                    v-for="p in periodos"
                     :key="p.value"
-                    @click="$router.get(route('modulo_8.index', { periodo: p.value }))"
+                    @click="router.get(route('modulo_8.index', { periodo: p.value }))"
                     :class="periodo == p.value
                         ? 'bg-cyan-600 border-cyan-500 text-white'
                         : 'bg-slate-700 border-slate-600 text-slate-400 hover:border-slate-500'"
@@ -25,10 +23,8 @@
                 </button>
             </div>
 
-            <!-- Grid de estadísticas -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                
-                <!-- Saldo Actual -->
+
                 <div class="bg-gradient-to-br from-cyan-900/40 to-blue-900/40 border border-cyan-500/20 rounded-xl p-6">
                     <div class="flex items-center justify-between mb-2">
                         <p class="text-xs text-cyan-400 uppercase tracking-wider">Saldo Actual</p>
@@ -39,7 +35,6 @@
                     <p class="text-3xl font-bold text-white font-mono">${{ formatMonto(stats.saldo_actual) }}</p>
                 </div>
 
-                <!-- Recargas en período -->
                 <div class="bg-gradient-to-br from-purple-900/40 to-pink-900/40 border border-purple-500/20 rounded-xl p-6">
                     <div class="flex items-center justify-between mb-2">
                         <p class="text-xs text-purple-400 uppercase tracking-wider">Recargas</p>
@@ -51,7 +46,6 @@
                     <p class="text-xs text-purple-300 mt-1">en {{ periodo }} días</p>
                 </div>
 
-                <!-- Exitosas vs Fallidas -->
                 <div class="bg-gradient-to-br from-green-900/40 to-emerald-900/40 border border-green-500/20 rounded-xl p-6">
                     <div class="flex items-center justify-between mb-2">
                         <p class="text-xs text-green-400 uppercase tracking-wider">Exitosas</p>
@@ -63,7 +57,6 @@
                     <p class="text-xs text-green-300 mt-1" v-if="stats.recargas_periodo > 0">{{ stats.ratio_exito }}% éxito</p>
                 </div>
 
-                <!-- Monto total recargado -->
                 <div class="bg-gradient-to-br from-orange-900/40 to-yellow-900/40 border border-orange-500/20 rounded-xl p-6">
                     <div class="flex items-center justify-between mb-2">
                         <p class="text-xs text-orange-400 uppercase tracking-wider">Total Recargado</p>
@@ -75,10 +68,8 @@
                 </div>
             </div>
 
-            <!-- Grid: Métodos y Últimas Recargas -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                <!-- Métodos de pago más usados -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
                     <div class="px-6 py-4 border-b border-slate-700">
                         <h2 class="text-base font-semibold text-white flex items-center gap-2">
@@ -104,7 +95,6 @@
                     </div>
                 </div>
 
-                <!-- Últimas 5 recargas -->
                 <div class="lg:col-span-2 bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
                     <div class="px-6 py-4 border-b border-slate-700">
                         <h2 class="text-base font-semibold text-white flex items-center gap-2">
@@ -136,9 +126,8 @@
                 </div>
             </div>
 
-            <!-- Botones de acceso a reportes -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Link :href="route('modulo_8.reportes.historial')" class="p-6 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl hover:border-cyan-500 transition group">
+                <Link :href="route('modulo_8.reportes.historial', { periodo: periodo })" class="p-6 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl hover:border-cyan-500 transition group">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-base font-semibold text-white group-hover:text-cyan-400 transition">Historial Completo</h3>
                         <svg class="w-5 h-5 text-slate-400 group-hover:text-cyan-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,7 +137,7 @@
                     <p class="text-sm text-slate-400">Ver todas tus recargas</p>
                 </Link>
 
-                <Link :href="route('modulo_8.reportes.fallidos')" class="p-6 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl hover:border-red-500 transition group">
+                <Link :href="route('modulo_8.reportes.fallidos', { periodo: periodo })" class="p-6 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl hover:border-red-500 transition group">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-base font-semibold text-white group-hover:text-red-400 transition">Pagos Fallidos</h3>
                         <svg class="w-5 h-5 text-slate-400 group-hover:text-red-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,7 +147,7 @@
                     <p class="text-sm text-slate-400">Reintenta pagos fallidos</p>
                 </Link>
 
-                <Link :href="route('modulo_8.reportes.conciliacion')" class="p-6 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl hover:border-purple-500 transition group">
+                <Link :href="route('modulo_8.reportes.conciliacion', { periodo: periodo })" class="p-6 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl hover:border-purple-500 transition group">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-base font-semibold text-white group-hover:text-purple-400 transition">Conciliación</h3>
                         <svg class="w-5 h-5 text-slate-400 group-hover:text-purple-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,7 +163,7 @@
 </template>
 
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 
 const props = defineProps({
