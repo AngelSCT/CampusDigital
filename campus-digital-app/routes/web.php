@@ -416,3 +416,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 });
+
+// ── MÓDULO CARRITO — Panel de Administración (requiere auth + rol admin_carrito) ──
+Route::middleware(['auth', 'role.cart.admin'])
+    ->prefix('admin/cart')
+    ->name('admin.cart.')
+    ->group(function () {
+        Route::get('solicitudes',                              [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'index'])   ->name('solicitudes.index');
+        Route::get('solicitudes/{solicitud}',                  [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'show'])    ->name('solicitudes.show');
+        Route::post('solicitudes/{solicitud}/aprobar',         [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'aprobar']) ->name('solicitudes.aprobar');
+        Route::post('solicitudes/{solicitud}/rechazar',        [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'rechazar'])->name('solicitudes.rechazar');
+        Route::get('solicitudes/{folio}/token',                [\App\Http\Controllers\Admin\Cart\TokenEntregaController::class,'show'])    ->name('token.show');
+    });
