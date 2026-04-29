@@ -143,6 +143,28 @@ Route::middleware('api.key')->prefix('v1/carrito')->group(function () {
     Route::get('usuarios/{id}/historial',[CartApiController::class, 'getOrderHistory']);
 });
 
+// ── MÓDULO CARRITO — Endpoints privados (requieren JWT de módulo) ──────────
+Route::middleware('auth.module.jwt')->prefix('cart')->group(function () {
+    Route::post  ('carritos',                                [\App\Http\Controllers\Api\Cart\CarritoController::class, 'store']);
+    Route::get   ('carritos/{uuid}',                         [\App\Http\Controllers\Api\Cart\CarritoController::class, 'show']);
+    Route::post  ('carritos/{uuid}/items',                   [\App\Http\Controllers\Api\Cart\ItemController::class,    'store']);
+    Route::delete('carritos/{uuid}/items/{item_id}',         [\App\Http\Controllers\Api\Cart\ItemController::class,    'destroy']);
+    Route::post  ('carritos/{uuid}/checkout',                [\App\Http\Controllers\Api\Cart\CheckoutController::class,'checkout']);
+    Route::post  ('carritos/{uuid}/cancelar',                [\App\Http\Controllers\Api\Cart\CarritoController::class, 'cancelar']);
+    Route::get   ('historico',                               [\App\Http\Controllers\Api\Cart\CarritoController::class, 'historico']);
+    Route::post  ('carritos/{uuid}/items/{item_id}/devolver',[\App\Http\Controllers\Api\Cart\ItemController::class,    'devolver']);
+});
+
+// ── MÓDULO CARRITO — Token refresh (sin auth.module.jwt; recibe refresh, no access) ──
+Route::post('cart/tokens/refresh', [\App\Http\Controllers\Cart\TokenRefreshController::class, 'refresh']);
+
+// ── MÓDULO CARRITO — APIs Públicas (sin autenticación) ─────────────────────
+Route::prefix('public')->group(function () {
+    Route::get('categorias', [\App\Http\Controllers\Cart\CategoriasPublicController::class, 'index']);
+    Route::post('modulos/solicitud', [\App\Http\Controllers\Cart\SolicitudModuloController::class, 'store']);
+    Route::get('modulos/solicitud/{folio}/estado', [\App\Http\Controllers\Cart\SolicitudModuloController::class, 'estado']);
+});
+
 Route::prefix('rfid')->group(function () {
 
     Route::post('/auth', [RfidApiController::class, 'auth']);

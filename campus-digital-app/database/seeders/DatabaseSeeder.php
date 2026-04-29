@@ -14,5 +14,11 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             CarritoSeeder::class,
         ]);
+
+        // CategoriasSeeder inserta datos base del módulo Carrito-servicio.
+        // Usa updateOrCreate, por lo que es idempotente y seguro repetirlo.
+        if (!app()->environment('production')) {
+            $this->call([CategoriasSeeder::class]);
+        }
     }
 }

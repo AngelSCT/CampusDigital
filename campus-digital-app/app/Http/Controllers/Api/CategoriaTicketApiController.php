@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CategoriaTicketResource;
 use App\Models\CategoriaTicket;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class CategoriaTicketApiController extends Controller
     // GET /api/categorias-ticket
     public function index()
     {
-        return response()->json(
+        return CategoriaTicketResource::collection(
             CategoriaTicket::with('area')->whereNull('deleted_at')->get()
         );
     }
@@ -19,9 +20,9 @@ class CategoriaTicketApiController extends Controller
     // GET /api/categorias-ticket/{id}
     public function show($id)
     {
-        $categoria = CategoriaTicket::with('area')->whereNull('deleted_at')->findOrFail($id);
-
-        return response()->json($categoria);
+        return new CategoriaTicketResource(
+            CategoriaTicket::with('area')->whereNull('deleted_at')->findOrFail($id)
+        );
     }
 
     // POST /api/categorias-ticket
@@ -35,7 +36,7 @@ class CategoriaTicketApiController extends Controller
 
         $categoria = CategoriaTicket::create($request->only(['id_area', 'nombre_categoria', 'tiempo_sla_horas']));
 
-        return response()->json($categoria->load('area'), 201);
+        return (new CategoriaTicketResource($categoria->load('area')))->response()->setStatusCode(201);
     }
 
     // PUT /api/categorias-ticket/{id}
@@ -51,7 +52,7 @@ class CategoriaTicketApiController extends Controller
 
         $categoria->update($request->only(['id_area', 'nombre_categoria', 'tiempo_sla_horas']));
 
-        return response()->json($categoria->fresh()->load('area'));
+        return new CategoriaTicketResource($categoria->fresh()->load('area'));
     }
 
     // DELETE /api/categorias-ticket/{id}

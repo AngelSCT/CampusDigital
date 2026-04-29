@@ -31,9 +31,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
-            'permission' => \App\Http\Middleware\CheckPermission::class,
-            'api.key'    => \App\Http\Middleware\ApiKeyMiddleware::class,  
+            'role'            => \App\Http\Middleware\CheckRole::class,
+            'permission'      => \App\Http\Middleware\CheckPermission::class,
+            'api.key'         => \App\Http\Middleware\ApiKeyMiddleware::class,
+            'auth.module.jwt' => \App\Http\Middleware\AuthModuleJwt::class,
         ]);
 
     })
