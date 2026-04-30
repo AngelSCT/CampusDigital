@@ -27,32 +27,51 @@ const estadoActual = ref(props.pedido.estado)
 const showCancelar = ref(false)
 const formCancelar = useForm({ motivo: '' })
 
-// Polling cada 20 seg si el pedido no está en estado terminal
+// ── Polling cada 10 seg si el pedido NO está en estado terminal ──
 let interval = null
 const terminales = ['entregado', 'cancelado']
+const polling = ref(false)
+const flashCambio = ref(false)
 
 function iniciarPolling() {
     if (terminales.includes(estadoActual.value)) return
+    polling.value = true
     interval = setInterval(async () => {
         try {
-            const res = await fetch(route('pedidos.estado-json', props.pedido.id))
+            // ⬇️ FIX: URL directa en lugar de route() — más confiable
+            const res = await fetch(`/pedidos/${props.pedido.id}/estado-json`, {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin',
+            })
+            if (!res.ok) return
             const json = await res.json()
+
             if (json.success && json.data.estado !== estadoActual.value) {
+                // Animación flash al detectar cambio
+                flashCambio.value = true
+                setTimeout(() => { flashCambio.value = false }, 1500)
+
                 estadoActual.value = json.data.estado
+
+                // Si el cambio fue al estado terminal, recargar para traer el historial nuevo
                 if (terminales.includes(json.data.estado)) {
                     clearInterval(interval)
-                    router.reload({ only: ['pedido'] })
+                    polling.value = false
                 }
+                // En cualquier cambio, recargar el pedido para traer el historial actualizado
+                router.reload({ only: ['pedido'] })
             }
-        } catch (_) {}
-    }, 20000)
+        } catch (err) {
+            console.error('Polling error:', err)
+        }
+    }, 10000)
 }
 
 onMounted(iniciarPolling)
 onUnmounted(() => clearInterval(interval))
 
 function cancelar() {
-    formCancelar.post(route('pedidos.cancelar', props.pedido.id), {
+    formCancelar.post(`/pedidos/${props.pedido.id}/cancelar`, {
         onSuccess: () => { showCancelar.value = false; formCancelar.reset() }
     })
 }
@@ -83,7 +102,7 @@ const page = usePage()
 
             <!-- Breadcrumb -->
             <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                <Link :href="route('pedidos.index')" class="hover:text-indigo-600">Mis pedidos</Link>
+                <a href="/pedidos" class="hover:text-indigo-600">Mis pedidos</a>
                 <span>/</span>
                 <span class="text-gray-800 font-medium">{{ pedido.numero_folio }}</span>
             </div>
@@ -101,9 +120,24 @@ const page = usePage()
                         <h1 class="text-xl font-bold text-gray-900">{{ pedido.numero_folio }}</h1>
                         <p class="text-sm text-gray-500 mt-1 capitalize">{{ pedido.modulo }} · {{ formatFecha(pedido.created_at) }}</p>
                     </div>
-                    <span :class="['px-3 py-1.5 rounded-full text-sm font-semibold', colores[estadoActual]]">
-                        {{ iconos[estadoActual] }} {{ etiquetas[estadoActual] }}
-                    </span>
+
+                    <!-- Badge de estado + indicador de polling en vivo -->
+                    <div class="flex flex-col items-end gap-1.5">
+                        <span :class="[
+                            'px-3 py-1.5 rounded-full text-sm font-semibold transition-all duration-500',
+                            colores[estadoActual],
+                            flashCambio ? 'ring-4 ring-purple-400 scale-110' : ''
+                        ]">
+                            {{ iconos[estadoActual] }} {{ etiquetas[estadoActual] }}
+                        </span>
+                        <div v-if="polling" class="flex items-center gap-1.5 text-xs text-gray-500">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                            Actualizando en vivo
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Stepper de estados -->
@@ -192,7 +226,6 @@ const page = usePage()
                         :key="h.id"
                         class="mb-6 ms-6 last:mb-0"
                     >
-                        <!-- Círculo del timeline (absoluto sobre la línea) -->
                         <span
                             :class="[
                                 'absolute -start-4 flex h-8 w-8 items-center justify-center rounded-full ring-4 ring-white text-sm shadow-sm',
@@ -204,7 +237,6 @@ const page = usePage()
                             {{ iconos[h.estado_nuevo] }}
                         </span>
 
-                        <!-- Tarjeta del evento -->
                         <div class="bg-gray-50 border border-gray-100 rounded-lg p-3">
                             <div class="flex flex-wrap items-center gap-2 mb-1">
                                 <span
@@ -224,7 +256,6 @@ const page = usePage()
                                 </span>
                             </div>
 
-                            <!-- Tiempo transcurrido desde el evento anterior -->
                             <p
                                 v-if="i > 0 && tiempoTranscurrido(pedido.historial[i-1].created_at, h.created_at)"
                                 class="text-xs text-indigo-600 italic"
@@ -246,7 +277,6 @@ const page = usePage()
                         </div>
                     </li>
 
-                    <!-- Punto de "estado actual" si no es terminal -->
                     <li
                         v-if="!terminales.includes(pedido.estado)"
                         class="ms-6 relative"
