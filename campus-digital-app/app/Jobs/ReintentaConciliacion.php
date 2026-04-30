@@ -6,8 +6,6 @@ use App\Models\Cart\Bitacora;
 use App\Models\Cart\Carrito;
 use App\Models\Cart\ConciliacionPendiente;
 use App\Modules\Cart\Services\SaldoClient;
-use App\Modules\Cart\Services\SaldoConfirmed;
-use App\Modules\Cart\Services\SaldoInsufficientFunds;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -20,6 +18,10 @@ class ReintentaConciliacion implements ShouldQueue
 
     public function __construct(public readonly ConciliacionPendiente $conciliacion) {}
 
+    /**
+     * Usa cargoForzoso() directamente porque el servicio ya fue entregado
+     * y la deuda necesita cobrarse sin importar el saldo disponible.
+     */
     public function handle(SaldoClient $saldo): void
     {
         $conciliacion = $this->conciliacion->fresh();
@@ -28,23 +30,20 @@ class ReintentaConciliacion implements ShouldQueue
             return;
         }
 
-        $result = $saldo->reservar(
+        $ok = $saldo->cargoForzoso(
             $conciliacion->usuario_ref,
             (float) $conciliacion->monto,
-            $conciliacion->carrito_uuid
+            $conciliacion->carrito_uuid,
+            'conciliacion_diferida',
+            Carrito::ESTADO_CONFIRMADO_PENDIENTE_CONCILIACION,
         );
 
-        if ($result instanceof SaldoConfirmed) {
+        if ($ok) {
             $this->onConfirmado($conciliacion);
             return;
         }
 
-        if ($result instanceof SaldoInsufficientFunds) {
-            $this->onDeuda($conciliacion, $saldo);
-            return;
-        }
-
-        // SaldoUnavailable: incrementar intentos y reagendar o escalar.
+        // cargoForzoso() falló → Saldo no disponible → reagendar o escalar.
         $this->onNoDisponible($conciliacion);
     }
 
@@ -68,32 +67,10 @@ class ReintentaConciliacion implements ShouldQueue
         ]);
     }
 
-    private function onDeuda(ConciliacionPendiente $conciliacion, SaldoClient $saldo): void
-    {
-        $conciliacion->update([
-            'estado_conciliacion' => ConciliacionPendiente::ESTADO_DEUDA,
-            'ultimo_intento_at'   => now(),
-        ]);
-
-        Carrito::where('uuid', $conciliacion->carrito_uuid)->update([
-            'estado' => Carrito::ESTADO_REVERTIDO,
-        ]);
-
-        // Intentar registrar cargo forzoso (saldo negativo) en el módulo Saldo.
-        $saldo->cargoForzoso($conciliacion->usuario_ref, (float) $conciliacion->monto, $conciliacion->carrito_uuid);
-
-        Bitacora::create([
-            'accion'       => 'conciliacion.deuda',
-            'modulo_id'    => $conciliacion->modulo_id,
-            'carrito_uuid' => $conciliacion->carrito_uuid,
-            'payload'      => ['monto' => $conciliacion->monto, 'usuario_ref' => $conciliacion->usuario_ref],
-        ]);
-    }
-
     private function onNoDisponible(ConciliacionPendiente $conciliacion): void
     {
-        $intentosNuevos  = $conciliacion->intentos + 1;
-        $reintentosMax   = (int) config('cart.saldo.reintentos_max', 5);
+        $intentosNuevos = $conciliacion->intentos + 1;
+        $reintentosMax  = (int) config('cart.saldo.reintentos_max', 5);
 
         if ($intentosNuevos >= $reintentosMax) {
             $conciliacion->update([
@@ -116,9 +93,9 @@ class ReintentaConciliacion implements ShouldQueue
         $proximoIntento = now()->addMinutes($backoffMinutos);
 
         $conciliacion->update([
-            'intentos'            => $intentosNuevos,
-            'ultimo_intento_at'   => now(),
-            'proximo_intento_at'  => $proximoIntento,
+            'intentos'           => $intentosNuevos,
+            'ultimo_intento_at'  => now(),
+            'proximo_intento_at' => $proximoIntento,
         ]);
 
         static::dispatch($conciliacion->fresh())->delay($proximoIntento);

@@ -1,6 +1,6 @@
 # Módulo Carrito — Documento de Diseño de Arquitectura
 
-> Versión 1.1 · 2026-04-28  
+> Versión 1.2 · 2026-04-29  
 > Equipo: Módulo Carrito — Proyecto Integrador CampusDigital  
 > Stack: Laravel 11 · Inertia.js · Vue 3 · Axios · PHPUnit
 
@@ -15,6 +15,16 @@
 5. [Contrato del Control Vue](#5-contrato-del-control-vue)
 6. [Plan de Pruebas PHPUnit](#6-plan-de-pruebas-phpunit)
 7. [Riesgos de Seguridad y Mitigaciones](#7-riesgos-de-seguridad-y-mitigaciones)
+
+---
+
+## Changelog v1.2
+
+| # | Cambio | Secciones tocadas |
+|---|--------|-------------------|
+| C7 | Contrato definitivo con módulo Saldo: 4 endpoints, auth interna, ciclo reservar/confirmar/liberar | Anexo C (nuevo), SaldoClient, CheckoutService, ReintentaConciliacion |
+
+**C7 — Contrato definitivo de integración con módulo Saldo.** Se amplía `SaldoClient` con cuatro métodos (`reservar`, `confirmar`, `liberar`, `cargoForzoso`). `CheckoutService::confirmar()` ahora cierra el ciclo reservar → confirmar con rollback automático vía `liberar()` en caso de excepción. `ReintentaConciliacion` usa `cargoForzoso()` directamente (no `reservar()`) porque el servicio ya fue entregado. Todas las llamadas llevan `X-Internal-Token`. Ver contrato completo en **Anexo C**.
 
 ---
 
@@ -1322,4 +1332,115 @@ return [
 ---
 las tablas se prefijaron con cart_ para coexistir con otros módulos del monorepo. Los modelos hacen el mapeo vía $table." Así queda documentado y la evaluación cruzada no te lo señala como inconsistencia.
 
-*Fin del Documento de Diseño v1.1*
+---
+
+## Anexo C — Contrato de integración con módulo Saldo [v1.2 — C7]
+
+Todas las llamadas incluyen el header:
+
+```
+X-Internal-Token: <valor de config('cart.saldo.internal_token') / env CART_SALDO_INTERNAL_TOKEN>
+```
+
+---
+
+### C.1 Reservar fondos
+
+```
+POST /api/internal/saldo/reservar
+```
+
+**Body:**
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `usuario_ref` | string | Matrícula o identificador del usuario |
+| `monto` | decimal | Monto a reservar (MXN) |
+| `carrito_uuid` | string | UUID del carrito |
+| `modulo_slug` | string | Slug del módulo cliente que solicita |
+| `concepto` | string | Descripción breve del cobro (ej. `"checkout"`) |
+
+**Respuestas:**
+
+| HTTP | Body | Significado |
+|------|------|-------------|
+| 200 | `{ ok: true, reserva_id, saldo_disponible_post_reserva, expira_at }` | Fondos reservados |
+| 402 | `{ ok: false, motivo: "fondos_insuficientes", saldo_disponible }` | Saldo insuficiente |
+| 422 | `{ ok: false, motivo: "..." }` | Error de validación |
+| 503 | `{ ok: false, motivo: "servicio_no_disponible" }` | Saldo no disponible |
+
+---
+
+### C.2 Confirmar reserva
+
+```
+POST /api/internal/saldo/confirmar/{reserva_id}
+```
+
+**Body:**
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `carrito_uuid` | string | UUID del carrito asociado |
+
+**Respuestas:**
+
+| HTTP | Body | Significado |
+|------|------|-------------|
+| 200 | `{ ok: true, movimiento_id, saldo_post_cargo }` | Cargo aplicado |
+| 409 | `{ ok: false, motivo: "reserva_expirada" \| "reserva_ya_consumida" }` | Reserva inválida |
+
+---
+
+### C.3 Liberar reserva
+
+```
+POST /api/internal/saldo/liberar/{reserva_id}
+```
+
+Body: vacío.
+
+**Respuestas:**
+
+| HTTP | Body | Significado |
+|------|------|-------------|
+| 200 | `{ ok: true, saldo_restaurado }` | Fondos devueltos |
+
+---
+
+### C.4 Cargo forzoso
+
+```
+POST /api/internal/saldo/cargo-forzoso
+```
+
+Usado exclusivamente por `ReintentaConciliacion` para cobrar el servicio ya entregado, pudiendo dejar el saldo en negativo.
+
+**Body:**
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `usuario_ref` | string | Matrícula del usuario |
+| `monto` | decimal | Monto a cargar |
+| `carrito_uuid` | string | UUID del carrito |
+| `concepto` | string | Descripción (ej. `"conciliacion_diferida"`) |
+| `carrito_estado` | string | Estado actual del carrito en el sistema |
+
+**Respuestas:**
+
+| HTTP | Body | Significado |
+|------|------|-------------|
+| 200 | `{ ok: true, movimiento_id, saldo_resultante }` | Cargo registrado |
+
+---
+
+### C.5 Flujo de ciclo de vida de una reserva
+
+```
+reservar() ──► confirmar()          ← camino feliz
+     │
+     └──► liberar()                 ← rollback por excepción inesperada
+```
+
+`CheckoutService` garantiza que si ocurre cualquier excepción después de `reservar()` y antes de que `confirmar()` retorne normalmente, se invoca `liberar()` en un bloque `finally`.
+
+---
+
+*Fin del Documento de Diseño v1.2*

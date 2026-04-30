@@ -54,33 +54,61 @@ class SaldoIntegrationTest extends CartTestCase
     // ─── Helpers ─────────────────────────────────────────────────────────────
 
     /**
-     * Inyecta un SaldoClient stub en el contenedor para aislar los tests de checkout
-     * de la implementación HTTP real. Más fiable que Http::fake() cuando SaldoClient
-     * es resuelto por el contenedor durante una solicitud HTTP de prueba.
+     * Inyecta un SaldoClient stub en el contenedor.
+     * Todos los métodos deben estar implementados para evitar llamadas a la red.
      */
-    private function bindSaldoClientStub(SaldoResult $resultReservar, bool $cargoForzoso = true): void
-    {
-        $stub = new class($resultReservar, $cargoForzoso) extends SaldoClient {
+    private function bindSaldoClientStub(
+        SaldoResult $resultReservar,
+        bool        $confirmar     = true,
+        bool        $liberar       = true,
+        bool        $cargoForzoso  = true,
+    ): void {
+        $stub = new class($resultReservar, $confirmar, $liberar, $cargoForzoso) extends SaldoClient {
+            public bool $liberarLlamado   = false;
+            public bool $confirmarLlamado = false;
             public function __construct(
                 private readonly SaldoResult $r,
+                private readonly bool $conf,
+                private readonly bool $lib,
                 private readonly bool $cargo,
             ) {}
-            public function reservar(string $u, float $m, string $c): SaldoResult { return $this->r; }
-            public function cargoForzoso(string $u, float $m, string $c): bool   { return $this->cargo; }
+            public function reservar(string $u, float $m, string $c, string $slug, string $concepto): SaldoResult
+            {
+                return $this->r;
+            }
+            public function confirmar(string $reservaId, string $carritoUuid): bool
+            {
+                $this->confirmarLlamado = true;
+                return $this->conf;
+            }
+            public function liberar(string $reservaId): bool
+            {
+                $this->liberarLlamado = true;
+                return $this->lib;
+            }
+            public function cargoForzoso(string $u, float $m, string $c, string $concepto, ?string $estado = null): bool
+            {
+                return $this->cargo;
+            }
         };
         $this->app->instance(SaldoClient::class, $stub);
     }
 
     /** Crea un SaldoClient stub anónimo para uso directo en tests de job. */
-    private function makeSaldoClientStub(SaldoResult $resultReservar, bool $cargoForzoso = true): SaldoClient
+    private function makeSaldoClientStub(bool $cargoForzoso = true): SaldoClient
     {
-        return new class($resultReservar, $cargoForzoso) extends SaldoClient {
-            public function __construct(
-                private readonly SaldoResult $r,
-                private readonly bool $cargo,
-            ) {}
-            public function reservar(string $u, float $m, string $c): SaldoResult { return $this->r; }
-            public function cargoForzoso(string $u, float $m, string $c): bool   { return $this->cargo; }
+        return new class($cargoForzoso) extends SaldoClient {
+            public function __construct(private readonly bool $cargo) {}
+            public function reservar(string $u, float $m, string $c, string $slug, string $concepto): SaldoResult
+            {
+                return new SaldoUnavailable();
+            }
+            public function confirmar(string $reservaId, string $carritoUuid): bool { return true; }
+            public function liberar(string $reservaId): bool                        { return true; }
+            public function cargoForzoso(string $u, float $m, string $c, string $concepto, ?string $estado = null): bool
+            {
+                return $this->cargo;
+            }
         };
     }
 
@@ -132,7 +160,7 @@ class SaldoIntegrationTest extends CartTestCase
     #[Test]
     public function checkout_con_saldo_confirmado_pasa_a_estado_confirmado(): void
     {
-        $this->bindSaldoClientStub(new SaldoConfirmed('RSRV-001'));
+        $this->bindSaldoClientStub(new SaldoConfirmed('RSRV-001', '2026-05-01T00:00:00Z'));
 
         $carrito = $this->crearCarritoConSaldo();
         $this->agregarItem($carrito, 'prestamo', 50.00);
@@ -166,7 +194,6 @@ class SaldoIntegrationTest extends CartTestCase
     {
         $this->bindSaldoClientStub(new SaldoUnavailable());
 
-        // 'reserva' tiene permite_pago_diferido=false
         $carrito = $this->crearCarritoConSaldo();
         $this->agregarItem($carrito, 'reserva', 100.00);
         $carrito->update(['total' => '100.00']);
@@ -182,7 +209,6 @@ class SaldoIntegrationTest extends CartTestCase
     {
         $this->bindSaldoClientStub(new SaldoUnavailable());
 
-        // 'prestamo' tiene permite_pago_diferido=true
         $carrito = $this->crearCarritoConSaldo();
         $this->agregarItem($carrito, 'prestamo', 50.00);
         $carrito->update(['total' => '50.00']);
@@ -205,7 +231,6 @@ class SaldoIntegrationTest extends CartTestCase
         $this->bindSaldoClientStub(new SaldoUnavailable());
         config(['cart.saldo.tope_pendiente_por_usuario' => 50.0]);
 
-        // Usuario ya tiene $45 pendientes
         ConciliacionPendiente::create([
             'carrito_uuid'        => 'uuid-anterior',
             'modulo_id'           => $this->modulo->id,
@@ -214,7 +239,6 @@ class SaldoIntegrationTest extends CartTestCase
             'estado_conciliacion' => ConciliacionPendiente::ESTADO_PENDIENTE,
         ]);
 
-        // Checkout de $30 → $75 > $50
         $carrito = $this->crearCarritoConSaldo('MAT-SALDO');
         $this->agregarItem($carrito, 'prestamo', 30.00);
         $carrito->update(['total' => '30.00']);
@@ -231,7 +255,6 @@ class SaldoIntegrationTest extends CartTestCase
         $this->bindSaldoClientStub(new SaldoUnavailable());
         config(['cart.saldo.tope_pendiente_global' => 100.0]);
 
-        // Globalmente ya hay $90 pendientes
         ConciliacionPendiente::create([
             'carrito_uuid'        => 'uuid-global',
             'modulo_id'           => $this->modulo->id,
@@ -250,61 +273,102 @@ class SaldoIntegrationTest extends CartTestCase
             ->assertJsonPath('error', 'SALDO_NO_DISPONIBLE');
     }
 
+    // ─── Nuevos tests de ciclo reservar/confirmar/liberar ────────────────────
+
+    #[Test]
+    public function reservar_exitoso_pero_confirmar_falla_devuelve_carrito_abierto_y_registra_incidente(): void
+    {
+        // confirmar() devuelve false (409 simulado)
+        $this->bindSaldoClientStub(
+            resultReservar: new SaldoConfirmed('RSRV-FAIL', '2026-05-01T00:00:00Z'),
+            confirmar:      false,
+        );
+
+        $carrito = $this->crearCarritoConSaldo();
+        $this->agregarItem($carrito, 'prestamo', 50.00);
+        $carrito->update(['total' => '50.00']);
+
+        $this->withToken($this->token)
+            ->postJson("/api/cart/carritos/{$carrito->uuid}/checkout")
+            ->assertOk();
+
+        // El carrito debe haber vuelto a abierto
+        $this->assertEquals(Carrito::ESTADO_ABIERTO, $carrito->fresh()->estado);
+
+        // Incidente registrado en bitácora
+        $this->assertDatabaseHas('cart_bitacora', [
+            'accion'       => 'saldo.confirmar_fallido',
+            'carrito_uuid' => $carrito->uuid,
+        ]);
+    }
+
+    #[Test]
+    public function excepcion_entre_reservar_y_confirmar_llama_a_liberar_para_rollback(): void
+    {
+        // Stub que lanza excepción en confirmarDirecto simulando fallo antes de confirmar()
+        $liberarLlamado = false;
+        $stub = new class($liberarLlamado) extends SaldoClient {
+            public bool $liberarLlamado = false;
+            public function reservar(string $u, float $m, string $c, string $slug, string $concepto): SaldoResult
+            {
+                return new SaldoConfirmed('RSRV-EXC');
+            }
+            public function confirmar(string $reservaId, string $carritoUuid): bool
+            {
+                // Simula que confirmar() mismo lanza excepción inesperada
+                throw new \RuntimeException('Error inesperado durante confirmar');
+            }
+            public function liberar(string $reservaId): bool
+            {
+                $this->liberarLlamado = true;
+                return true;
+            }
+            public function cargoForzoso(string $u, float $m, string $c, string $concepto, ?string $estado = null): bool
+            {
+                return true;
+            }
+        };
+        $this->app->instance(SaldoClient::class, $stub);
+
+        $carrito = $this->crearCarritoConSaldo();
+        $this->agregarItem($carrito, 'prestamo', 50.00);
+        $carrito->update(['total' => '50.00']);
+
+        // La excepción debe propagarse (500)
+        $this->withToken($this->token)
+            ->postJson("/api/cart/carritos/{$carrito->uuid}/checkout")
+            ->assertStatus(500);
+
+        // liberar() debe haber sido llamado para hacer rollback de la reserva
+        $this->assertTrue($stub->liberarLlamado, 'liberar() debe ser llamado al ocurrir una excepción inesperada');
+    }
+
     // ─── Tests del Job ReintentaConciliacion ─────────────────────────────────
 
     #[Test]
-    public function job_con_saldo_confirmando_pasa_carrito_a_confirmado(): void
+    public function job_con_cargo_forzoso_exitoso_pasa_carrito_a_confirmado(): void
     {
         $conciliacion = $this->crearConciliacion();
         $job          = new ReintentaConciliacion($conciliacion);
-        $job->handle($this->makeSaldoClientStub(new SaldoConfirmed('RSRV-JOB-001')));
+        $job->handle($this->makeSaldoClientStub(cargoForzoso: true));
 
         $conciliacion->refresh();
         $this->assertEquals(ConciliacionPendiente::ESTADO_EXITOSA, $conciliacion->estado_conciliacion);
 
         $carrito = Carrito::where('uuid', $conciliacion->carrito_uuid)->first();
         $this->assertEquals(Carrito::ESTADO_CONFIRMADO, $carrito->estado);
+
+        $this->assertDatabaseHas('cart_bitacora', ['accion' => 'conciliacion.exitosa']);
     }
 
     #[Test]
-    public function job_con_fondos_insuficientes_revierte_carrito_y_llama_cargo_forzoso(): void
-    {
-        $cargoCalled  = false;
-        $stub = new class(new SaldoInsufficientFunds(), $cargoCalled) extends SaldoClient {
-            public bool $cargoCalled = false;
-            public function reservar(string $u, float $m, string $c): SaldoResult
-            {
-                return new SaldoInsufficientFunds();
-            }
-            public function cargoForzoso(string $u, float $m, string $c): bool
-            {
-                $this->cargoCalled = true;
-                return true;
-            }
-        };
-
-        $conciliacion = $this->crearConciliacion();
-        $job          = new ReintentaConciliacion($conciliacion);
-        $job->handle($stub);
-
-        $conciliacion->refresh();
-        $this->assertEquals(ConciliacionPendiente::ESTADO_DEUDA, $conciliacion->estado_conciliacion);
-
-        $carrito = Carrito::where('uuid', $conciliacion->carrito_uuid)->first();
-        $this->assertEquals(Carrito::ESTADO_REVERTIDO, $carrito->estado);
-
-        $this->assertTrue($stub->cargoCalled, 'cargoForzoso() debe ser llamado');
-        $this->assertDatabaseHas('cart_bitacora', ['accion' => 'conciliacion.deuda']);
-    }
-
-    #[Test]
-    public function job_con_saldo_caido_incrementa_intentos_y_reagenda(): void
+    public function job_con_cargo_forzoso_fallido_incrementa_intentos_y_reagenda(): void
     {
         Queue::fake();
 
         $conciliacion = $this->crearConciliacion(intentos: 0);
         $job          = new ReintentaConciliacion($conciliacion);
-        $job->handle($this->makeSaldoClientStub(new SaldoUnavailable()));
+        $job->handle($this->makeSaldoClientStub(cargoForzoso: false));
 
         $conciliacion->refresh();
         $this->assertEquals(1, $conciliacion->intentos);
@@ -319,10 +383,9 @@ class SaldoIntegrationTest extends CartTestCase
     {
         config(['cart.saldo.reintentos_max' => 5]);
 
-        // intentos=4 → tras handle() será 5 = reintentos_max → revision manual
         $conciliacion = $this->crearConciliacion(intentos: 4);
         $job          = new ReintentaConciliacion($conciliacion);
-        $job->handle($this->makeSaldoClientStub(new SaldoUnavailable()));
+        $job->handle($this->makeSaldoClientStub(cargoForzoso: false));
 
         $conciliacion->refresh();
         $this->assertEquals(5, $conciliacion->intentos);
