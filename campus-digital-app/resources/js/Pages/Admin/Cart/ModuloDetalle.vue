@@ -113,7 +113,7 @@
 <script setup>
 import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import AdminLayout from '@/Layouts/AuthLayout.vue';
 
 const props = defineProps({
     modulo: Object,

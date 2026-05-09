@@ -24,6 +24,7 @@ abstract class AdminCartTestCase extends CartTestCase
         $this->setUpJwtConfig();
         $this->createAuthTables();
         $this->seedCategorias();
+
     }
 
     // ─── Auth tables ─────────────────────────────────────────────────────────

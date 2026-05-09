@@ -24,6 +24,11 @@ class HandleInertiaRequests extends Middleware
      */
     public function version(Request $request): ?string
     {
+        // Disable asset version checking in tests to avoid 409 when manifest exists.
+        if (app()->environment('testing')) {
+            return null;
+        }
+
         return parent::version($request);
     }
 

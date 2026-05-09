@@ -28,4 +28,12 @@ return [
         // Reintentos máximos antes de marcar como requiere_revision_manual
         'reintentos_max'             => (int) env('CART_SALDO_REINTENTOS_MAX', 5),
     ],
+
+    // Configuración para módulos CLIENTES que consumen la API del Carrito
+    'client' => [
+        // JWT emitido por el panel admin al aprobar la solicitud del módulo
+        'module_token'  => env('CART_CLIENT_MODULE_TOKEN'),
+        'refresh_token' => env('CART_CLIENT_REFRESH_TOKEN'),
+        // URL base: ahora en config/services.php → services.cart.url (CART_API_URL)
+    ],
 ];

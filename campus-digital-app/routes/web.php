@@ -434,3 +434,16 @@ Route::middleware(['auth', 'role.cart.admin'])
         Route::post('modulos/{modulo}/forzar-refresh',         [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'forzarRefresh'])       ->name('modulos.forzar-refresh');
         Route::get('bitacora',                                 [\App\Http\Controllers\Admin\Cart\BitacoraController::class,   'index'])              ->name('bitacora.index');
     });
+
+// ── DEMO — Módulo Biblioteca (integración de referencia para equipos clientes) ──
+Route::prefix('demo/biblioteca')->name('demo.biblioteca.')->group(function () {
+    Route::get('prestamo',                              [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'index'])           ->name('prestamo');
+    Route::prefix('cart-proxy')->name('cart-proxy.')->group(function () {
+        Route::post('carritos',                         [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyCreateCart']) ->name('carritos.create');
+        Route::get('carritos/{uuid}',                   [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyGetCart'])    ->name('carritos.show');
+        Route::post('carritos/{uuid}/items',            [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyAddItem'])    ->name('carritos.items.add');
+        Route::delete('carritos/{uuid}/items/{itemId}', [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyRemoveItem']) ->name('carritos.items.remove');
+        Route::post('carritos/{uuid}/checkout',         [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyCheckout'])   ->name('carritos.checkout');
+        Route::post('carritos/{uuid}/cancelar',         [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyCancel'])     ->name('carritos.cancel');
+    });
+});
