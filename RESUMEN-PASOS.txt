@@ -34,7 +34,7 @@ PASO 6: AHORA CREAR EL ARCHIVO .ENV
 PASO 7: EJECUTAR LAS MIGRACIONES Y LOS SEEDERS: 
     php artisan migrate
     php artisan db:seed
-    php artisan storage:link        NOTA:(SI ESTE FALLA O DA ERROR IGNORAR)
+    php artisan storage:link        NOTA:(SI ESTE FALLA O DA ERROR IGNORAR);
 
 PASO 8(OPCIONAL): CORRER SEEDERS ADICIONALES [ESTOS SOLO SON PARA TENER DATOS DE PRUEBA ESTE SE PUEDE OMITIR]
     php artisan db:seed --class=RfidDemoSeeder
