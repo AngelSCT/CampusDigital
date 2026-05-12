@@ -18,7 +18,6 @@ class UsuarioController extends Controller
     {        
         $query = Usuario::with(['roles']);
 
-        // Filtros
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -46,7 +45,6 @@ class UsuarioController extends Controller
             $query->where('email_verificado', $request->verificado === 'si');
         }
 
-        // Ordenamiento
         $sortField = $request->get('sort', 'created_at');
         $sortDirection = $request->get('direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
@@ -91,7 +89,6 @@ class UsuarioController extends Controller
 
         $usuario->roles()->attach($validated['roles']);
 
-        // Registrar en bitácora
         \App\Models\ActividadBitacora::create([
             'usuario_id' => auth()->id(),
             'accion' => 'crear_usuario',
@@ -142,7 +139,6 @@ class UsuarioController extends Controller
         $usuario->update($updateData);
         $usuario->roles()->sync($validated['roles']);
 
-        // Registrar en bitácora
         \App\Models\ActividadBitacora::create([
             'usuario_id' => auth()->id(),
             'accion' => 'actualizar_usuario',
@@ -166,7 +162,6 @@ class UsuarioController extends Controller
         $email = $usuario->email;
         $usuario->delete();
 
-        // Registrar en bitácora
         \App\Models\ActividadBitacora::create([
             'usuario_id' => auth()->id(),
             'accion' => 'eliminar_usuario',
@@ -194,7 +189,6 @@ class UsuarioController extends Controller
 
         $accion = $usuario->bloqueado ? 'bloqueado' : 'desbloqueado';
 
-        // Registrar en bitácora
         \App\Models\ActividadBitacora::create([
             'usuario_id' => auth()->id(),
             'accion' => 'cambiar_estado_usuario',
@@ -268,15 +262,12 @@ public function exportByRole(Request $request)
         
         fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
         
-        // Obtener todos los roles activos
         $roles = Rol::where('activo', true)->orderBy('nombre')->get();
         
         foreach ($roles as $rol) {
-            // Encabezado del rol
             fputcsv($file, ["ROL: " . strtoupper($rol->nombre)]);
-            fputcsv($file, ['']); // Línea vacía
+            fputcsv($file, ['']); 
             
-            // Encabezados de columnas
             fputcsv($file, [
                 'ID',
                 'Nombre Completo',
@@ -288,14 +279,12 @@ public function exportByRole(Request $request)
                 'Último Acceso'
             ]);
             
-            // Obtener usuarios de este rol
             $usuarios = Usuario::whereHas('roles', function($query) use ($rol) {
                 $query->where('rol.id', $rol->id);
             })
             ->orderBy('nombre')
             ->get();
             
-            // Datos de usuarios
             foreach ($usuarios as $usuario) {
                 fputcsv($file, [
                     $usuario->id,
@@ -309,16 +298,14 @@ public function exportByRole(Request $request)
                 ]);
             }
             
-            // Resumen del rol
-            fputcsv($file, ['']); // Línea vacía
+            fputcsv($file, ['']);
             fputcsv($file, ['Total de usuarios en este rol:', count($usuarios)]);
-            fputcsv($file, ['']); // Línea vacía
-            fputcsv($file, ['']); // Separador entre roles
+            fputcsv($file, ['']);
+            fputcsv($file, ['']); 
         }
         
-        // Resumen general
         fputcsv($file, ['=== RESUMEN GENERAL ===']);
-        fputcsv($file, ['']); // Línea vacía
+        fputcsv($file, ['']);
         fputcsv($file, ['Rol', 'Cantidad de Usuarios', 'Activos', 'Bloqueados', 'Email Verificado']);
         
         foreach ($roles as $rol) {
@@ -347,19 +334,18 @@ public function exportByRole(Request $request)
             ]);
         }
         
-        fputcsv($file, ['']); // Línea vacía
+        fputcsv($file, ['']); 
         fputcsv($file, ['Total general de usuarios:', Usuario::count()]);
         fputcsv($file, ['Usuarios activos:', Usuario::where('bloqueado', false)->count()]);
         fputcsv($file, ['Usuarios bloqueados:', Usuario::where('bloqueado', true)->count()]);
         fputcsv($file, ['Emails verificados:', Usuario::where('email_verificado', true)->count()]);
-        fputcsv($file, ['']); // Línea vacía
+        fputcsv($file, ['']); 
         fputcsv($file, ['Reporte generado el:', now()->format('d/m/Y H:i:s')]);
         fputcsv($file, ['Generado por:', auth()->user()->nombre . ' ' . auth()->user()->apellido]);
         
         fclose($file);
     };
 
-    // Registrar en bitácora
     \App\Models\ActividadBitacora::create([
         'usuario_id' => auth()->id(),
         'accion' => 'exportar_usuarios_por_rol',
@@ -434,7 +420,6 @@ public function exportByRolePdf(Request $request)
 
     $pdf->setPaper('A4', 'portrait');
 
-    // Registrar en bitácora
     \App\Models\ActividadBitacora::create([
         'usuario_id' => auth()->id(),
         'accion' => 'exportar_usuarios_por_rol_pdf',
@@ -446,5 +431,35 @@ public function exportByRolePdf(Request $request)
     ]);
 
     return $pdf->download('usuarios_por_rol_' . now()->format('Y-m-d_His') . '.pdf');
+}
+
+
+public function show(Usuario $usuario)
+{
+    $usuario->load(['roles', 'tarjeta']);
+ 
+    return inertia('Admin/Usuarios/Show', [
+        'usuario' => [
+            'id'               => $usuario->id,
+            'nombre'           => $usuario->nombre,
+            'apellido'         => $usuario->apellido,
+            'email'            => $usuario->email,
+            'telefono'         => $usuario->telefono,
+            'foto_url'         => $usuario->foto_url,
+            'bloqueado'        => (bool) $usuario->bloqueado,
+            'email_verificado' => (bool) $usuario->email_verificado,
+            'created_at'       => $usuario->created_at,
+            'updated_at'       => $usuario->updated_at,
+            'roles'            => $usuario->roles->map(fn($r) => [
+                'id'     => $r->id,
+                'nombre' => $r->nombre,
+            ]),
+            'tarjeta' => $usuario->tarjeta ? [
+                'uid'        => $usuario->tarjeta->uid,
+                'bloqueada'  => (bool) $usuario->tarjeta->bloqueada,
+                'created_at' => $usuario->tarjeta->created_at,
+            ] : null,
+        ],
+    ]);
 }
 }

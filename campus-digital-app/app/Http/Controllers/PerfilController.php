@@ -20,26 +20,37 @@ class PerfilController extends Controller
 
     public function updateProfile(Request $request)
     {
+        
         $usuario = auth()->user();
 
         $validated = $request->validate([
-            'fecha_nacimiento' => ['nullable', 'date', 'before:today'],
-            'genero' => ['nullable', 'string', 'max:30'],
-            'direccion' => ['nullable', 'string', 'max:500'],
-            'telefono' => ['nullable', 'string', 'max:30'],
+            'nombre'           => ['nullable', 'string', 'max:120'],
+            'apellido'         => ['nullable', 'string', 'max:120'],
+            'email'            => ['nullable', 'email', 'unique:usuario,email,' . $usuario->id],
+            'fecha_nacimiento' => ['nullable', 'date', 'before_or_equal:today'],
+            'genero'           => ['nullable', 'string', 'max:30'],
+            'direccion'        => ['nullable', 'string', 'max:500'],
+            'telefono'         => ['nullable', 'string', 'max:30'],
         ]);
 
-        $usuario->update([
-            'telefono' => $validated['telefono'] ?? '',
-        ]);
+        $camposUsuario = ['telefono' => $validated['telefono'] ?? ''];
 
-        if ($usuario->perfil) {
-            $usuario->perfil->update([
-                'fecha_nacimiento' => $validated['fecha_nacimiento'] ?? null,
-                'genero' => $validated['genero'] ?? '',
-                'direccion' => $validated['direccion'] ?? '',
-            ]);
+        if ($usuario->hasRole('administrador')) {
+            $camposUsuario['nombre']   = $validated['nombre']   ?? $usuario->nombre;
+            $camposUsuario['apellido'] = $validated['apellido'] ?? $usuario->apellido;
+            $camposUsuario['email']    = $validated['email']    ?? $usuario->email;
         }
+
+        $usuario->update($camposUsuario);
+
+        $usuario->perfil()->updateOrCreate(
+            ['usuario_id' => $usuario->id],
+            [
+                'fecha_nacimiento' => $validated['fecha_nacimiento'] ?? null,
+                'genero'           => $validated['genero']           ?? '',
+                'direccion'        => $validated['direccion']        ?? '',
+            ]
+        );
 
         return back()->with('success', 'Perfil actualizado exitosamente.');
     }
@@ -47,17 +58,15 @@ class PerfilController extends Controller
     public function updatePhoto(Request $request)
     {
         $request->validate([
-            'photo' => ['required', 'image', 'max:2048'], // 2MB max
+            'photo' => ['required', 'image', 'max:2048'], 
         ]);
 
         $usuario = auth()->user();
 
-        // Eliminar foto anterior si existe
         if ($usuario->foto_url && Storage::disk('public')->exists($usuario->foto_url)) {
             Storage::disk('public')->delete($usuario->foto_url);
         }
 
-        // Guardar nueva foto
         $path = $request->file('photo')->store('fotos-perfil', 'public');
 
         $usuario->update([

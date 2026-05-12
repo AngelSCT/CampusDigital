@@ -19,6 +19,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
 
     ->withMiddleware(function (Middleware $middleware) {
+
+        $middleware->validateCsrfTokens(except: [
+            'simulador/uid',
+            'simulador/*',
+            'auth/rfid-login',
+        ]);
+
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
@@ -26,7 +33,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'permission' => \App\Http\Middleware\CheckPermission::class,
+            'api.key'    => \App\Http\Middleware\ApiKeyMiddleware::class,  
         ]);
+
     })
 
     ->withExceptions(function (Exceptions $exceptions) {

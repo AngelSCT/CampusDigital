@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Recarga extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
-    protected $table = 'recargas';
+    protected $table = 'recarga';
 
     protected $fillable = [
         'usuario_id',
@@ -23,17 +24,23 @@ class Recarga extends Model
     ];
 
     protected $casts = [
-        'monto' => 'decimal:2',
-        'meta_json' => 'array',
+        'monto'      => 'decimal:2',
+        'meta_json'  => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
 
-    const ESTADOS = ['pendiente', 'exitoso', 'fallido'];
-    const METODOS = ['tarjeta', 'transferencia', 'efectivo', 'billetera_digital'];
+    // Estados posibles
+    const ESTADO_PENDIENTE = 'pendiente';
+    const ESTADO_EXITOSO   = 'exitoso';
+    const ESTADO_FALLIDO   = 'fallido';
 
-    // Relaciones
+    // Métodos de pago aceptados
+    const METODOS_PAGO = ['tarjeta', 'transferencia', 'efectivo'];
+
+    // ─── Relaciones ───────────────────────────────────────────
+
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
@@ -90,5 +97,27 @@ class Recarga extends Model
     public function generarFolio()
     {
         return 'WEB-' . strtoupper(uniqid());
+    }
+
+    public function saldoMovimiento()
+    {
+        return $this->belongsTo(SaldoMovimiento::class, 'saldo_movimiento_id');
+    }
+
+    // ─── Helpers ──────────────────────────────────────────────
+
+    public function esPendiente(): bool
+    {
+        return $this->estado === self::ESTADO_PENDIENTE;
+    }
+
+    public function fueExitosa(): bool
+    {
+        return $this->estado === self::ESTADO_EXITOSO;
+    }
+
+    public function falló(): bool
+    {
+        return $this->estado === self::ESTADO_FALLIDO;
     }
 }

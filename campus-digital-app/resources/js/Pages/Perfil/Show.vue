@@ -2,7 +2,6 @@
     <AuthLayout>
         <div class="py-6">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Header -->
                 <div class="mb-6">
                     <h2 class="text-2xl font-bold leading-7 text-white">
                         Mi Perfil
@@ -12,7 +11,6 @@
                     </p>
                 </div>
 
-                <!-- Información Personal -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl mb-6 border border-blue-500/20">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-white mb-4 flex items-center">
@@ -24,43 +22,54 @@
                         
                         <form @submit.prevent="actualizarPerfil" class="space-y-4">
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <!-- Nombre -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Nombre</label>
-                                    <input 
-                                        v-model="formPerfil.nombre" 
-                                        type="text" 
-                                        disabled
-                                        class="mt-1 bg-slate-900/50 text-slate-400 shadow-sm block w-full sm:text-sm border border-slate-700 rounded-lg px-3 py-2 focus:outline-none"
+                                    <input
+                                        v-model="formPerfil.nombre"
+                                        type="text"
+                                        :disabled="!esAdmin"
+                                        :class="esAdmin
+                                            ? 'bg-slate-900 text-white border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                            : 'bg-slate-900/50 text-slate-400 border-slate-700 cursor-not-allowed'"
+                                        class="mt-1 shadow-sm block w-full sm:text-sm rounded-lg px-3 py-2 transition-all duration-200"
                                     >
-                                    <p class="mt-1 text-xs text-slate-400">Contacta al administrador para cambiar tu nombre</p>
+                                    <p v-if="!esAdmin" class="mt-1 text-xs text-slate-400">
+                                        Contacta al administrador para cambiar tu nombre
+                                    </p>
                                 </div>
 
-                                <!-- Apellido -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Apellido</label>
-                                    <input 
-                                        v-model="formPerfil.apellido" 
-                                        type="text" 
-                                        disabled
-                                        class="mt-1 bg-slate-900/50 text-slate-400 shadow-sm block w-full sm:text-sm border border-slate-700 rounded-lg px-3 py-2 focus:outline-none"
+                                    <input
+                                        v-model="formPerfil.apellido"
+                                        type="text"
+                                        :disabled="!esAdmin"
+                                        :class="esAdmin
+                                            ? 'bg-slate-900 text-white border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                            : 'bg-slate-900/50 text-slate-400 border-slate-700 cursor-not-allowed'"
+                                        class="mt-1 shadow-sm block w-full sm:text-sm rounded-lg px-3 py-2 transition-all duration-200"
                                     >
-                                    <p class="mt-1 text-xs text-slate-400">Contacta al administrador para cambiar tu apellido</p>
+                                    <p v-if="!esAdmin" class="mt-1 text-xs text-slate-400">
+                                        Contacta al administrador para cambiar tu apellido
+                                    </p>
                                 </div>
 
-                                <!-- Email -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Email</label>
-                                    <input 
-                                        v-model="formPerfil.email" 
-                                        type="email" 
-                                        disabled
-                                        class="mt-1 bg-slate-900/50 text-slate-400 shadow-sm block w-full sm:text-sm border border-slate-700 rounded-lg px-3 py-2 focus:outline-none"
+                                    <input
+                                        v-model="formPerfil.email"
+                                        type="email"
+                                        :disabled="!esAdmin"
+                                        :class="esAdmin
+                                            ? 'bg-slate-900 text-white border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                            : 'bg-slate-900/50 text-slate-400 border-slate-700 cursor-not-allowed'"
+                                        class="mt-1 shadow-sm block w-full sm:text-sm rounded-lg px-3 py-2 transition-all duration-200"
                                     >
-                                    <p class="mt-1 text-xs text-slate-400">Contacta al administrador para cambiar tu email</p>
+                                    <p v-if="!esAdmin" class="mt-1 text-xs text-slate-400">
+                                        Contacta al administrador para cambiar tu email
+                                    </p>
                                 </div>
 
-                                <!-- Teléfono -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Teléfono</label>
                                     <input 
@@ -70,7 +79,6 @@
                                     >
                                 </div>
 
-                                <!-- Fecha de Nacimiento -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Fecha de Nacimiento</label>
                                     <input 
@@ -80,7 +88,6 @@
                                     >
                                 </div>
 
-                                <!-- Género -->
                                 <div>
                                     <label class="block text-sm font-medium text-white">Género</label>
                                     <select 
@@ -96,7 +103,6 @@
                                 </div>
                             </div>
 
-                            <!-- Dirección -->
                             <div>
                                 <label class="block text-sm font-medium text-white">Dirección</label>
                                 <textarea 
@@ -106,7 +112,6 @@
                                 ></textarea>
                             </div>
 
-                            <!-- Botón Guardar -->
                             <div class="flex justify-end">
                                 <button 
                                     type="submit" 
@@ -120,7 +125,6 @@
                     </div>
                 </div>
 
-                <!-- Foto de Perfil -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl mb-6 border border-blue-500/20">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-white mb-4 flex items-center">
@@ -176,7 +180,6 @@
                     </div>
                 </div>
 
-                <!-- Información de Cuenta -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl mb-6 border border-blue-500/20">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-white mb-4 flex items-center">
@@ -225,7 +228,6 @@
                     </div>
                 </div>
 
-                <!-- Cambiar Contraseña -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-white mb-4 flex items-center">
@@ -287,19 +289,26 @@
 </template>
 
 <script setup>
-import AuthLayout from '@/Components/AuthLayout.vue';
+import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const props = defineProps({
     usuario: Object,
 });
+
+const esAdmin = computed(() =>
+    props.usuario.roles?.some(r => r.nombre.toLowerCase() === 'administrador')
+);
 
 const formPerfil = useForm({
     nombre: props.usuario.nombre,
     apellido: props.usuario.apellido,
     email: props.usuario.email,
     telefono: props.usuario.telefono || '',
-    fecha_nacimiento: props.usuario.perfil?.fecha_nacimiento || '',
+    fecha_nacimiento: props.usuario.perfil?.fecha_nacimiento
+    ? String(props.usuario.perfil.fecha_nacimiento).substring(0, 10)
+    : '',
     genero: props.usuario.perfil?.genero || '',
     direccion: props.usuario.perfil?.direccion || '',
 });
@@ -314,7 +323,7 @@ const actualizarPerfil = () => {
     formPerfil.post(route('perfil.update'), {
         preserveScroll: true,
         onSuccess: () => {
-            // Mensaje de éxito
+            
         },
     });
 };
@@ -330,14 +339,12 @@ const cambiarPassword = () => {
 
 const subirFoto = (event) => {
     const file = event.target.files[0];
-    if (file) {
-        const formData = new FormData();
-        formData.append('photo', file);
-        
-        useForm(formData).post(route('perfil.photo.update'), {
-            preserveScroll: true,
-        });
-    }
+    if (!file) return;
+
+    useForm({ photo: file }).post(route('perfil.photo.update'), {
+        preserveScroll: true,
+        forceFormData: true,
+    });
 };
 
 const eliminarFoto = () => {

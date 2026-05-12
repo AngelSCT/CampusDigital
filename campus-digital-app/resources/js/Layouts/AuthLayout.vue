@@ -11,28 +11,54 @@
                         </div>
                         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                             <a href="/dashboard" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                </svg>
                                 Dashboard
                             </a>
 
-                            <!-- Links de Administrador -->
                             <template v-if="isAdmin">
                                 <a href="/admin/usuarios" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                    </svg>
                                     Usuarios
                                 </a>
                                 <a href="/admin/roles" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                    </svg>
                                     Roles
                                 </a>
                                 <a href="/admin/permisos" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                    </svg>
                                     Permisos
                                 </a>
                                 <a href="/admin/bitacora/accesos" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                    </svg>
                                     Bitácora
                                 </a>
+                                <a href="/admin/tarjetas/dashboard" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                    </svg>
+                                    Tarjetas
+                                </a>
                             </template>
+
+                            <a href="/archivos" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                                </svg>
+                                Archivos
+                            </a>
                         </div>
                     </div>
-
-                    <!-- User Menu Desktop -->
+                    
                     <div class="hidden sm:ml-6 sm:flex sm:items-center">
                         <div class="ml-3 relative">
                             <button @click="toggleUserMenu" type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-slate-900 transition-all duration-300 group">
@@ -42,8 +68,7 @@
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </button>
-
-                            <!-- Dropdown Menu -->
+                            
                             <transition
                                 enter-active-class="transition ease-out duration-200"
                                 enter-from-class="transform opacity-0 scale-95"
@@ -71,6 +96,30 @@
                                             Mi Perfil
                                         </a>
 
+                                        <!-- Mi Tarjeta -->
+                                        <a href="/mi-tarjeta" class="block px-4 py-2 text-sm text-white hover:bg-cyan-500/10 hover:text-cyan-400 flex items-center transition-all duration-200">
+                                            <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                            </svg>
+                                            Mi Tarjeta
+                                        </a>
+
+                                        <!-- Mis Archivos -->
+                                        <a href="/archivos" class="block px-4 py-2 text-sm text-white hover:bg-blue-500/10 hover:text-blue-400 flex items-center transition-all duration-200">
+                                            <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                                            </svg>
+                                            Mis Archivos
+                                        </a>
+
+                                        <!-- Lector -->
+                                        <a href="/lector" class="block px-4 py-2 text-sm text-white hover:bg-blue-500/10 hover:text-blue-400 flex items-center transition-all duration-200">
+                                            <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                            </svg>
+                                            Lector[EX!]
+                                        </a>
+                                        
                                         <!-- Cerrar Sesión -->
                                         <button @click="logout" type="button" class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center border-t border-blue-500/20 transition-all duration-200">
                                             <svg class="w-4 h-4 mr-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +133,6 @@
                         </div>
                     </div>
 
-                    <!-- Mobile menu button -->
                     <div class="flex items-center sm:hidden">
                         <button @click="toggleMobileMenu" type="button" class="inline-flex items-center justify-center p-2 rounded-lg text-white hover:text-blue-400 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-all duration-300">
                             <svg class="h-6 w-6" :class="{ 'hidden': showMobileMenu, 'block': !showMobileMenu }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,7 +146,6 @@
                 </div>
             </div>
 
-            <!-- Mobile menu -->
             <transition
                 enter-active-class="transition ease-out duration-200"
                 enter-from-class="opacity-0 -translate-y-1"
@@ -128,8 +175,7 @@
                             </a>
                         </template>
                     </div>
-
-                    <!-- User section mobile -->
+                    
                     <div class="pt-4 pb-3 border-t border-blue-500/20">
                         <div class="flex items-center px-4">
                             <div class="flex-shrink-0">
@@ -153,7 +199,6 @@
             </transition>
         </nav>
 
-        <!-- Flash Messages -->
         <div v-if="$page.props.flash?.success" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
             <div class="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-l-4 border-green-500 rounded-lg p-4 backdrop-blur-sm shadow-lg shadow-green-500/10">
                 <div class="flex">
@@ -198,7 +243,6 @@
             </div>
         </div>
 
-        <!-- Page Content -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <slot />
         </main>
@@ -213,7 +257,6 @@ const page = usePage();
 const showUserMenu = ref(false);
 const showMobileMenu = ref(false);
 
-// Computed properties
 const userName = computed(() => {
     const user = page.props.auth?.user;
     return user ? `${user.nombre} ${user.apellido}` : 'Usuario';
@@ -224,7 +267,7 @@ const userEmail = computed(() => page.props.auth?.user?.email || '');
 const userAvatar = computed(() => {
     const user = page.props.auth?.user;
     if (user?.foto_url) {
-        return user.foto_url;
+        return `/storage/${user.foto_url}`;  
     }
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(userName.value)}&background=1E40AF&color=fff`;
 });
@@ -255,11 +298,14 @@ function toggleMobileMenu() {
 
 function logout() {
     if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-        router.post('/logout');
+        fetch('/simulador/limpiar-login', { method: 'POST' })
+            .catch(() => {}) 
+            .finally(() => {
+                router.post('/logout');
+            });
     }
 }
 
-// Click outside to close
 function handleClickOutside(event) {
     const userMenuButton = event.target.closest('button');
     if (!userMenuButton) {

@@ -16,6 +16,13 @@ class CheckRole
 
         $user = auth()->user();
 
+        if (empty($roles)) {
+            if ($user->roles()->exists()) {
+                return $next($request);
+            }
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
         if ($user->hasAnyRole($roles)) {
             return $next($request);
         }

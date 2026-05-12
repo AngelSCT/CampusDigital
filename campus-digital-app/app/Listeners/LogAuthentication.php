@@ -15,10 +15,8 @@ class LogAuthentication
     {
         $usuario = $event->user;
         
-        // Actualizar último login
         $usuario->update(['ultimo_login_at' => now()]);
 
-        // Crear sesión
         $sesion = UsuarioSesion::create([
             'usuario_id' => $usuario->id,
             'session_id' => session()->getId(),
@@ -29,7 +27,6 @@ class LogAuthentication
             'activa' => true,
         ]);
 
-        // Registrar acceso exitoso
         AccesoBitacora::create([
             'usuario_id' => $usuario->id,
             'sesion_id' => $sesion->id,
@@ -60,7 +57,6 @@ class LogAuthentication
         $usuario = $event->user;
         
         if ($usuario) {
-            // Cerrar sesión activa
             UsuarioSesion::where('usuario_id', $usuario->id)
                 ->where('session_id', session()->getId())
                 ->where('activa', true)
@@ -69,7 +65,6 @@ class LogAuthentication
                     'activa' => false,
                 ]);
 
-            // Registrar logout
             AccesoBitacora::create([
                 'usuario_id' => $usuario->id,
                 'email_intentado' => $usuario->email,

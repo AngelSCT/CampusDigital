@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use Closure;
@@ -11,7 +10,14 @@ class CheckPermission
     public function handle(Request $request, Closure $next, string $permission): Response
     {
         if (!$request->user()->hasPermission($permission)) {
-            abort(403, 'No tienes permiso para realizar esta acción.');
+
+            if ($request->expectsJson() && !$request->header('X-Inertia')) {
+                return response()->json([
+                    'message' => 'No tienes permiso para realizar esta acción.'
+                ], 403);
+            }
+
+            return redirect()->route('sin-permiso');
         }
 
         return $next($request);

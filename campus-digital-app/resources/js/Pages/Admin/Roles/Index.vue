@@ -1,7 +1,6 @@
 <template>
     <AuthLayout>
         <div class="space-y-6">
-            <!-- Header -->
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
@@ -17,7 +16,6 @@
                 </a>
             </div>
 
-            <!-- Filtros -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20 p-4">
                 <form @submit.prevent="applyFilters" class="flex gap-4">
                     <!-- Búsqueda -->
@@ -31,7 +29,6 @@
                         >
                     </div>
 
-                    <!-- Botones -->
                     <div class="flex items-end gap-2">
                         <button 
                             type="button" 
@@ -50,7 +47,6 @@
                 </form>
             </div>
 
-            <!-- Tabla -->
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-slate-700">
@@ -92,6 +88,13 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end gap-2 min-w-[100px]">
+                                        <a :href="route('admin.roles.show', rol.id)"
+                                        class="text-slate-400 hover:text-white transition-colors duration-200" title="Ver detalle">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </a>
                                         <a :href="route('admin.roles.edit', rol.id)" class="text-blue-400 hover:text-blue-300 transition-colors duration-200" title="Editar">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -119,7 +122,6 @@
                     </table>
                 </div>
 
-                <!-- Paginación -->
                 <div v-if="roles.data.length > 0" class="bg-slate-900/50 px-4 py-3 border-t border-slate-700 sm:px-6">
                     <div class="flex items-center justify-between">
                         <div class="flex-1 flex justify-between sm:hidden">
@@ -150,7 +152,6 @@
                     </div>
                 </div>
 
-                <!-- Empty State -->
                 <div v-if="roles.data.length === 0" class="text-center py-12">
                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-700/50 flex items-center justify-center">
                         <svg class="h-8 w-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,7 +190,7 @@ function clearFilters() {
 }
 
 function isSystemRole(nombre) {
-    return ['administrador', 'docente', 'alumno'].includes(nombre.toLowerCase());
+    return ['administrador'].includes(nombre.toLowerCase());
 }
 
 function confirmDelete(rol) {

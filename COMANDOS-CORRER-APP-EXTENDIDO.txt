@@ -61,17 +61,17 @@ git clone https://github.com/AngelSCT/CampusDigital
 
 -SI USAS LINUX:
 
-    rm -rf node_modules
-    rm package-lock.json
-    composer install
-    npm install
+    rm -rf node_modules         NOTA:SOLO USAR SI DA ERROR
+    rm package-lock.json        NOTA:SOLO USAR SI DA ERROR
+    composer update
+    npm update
 
 -SI USAS WINDOWS:
 
-    Remove-Item node_modules -Recurse -Force
-    Remove-Item package-lock.json -Force
-    composer install
-    npm install
+    Remove-Item node_modules -Recurse -Force        NOTA:SOLO USAR SI DA ERROR
+    Remove-Item package-lock.json -Force            NOTA:SOLO USAR SI DA ERROR
+    composer update
+    npm update
 
 ---------------------------------------------------------------------------------------------
 
@@ -123,6 +123,7 @@ git clone https://github.com/AngelSCT/CampusDigital
 
     php artisan migrate
     php artisan db:seed
+    php artisan storage:link
 
 ---------------------------------------------------------------------------------------------
 
@@ -131,7 +132,7 @@ git clone https://github.com/AngelSCT/CampusDigital
 
 1)TERMINAL 1 COMANDO(EJECUTAR LARAVEL):
 
-    php artisan serve
+    php artisan serve     o usar   php artisan serve --host=0.0.0.0 --port=8000
 
 2)TERMINAL 2 COMANDO(EJECUTAR FRONTEND):
 
@@ -160,12 +161,34 @@ git commit -m "TEST COMMIT"
 git push origin main 
 
 
+//SETEAR REPOSITORIO
+git remote set-url origin https://github.com/usuario/nuevo-repo.git
+
+//SUBIR CAMBIOS A UNA RAMA ESPECIFICA
+git push origin main:feature/otra-rama
+
+//EXTRA
 git fetch --all
+
+
+COMANDOS PARA PORBAR EL SIMULADOR (ESCUCHA LAS PETICIONES DE HOST EXTERNOS):
+php artisan migrate:fresh --seed
+php artisan serve --host=0.0.0.0 --port=8000 
+npm run dev -- --host 
+
+AJUSTES DENTRO DE CHROME (OPCIONAL) PARA LA CONFIGURACION DE LA CAMARA DEL SIMULADIOR DE TARJETA 
+chrome://flags/#unsafely-treat-insecure-origin-as-secure
+http://192.168.1.20:8001
+---> DARLE EN HABILITAR Y DESPUES EN RELOAD
 
 NOTA:LA CARPETA DESDE LA QUE SE TIENE QUE HACER CAMBIOS PARA 
     SUBIR CAMBIOS O BAJAR CAMBIOS DE GIT ES LA RAIZ CampusDigital
 
 
+
+
+
+php artisan storage:link --force
 
 
 
