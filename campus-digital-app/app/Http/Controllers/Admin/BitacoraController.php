@@ -13,7 +13,7 @@ class BitacoraController extends Controller
 {
     public function accesos(Request $request)
     {
-        Log::channel('daily')->info('BitacoraController@accesos: Consulta de bitácora de accesos.', [
+        Log::channel('bitacora')->info('BitacoraController@accesos: Consulta de bitácora de accesos.', [
             'usuario'     => optional(auth()->user())->email,
             'ip'          => $request->ip(),
             'filtros'     => $request->only(['search', 'evento', 'exito', 'fecha_desde', 'fecha_hasta']),
@@ -54,7 +54,7 @@ class BitacoraController extends Controller
 
     public function actividad(Request $request)
     {
-        Log::channel('daily')->info('BitacoraController@actividad: Consulta de bitácora de actividad.', [
+        Log::channel('bitacora')->info('BitacoraController@actividad: Consulta de bitácora de actividad.', [
             'usuario' => optional(auth()->user())->email,
             'ip'      => $request->ip(),
             'filtros' => $request->only(['search', 'modulo', 'accion', 'fecha_desde', 'fecha_hasta']),
@@ -100,7 +100,7 @@ class BitacoraController extends Controller
 
     public function exportAccesos(Request $request)
     {
-        Log::channel('daily')->info('BitacoraController@exportAccesos: Exportación CSV de accesos.', [
+        Log::channel('bitacora')->info('BitacoraController@exportAccesos: Exportación CSV de accesos.', [
             'usuario' => optional(auth()->user())->email,
             'ip'      => $request->ip(),
         ]);
@@ -116,7 +116,7 @@ class BitacoraController extends Controller
             $csvData .= "{$acceso->id},{$usuario},{$acceso->email_intentado},{$acceso->evento},{$exito},{$acceso->ip},{$acceso->created_at}\n";
         }
 
-        Log::channel('daily')->info('BitacoraController@exportAccesos: CSV generado.', [
+        Log::channel('bitacora')->info('BitacoraController@exportAccesos: CSV generado.', [
             'total_registros' => $accesos->count(),
         ]);
 
@@ -127,7 +127,7 @@ class BitacoraController extends Controller
 
     public function exportActividad(Request $request)
     {
-        Log::channel('daily')->info('BitacoraController@exportActividad: Exportación CSV de actividad.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividad: Exportación CSV de actividad.', [
             'usuario' => optional(auth()->user())->email,
             'ip'      => $request->ip(),
         ]);
@@ -143,7 +143,7 @@ class BitacoraController extends Controller
             $csvData .= "{$actividad->id},{$usuario},{$actividad->modulo},{$actividad->accion},\"{$actividad->detalle}\",{$exito},{$actividad->ip},{$actividad->created_at}\n";
         }
 
-        Log::channel('daily')->info('BitacoraController@exportActividad: CSV generado.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividad: CSV generado.', [
             'total_registros' => $actividades->count(),
         ]);
 
@@ -154,7 +154,7 @@ class BitacoraController extends Controller
 
     public function exportAccesosPdf(Request $request)
     {
-        Log::channel('daily')->info('BitacoraController@exportAccesosPdf: Exportación PDF de accesos.', [
+        Log::channel('bitacora')->info('BitacoraController@exportAccesosPdf: Exportación PDF de accesos.', [
             'usuario' => optional(auth()->user())->email,
             'ip'      => $request->ip(),
         ]);
@@ -190,7 +190,7 @@ class BitacoraController extends Controller
 
         $pdf->setPaper('A4', 'landscape');
 
-        Log::channel('daily')->info('BitacoraController@exportAccesosPdf: PDF generado.', [
+        Log::channel('bitacora')->info('BitacoraController@exportAccesosPdf: PDF generado.', [
             'total_registros' => $accesos->count(),
         ]);
 
@@ -204,7 +204,7 @@ class BitacoraController extends Controller
             'fecha_hasta' => 'required|date|after_or_equal:fecha_desde',
         ]);
 
-        Log::channel('daily')->info('BitacoraController@exportAccesosPeriodo: Exportación CSV de accesos por período.', [
+        Log::channel('bitacora')->info('BitacoraController@exportAccesosPeriodo: Exportación CSV de accesos por período.', [
             'usuario'     => optional(auth()->user())->email,
             'ip'          => $request->ip(),
             'fecha_desde' => $request->fecha_desde,
@@ -226,7 +226,7 @@ class BitacoraController extends Controller
 
         $accesos = $query->orderBy('created_at', 'desc')->get();
 
-        Log::channel('daily')->info('BitacoraController@exportAccesosPeriodo: CSV generado.', [
+        Log::channel('bitacora')->info('BitacoraController@exportAccesosPeriodo: CSV generado.', [
             'total_registros' => $accesos->count(),
         ]);
 
@@ -313,7 +313,7 @@ class BitacoraController extends Controller
             'fecha_hasta' => 'required|date|after_or_equal:fecha_desde',
         ]);
 
-        Log::channel('daily')->info('BitacoraController@exportAccesosPeriodoPdf: Exportación PDF de accesos por período.', [
+        Log::channel('bitacora')->info('BitacoraController@exportAccesosPeriodoPdf: Exportación PDF de accesos por período.', [
             'usuario'     => optional(auth()->user())->email,
             'ip'          => $request->ip(),
             'fecha_desde' => $request->fecha_desde,
@@ -371,7 +371,7 @@ class BitacoraController extends Controller
 
         $pdf->setPaper('A4', 'landscape');
 
-        Log::channel('daily')->info('BitacoraController@exportAccesosPeriodoPdf: PDF generado.', [
+        Log::channel('bitacora')->info('BitacoraController@exportAccesosPeriodoPdf: PDF generado.', [
             'total_registros' => $accesos->count(),
         ]);
 
@@ -380,7 +380,7 @@ class BitacoraController extends Controller
 
     public function exportActividadPdf(Request $request)
     {
-        Log::channel('daily')->info('BitacoraController@exportActividadPdf: Exportación PDF de actividad.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividadPdf: Exportación PDF de actividad.', [
             'usuario' => optional(auth()->user())->email,
             'ip'      => $request->ip(),
         ]);
@@ -425,7 +425,7 @@ class BitacoraController extends Controller
 
         $pdf->setPaper('A4', 'landscape');
 
-        Log::channel('daily')->info('BitacoraController@exportActividadPdf: PDF generado.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividadPdf: PDF generado.', [
             'total_registros' => $actividades->count(),
         ]);
 
@@ -439,7 +439,7 @@ class BitacoraController extends Controller
             'fecha_hasta' => 'required|date|after_or_equal:fecha_desde',
         ]);
 
-        Log::channel('daily')->info('BitacoraController@exportActividadPeriodo: Exportación CSV de actividad por período.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividadPeriodo: Exportación CSV de actividad por período.', [
             'usuario'     => optional(auth()->user())->email,
             'ip'          => $request->ip(),
             'fecha_desde' => $request->fecha_desde,
@@ -461,7 +461,7 @@ class BitacoraController extends Controller
 
         $actividades = $query->orderBy('created_at', 'desc')->get();
 
-        Log::channel('daily')->info('BitacoraController@exportActividadPeriodo: CSV generado.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividadPeriodo: CSV generado.', [
             'total_registros' => $actividades->count(),
         ]);
 
@@ -561,7 +561,7 @@ class BitacoraController extends Controller
             'fecha_hasta' => 'required|date|after_or_equal:fecha_desde',
         ]);
 
-        Log::channel('daily')->info('BitacoraController@exportActividadPeriodoPdf: Exportación PDF de actividad por período.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividadPeriodoPdf: Exportación PDF de actividad por período.', [
             'usuario'     => optional(auth()->user())->email,
             'ip'          => $request->ip(),
             'fecha_desde' => $request->fecha_desde,
@@ -627,7 +627,7 @@ class BitacoraController extends Controller
 
         $pdf->setPaper('A4', 'landscape');
 
-        Log::channel('daily')->info('BitacoraController@exportActividadPeriodoPdf: PDF generado.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividadPeriodoPdf: PDF generado.', [
             'total_registros' => $actividades->count(),
         ]);
 
@@ -636,7 +636,7 @@ class BitacoraController extends Controller
 
     public function exportActividadModulo(Request $request)
     {
-        Log::channel('daily')->info('BitacoraController@exportActividadModulo: Exportación CSV de actividad por módulo.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividadModulo: Exportación CSV de actividad por módulo.', [
             'usuario' => optional(auth()->user())->email,
             'ip'      => $request->ip(),
             'filtros' => $request->only(['fecha_desde', 'fecha_hasta']),
@@ -655,7 +655,7 @@ class BitacoraController extends Controller
         $actividades = $query->orderBy('modulo')->orderBy('created_at', 'desc')->get();
         $modulos = $actividades->groupBy('modulo');
 
-        Log::channel('daily')->info('BitacoraController@exportActividadModulo: CSV generado.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividadModulo: CSV generado.', [
             'total_modulos'   => $modulos->count(),
             'total_registros' => $actividades->count(),
         ]);
@@ -734,7 +734,7 @@ class BitacoraController extends Controller
 
     public function exportActividadModuloPdf(Request $request)
     {
-        Log::channel('daily')->info('BitacoraController@exportActividadModuloPdf: Exportación PDF de actividad por módulo.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividadModuloPdf: Exportación PDF de actividad por módulo.', [
             'usuario' => optional(auth()->user())->email,
             'ip'      => $request->ip(),
             'filtros' => $request->only(['fecha_desde', 'fecha_hasta']),
@@ -785,7 +785,7 @@ class BitacoraController extends Controller
 
         $pdf->setPaper('A4', 'landscape');
 
-        Log::channel('daily')->info('BitacoraController@exportActividadModuloPdf: PDF generado.', [
+        Log::channel('bitacora')->info('BitacoraController@exportActividadModuloPdf: PDF generado.', [
             'total_modulos'   => count($datosModulos),
             'total_registros' => $actividades->count(),
         ]);
