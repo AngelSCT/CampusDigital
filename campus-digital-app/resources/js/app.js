@@ -6,19 +6,19 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import clickAway from "./directives/clickAway";
 
 if (import.meta.env.DEV) {
-    window.axios.get('/api/usuarios', { params: { per_page: 5 } })
+    window.axios.get('/api/v1/usuarios', { params: { per_page: 5 } })
         .then(r => console.info('[Axios] GET /api/usuarios →', r.data))
         .catch(e => console.error('[Axios] GET /api/usuarios ✗', e.response?.data));
 
-    window.axios.get('/api/tarjetas', { params: { per_page: 5 } })
+    window.axios.get('/api/v1/tarjetas', { params: { per_page: 5 } })
         .then(r => console.info('[Axios] GET /api/tarjetas →', r.data))
         .catch(e => console.error('[Axios] GET /api/tarjetas ✗', e.response?.data));
 
-    window.axios.get('/api/sesiones', { params: { per_page: 5 } })
+    window.axios.get('/api/v1/sesiones', { params: { per_page: 5 } })
         .then(r => console.info('[Axios] GET /api/sesiones →', r.data))
         .catch(e => console.error('[Axios] GET /api/sesiones ✗', e.response?.data));
 
-    window.axios.get('/api/usuario-roles')
+    window.axios.get('/api/v1/usuario-roles')
         .then(r => console.info('[Axios] GET /api/usuario-roles →', r.data))
         .catch(e => console.error('[Axios] GET /api/usuario-roles ✗', e.response?.data));
 }
