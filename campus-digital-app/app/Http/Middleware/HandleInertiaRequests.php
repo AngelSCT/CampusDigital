@@ -28,12 +28,14 @@ class HandleInertiaRequests extends Middleware
                                     ->roles()
                                     ->select('rol.id', 'rol.nombre')
                                     ->get(),
-                    'saldo'    => $request->user()->saldo?->saldo ?? 0, // ← Línea nueva
+                    'saldo'    => $request->user()->saldo?->saldo ?? 0,
                 ] : null,
             ],
             'flash' => [
-                'success' => fn () => $request->session()->get('success'),
-                'error'   => fn () => $request->session()->get('error'),
+                'resultado'   => fn () => $request->session()->get('resultado'),
+                'success'     => fn () => $request->session()->get('success'),
+                'error'       => fn () => $request->session()->get('error'),
+                'scan_result' => fn () => $request->session()->get('scan_result'),
             ],
         ]);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Rol;
 use App\Models\Permiso;
@@ -10,6 +11,9 @@ use Inertia\Inertia;
 
 class RolController extends Controller
 {
+
+    private const ROL_PROTEGIDO = 'administrador';
+
     public function index(Request $request)
     {
         $query = Rol::withCount('usuarios');
@@ -74,6 +78,30 @@ class RolController extends Controller
             'permisos.*' => ['exists:permiso,id'],
         ]);
 
+        if (strtolower($rol->nombre) === self::ROL_PROTEGIDO) {
+
+            if (strtolower($validated['nombre']) !== self::ROL_PROTEGIDO) {
+                return back()->withErrors(['nombre' => 'El nombre del rol administrador no puede modificarse.']);
+            }
+
+            $permisosRestringidos = \App\Models\Permiso::whereIn('clave', [
+                'role.read', 'role.write', 'role.delete', 'role.show',
+                'permission.read', 'permission.write', 'permission.delete', 'permission.show',
+            ])->pluck('id')->toArray();
+
+            $permisosFinales = array_unique(
+                array_merge($validated['permisos'] ?? [], $permisosRestringidos)
+            );
+
+            $rol->update([
+                'descripcion' => $validated['descripcion'] ?? '',
+            ]);
+            $rol->permisos()->sync($permisosFinales);
+
+            return redirect()->route('admin.roles.index')
+                ->with('success', 'Rol actualizado (nombre y permisos de seguridad no modificables).');
+        }
+
         $rol->update([
             'nombre' => $validated['nombre'],
             'descripcion' => $validated['descripcion'] ?? '',
@@ -86,6 +114,11 @@ class RolController extends Controller
 
     public function destroy(Rol $rol)
     {
+
+        if (strtolower($rol->nombre) === self::ROL_PROTEGIDO) {
+            return back()->withErrors(['error' => 'El rol administrador no puede eliminarse.']);
+        }
+
         if ($rol->usuarios()->count() > 0) {
             return back()->withErrors(['error' => 'No puedes eliminar un rol que tiene usuarios asignados.']);
         }
@@ -93,5 +126,71 @@ class RolController extends Controller
         $rol->delete();
 
         return redirect()->route('admin.roles.index')->with('success', 'Rol eliminado exitosamente.');
+    }
+
+
+        public function show(Rol $rol)
+    {
+        $rol->load([
+            'permisos' => fn($q) => $q->orderBy('clave'),
+            'usuarios' => fn($q) => $q->select(
+                    'usuario.id', 'usuario.nombre', 'usuario.apellido',
+                    'usuario.email', 'usuario.foto_url', 'usuario.bloqueado',
+                    'usuario.ultimo_login_at', 'usuario.created_at'
+                )
+                ->withPivot('asignado_at', 'asignado_por_usuario_id')
+                ->orderBy('usuario.nombre'),
+        ]);
+    
+        $totalUsuarios      = $rol->usuarios()->count();
+        $usuariosActivos    = $rol->usuarios()->where('bloqueado', false)->count();
+        $usuariosBloqueados = $rol->usuarios()->where('bloqueado', true)->count();
+    
+        $ultimaAsignacion = \DB::table('usuario_rol')
+            ->where('rol_id', $rol->id)
+            ->whereNull('deleted_at')
+            ->max('asignado_at');
+    
+        $asignadoresPorId = \DB::table('usuario_rol as ur')
+            ->join('usuario as u', 'u.id', '=', 'ur.asignado_por_usuario_id')
+            ->where('ur.rol_id', $rol->id)
+            ->whereNull('ur.deleted_at')
+            ->select('u.id', 'u.nombre', 'u.apellido', \DB::raw('count(*) as veces'))
+            ->groupBy('u.id', 'u.nombre', 'u.apellido')
+            ->orderByDesc('veces')
+            ->get();
+    
+        $permisosPorModulo = $rol->permisos->groupBy(function ($p) {
+            return explode('.', $p->clave)[0];
+        });
+    
+        $actividadReciente = \DB::table('actividad_bitacora as ab')
+            ->join('usuario as u', 'u.id', '=', 'ab.usuario_id')
+            ->join('usuario_rol as ur', function ($join) use ($rol) {
+                $join->on('ur.usuario_id', '=', 'ab.usuario_id')
+                    ->where('ur.rol_id', $rol->id)
+                    ->whereNull('ur.deleted_at');
+            })
+            ->select(
+                'u.nombre', 'u.apellido', 'u.email',
+                'ab.accion', 'ab.modulo', 'ab.created_at'
+            )
+            ->orderByDesc('ab.created_at')
+            ->limit(10)
+            ->get();
+    
+        return Inertia::render('Admin/Roles/Show', [
+            'rol'               => $rol,
+            'stats' => [
+                'total_usuarios'      => $totalUsuarios,
+                'usuarios_activos'    => $usuariosActivos,
+                'usuarios_bloqueados' => $usuariosBloqueados,
+                'total_permisos'      => $rol->permisos->count(),
+                'ultima_asignacion'   => $ultimaAsignacion,
+            ],
+            'permisosPorModulo'   => $permisosPorModulo,
+            'asignadores'         => $asignadoresPorId,
+            'actividadReciente'   => $actividadReciente,
+        ]);
     }
 }

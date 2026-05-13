@@ -11,12 +11,10 @@ class UsuariosPruebaSeeder extends Seeder
 {
     public function run(): void
     {
-        // Obtener roles
         $rolAdmin = Rol::where('nombre', 'administrador')->first();
         $rolProveedor = Rol::where('nombre', 'proveedor_area')->first();
         $rolEstudiante = Rol::where('nombre', 'estudiante')->first();
 
-        // Crear usuario administrador
         $admin = Usuario::create([
             'nombre' => 'Admin',
             'apellido' => 'Sistema',
@@ -28,7 +26,6 @@ class UsuariosPruebaSeeder extends Seeder
         $admin->roles()->attach($rolAdmin->id);
         $admin->perfil()->create([]);
 
-        // Crear usuario proveedor
         $proveedor = Usuario::create([
             'nombre' => 'Proveedor',
             'apellido' => 'Cafetería',
@@ -40,7 +37,6 @@ class UsuariosPruebaSeeder extends Seeder
         $proveedor->roles()->attach($rolProveedor->id);
         $proveedor->perfil()->create([]);
 
-        // Crear usuario estudiante
         $estudiante = Usuario::create([
             'nombre' => 'Juan',
             'apellido' => 'Pérez',

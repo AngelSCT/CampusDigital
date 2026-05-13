@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Recarga extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'recargas';
 
@@ -23,23 +24,28 @@ class Recarga extends Model
     ];
 
     protected $casts = [
-        'monto' => 'decimal:2',
-        'meta_json' => 'array',
+        'monto'      => 'decimal:2',
+        'meta_json'  => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
 
-    const ESTADOS = ['pendiente', 'exitoso', 'fallido'];
-    const METODOS = ['tarjeta', 'transferencia', 'efectivo', 'billetera_digital'];
+    // Estados posibles
+    const ESTADO_PENDIENTE = 'pendiente';
+    const ESTADO_EXITOSO   = 'exitoso';
+    const ESTADO_FALLIDO   = 'fallido';
 
-    // Relaciones
+    // Métodos de pago aceptados
+    const METODOS_PAGO = ['tarjeta', 'transferencia', 'efectivo', 'billetera_digital'];
+
+    // ── Relaciones ────────────────────────────────────────────────────────
+
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
     }
 
-    // Polimorfismo: esta recarga tiene movimientos asociados
     public function movimiento()
     {
         return $this->morphMany(Movimiento::class, 'referenciable');
@@ -50,15 +56,21 @@ class Recarga extends Model
         return $this->morphOne(Comprobante::class, 'referencia');
     }
 
-    // Scopes útiles
+    public function saldoMovimiento()
+    {
+        return $this->belongsTo(SaldoMovimiento::class, 'saldo_movimiento_id');
+    }
+
+    // ── Scopes ────────────────────────────────────────────────────────────
+
     public function scopeExitosas($query)
     {
-        return $query->where('estado', 'exitoso');
+        return $query->where('estado', self::ESTADO_EXITOSO);
     }
 
     public function scopeFallidas($query)
     {
-        return $query->where('estado', 'fallido');
+        return $query->where('estado', self::ESTADO_FALLIDO);
     }
 
     public function scopeDelUsuario($query, $usuarioId)
@@ -71,23 +83,24 @@ class Recarga extends Model
         return $query->orderByDesc('created_at');
     }
 
-    // Métodos helper
-    public function esExitosa()
+    // ── Helpers ───────────────────────────────────────────────────────────
+
+    public function esExitosa(): bool
     {
-        return $this->estado === 'exitoso';
+        return $this->estado === self::ESTADO_EXITOSO;
     }
 
-    public function esFallida()
+    public function esFallida(): bool
     {
-        return $this->estado === 'fallido';
+        return $this->estado === self::ESTADO_FALLIDO;
     }
 
-    public function esPendiente()
+    public function esPendiente(): bool
     {
-        return $this->estado === 'pendiente';
+        return $this->estado === self::ESTADO_PENDIENTE;
     }
 
-    public function generarFolio()
+    public function generarFolio(): string
     {
         return 'WEB-' . strtoupper(uniqid());
     }

@@ -100,7 +100,7 @@ function submit() {
 
     router.put(route('admin.permisos.update', props.permiso.id), form, {
         onSuccess: () => {
-            // Redirige automáticamente
+           
         },
         onError: (err) => {
             errors.value = err;

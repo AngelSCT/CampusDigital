@@ -35,22 +35,20 @@ class Usuario extends Authenticatable implements MustVerifyEmail
 
     protected $casts = [
         'email_verificado' => 'boolean',
-        'bloqueado' => 'boolean',
-        'bloqueado_hasta' => 'datetime',
-        'ultimo_login_at' => 'datetime',
-        'seguridad_json' => 'array',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
+        'bloqueado'        => 'boolean',
+        'bloqueado_hasta'  => 'datetime',
+        'ultimo_login_at'  => 'datetime',
+        'seguridad_json'   => 'array',
+        'created_at'       => 'datetime',
+        'updated_at'       => 'datetime',
+        'deleted_at'       => 'datetime',
     ];
 
-    // Override para Fortify
     public function getAuthPassword()
     {
         return $this->password_hash;
     }
 
-    // Override para email verification
     public function hasVerifiedEmail()
     {
         return $this->email_verificado;
@@ -58,9 +56,7 @@ class Usuario extends Authenticatable implements MustVerifyEmail
 
     public function markEmailAsVerified()
     {
-        return $this->forceFill([
-            'email_verificado' => true,
-        ])->save();
+        return $this->forceFill(['email_verificado' => true])->save();
     }
 
     public function getEmailForVerification()
@@ -68,7 +64,47 @@ class Usuario extends Authenticatable implements MustVerifyEmail
         return $this->email;
     }
 
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new \App\Notifications\VerifyEmailNotification);
+    }
 
+    public function getNombreCompletoAttribute()
+    {
+        return trim($this->nombre . ' ' . $this->apellido);
+    }
+
+    public function estaBloqueado()
+    {
+        if (!$this->bloqueado) return false;
+
+        if ($this->bloqueado_hasta && now()->greaterThan($this->bloqueado_hasta)) {
+            $this->update(['bloqueado' => false, 'bloqueado_hasta' => null]);
+            return false;
+        }
+
+        return true;
+    }
+
+    public function hasRole($roleName)
+    {
+        return $this->roles()->where('nombre', $roleName)->exists();
+    }
+
+    public function hasAnyRole($roles)
+    {
+        return $this->roles()->whereIn('nombre', $roles)->exists();
+    }
+
+    public function hasPermission($permissionKey)
+    {
+        return $this->roles()
+            ->whereHas('permisos', function ($query) use ($permissionKey) {
+                $query->where('clave', $permissionKey);
+            })->exists();
+    }
+
+    // ── Relaciones ────────────────────────────────────────────────────────
 
     public function perfil()
     {
@@ -90,79 +126,42 @@ class Usuario extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(ActividadBitacora::class, 'usuario_id');
     }
 
-    // Métodos auxiliares
-    public function hasRole($roleName)
+    public function roles()
     {
-        return $this->roles()->where('nombre', $roleName)->exists();
+        return $this->belongsToMany(Rol::class, 'usuario_rol', 'usuario_id', 'rol_id')
+            ->withTimestamps()
+            ->wherePivotNull('deleted_at');
     }
 
-    public function hasAnyRole($roles)
+    public function tarjeta()
     {
-        return $this->roles()->whereIn('nombre', $roles)->exists();
+        return $this->hasOne(TarjetaUniversitaria::class, 'usuario_id');
     }
 
-    public function hasPermission($permissionKey)
+    public function archivos()
     {
-        return $this->roles()
-            ->whereHas('permisos', function ($query) use ($permissionKey) {
-                $query->where('clave', $permissionKey);
-            })
-            ->exists();
+        return $this->hasMany(\App\Models\Archivo::class, 'usuario_id');
     }
 
-    public function getNombreCompletoAttribute()
+    public function carpetas()
     {
-        return trim($this->nombre . ' ' . $this->apellido);
+        return $this->hasMany(\App\Models\ArchivosCarpeta::class, 'usuario_id');
     }
 
-    public function estaBloqueado()
+    // ── Módulo 8 ──────────────────────────────────────────────────────────
+
+    public function saldo()
     {
-        if (!$this->bloqueado) {
-            return false;
-        }
-
-        if ($this->bloqueado_hasta && now()->greaterThan($this->bloqueado_hasta)) {
-            $this->update(['bloqueado' => false, 'bloqueado_hasta' => null]);
-            return false;
-        }
-
-        return true;
+        return $this->hasOne(Saldo::class);
     }
-    public function sendEmailVerificationNotification()
-{
-    $this->notify(new \App\Notifications\VerifyEmailNotification);
-}
 
-public function roles()
-{
-    return $this->belongsToMany(Rol::class, 'usuario_rol', 'usuario_id', 'rol_id')
-        ->withTimestamps()
-        ->wherePivotNull('deleted_at');
-}
+    public function recargas()
+    {
+        return $this->hasMany(Recarga::class);
+    }
 
-public function saldo()
-{
-    return $this->hasOne(Saldo::class);
-}
-
-public function recargas()
-{
-    return $this->hasMany(Recarga::class);
-}
-
-public function pagos()
-{
-    return $this->hasMany(Pago::class);
-}
-
-public function comprobantes()
-{
-    return $this->hasMany(Comprobante::class);
-}
-
-public function movimientos()
-{
-    return $this->hasMany(Movimiento::class);
-}
-
+    public function movimientos()
+    {
+        return $this->hasMany(Movimiento::class);
+    }
 }

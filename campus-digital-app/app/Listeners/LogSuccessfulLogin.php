@@ -19,7 +19,6 @@ class LogSuccessfulLogin
             'detalle' => 'Login exitoso',
         ]);
 
-        // Actualizar último login
         $event->user->update([
             'ultimo_login_at' => now(),
         ]);

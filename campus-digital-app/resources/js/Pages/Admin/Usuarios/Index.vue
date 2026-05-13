@@ -21,7 +21,6 @@
                         </svg>
                     </button>
                     
-<!-- Menú desplegable -->
 <div v-if="showExportMenu" class="absolute right-0 mt-2 w-64 rounded-lg shadow-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-blue-500/20 z-10">
     <div class="py-1">
         <!-- Exportar todos - CSV -->
@@ -180,7 +179,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center min-w-[200px]">
                                         <div class="h-10 w-10 flex-shrink-0">
-                                            <img class="h-10 w-10 rounded-full ring-2 ring-slate-600" :src="usuario.foto_url || '/default-avatar.png'" alt="">
+                                            <img class="h-10 w-10 rounded-full ring-2 ring-slate-600" :src="usuario.foto_url ? `/storage/${usuario.foto_url}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(usuario.nombre + ' ' + usuario.apellido)}&background=1E40AF&color=fff`" alt="">
                                         </div>
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-white">{{ usuario.nombre }} {{ usuario.apellido }}</div>
@@ -222,6 +221,20 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end gap-2 min-w-[120px]">
+                                        <a
+                                            :href="route('admin.usuarios.show', usuario.id)"
+                                            class="text-slate-400 hover:text-white transition-colors duration-200"
+                                            title="Ver detalle"
+                                        >
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+                                                        -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </a>
+
                                         <a :href="route('admin.usuarios.edit', usuario.id)" class="text-blue-400 hover:text-blue-300 transition-colors duration-200" title="Editar">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
