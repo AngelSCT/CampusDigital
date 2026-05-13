@@ -71,3 +71,9 @@ MAIL_PASSWORD=contrasena-de-aplicacion      ESTA SE GENERA CON CONTRASENAS DE AP
 MAIL_ENCRYPTION=tls                         DEJAR IGUAL
 MAIL_FROM_ADDRESS="correo@gmail.com"        REPETIR EL CORREO SMTP ,IMPORTANTE ENTRE COMILLAS ""
 MAIL_FROM_NAME="${APP_NAME}"                DEJAR IGUAL
+
+
+------
+EXECUTAR OPCIONAL
+
+php artisan install:api  
