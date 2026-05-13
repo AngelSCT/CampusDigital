@@ -98,6 +98,14 @@ class Pedido extends Model
 
     public function historial()
     {
-    return $this->hasMany(PedidoHistorial::class, 'pedido_id')->orderBy('created_at', 'asc');
+        return $this->hasMany(PedidoHistorial::class, 'pedido_id');
+    }
+
+    /**
+     * Relación: un pedido tiene muchos items (detalle por producto).
+     */
+    public function items()
+    {
+        return $this->hasMany(PedidoItem::class, 'pedido_id');
     }
 }
