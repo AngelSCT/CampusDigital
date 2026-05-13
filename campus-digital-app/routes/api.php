@@ -39,6 +39,17 @@ use App\Http\Controllers\Api\RecargaApiController;
 // RUTAS EXTRA CON UID Y EL PIN
 use App\Http\Controllers\Api\RfidApiController;
 
+// MODULO INVENTARIO
+use App\Http\Controllers\Api\InventarioApiController;
+use App\Http\Controllers\Api\CatalogoApiController;
+use App\Http\Controllers\Api\CatalogoVendedorApiController;
+use App\Http\Controllers\Api\CategoriaApiController;
+use App\Http\Controllers\Api\PromocionApiController;
+use App\Http\Controllers\Api\PrecioApiController;
+use App\Http\Controllers\Api\DisponibilidadApiController;
+use App\Http\Controllers\Api\ReglaApiController;
+use App\Http\Controllers\Api\MovimientoApiController;
+
 Route::middleware('api.key')->group(function () {
 
     Route::apiResource('areas', AreaApiController::class);
@@ -51,6 +62,18 @@ Route::middleware('api.key')->group(function () {
     Route::apiResource('insumos', InsumoApiController::class);
     Route::apiResource('gastos-ticket', GastoTicketApiController::class);
     Route::apiResource('historial-tickets', HistorialTicketApiController::class);
+    Route::apiResource('inventario', InventarioApiController::class);
+    Route::get('inventario-stock-bajo', [InventarioApiController::class, 'stockBajo']);
+
+    // Control de CRUDs adicionales (catalogos, vendedores, categorias, promociones, precios, disponibilidades, reglas, movimientos)
+    Route::apiResource('catalogos', CatalogoApiController::class);
+    Route::apiResource('vendedores', CatalogoVendedorApiController::class);
+    Route::apiResource('categorias', CategoriaApiController::class);
+    Route::apiResource('promociones', PromocionApiController::class);
+    Route::apiResource('precios', PrecioApiController::class);
+    Route::apiResource('disponibilidades', DisponibilidadApiController::class);
+    Route::apiResource('reglas', ReglaApiController::class);
+    Route::apiResource('movimientos', MovimientoApiController::class);
 
     Route::apiResource('usuarios', UsuarioApiController::class);
     Route::post('usuarios/{id}/toggle-block', [UsuarioApiController::class, 'toggleBlock']);
