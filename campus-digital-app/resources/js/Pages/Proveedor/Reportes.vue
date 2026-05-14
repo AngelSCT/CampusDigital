@@ -165,6 +165,53 @@ const setPeriodo = (p) => {
                         </div>
                     </div>
                 </div>
+                </div>
+
+                <!-- NEW: Historial de Atención -->
+                <div class="mt-6 bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-800 bg-slate-900/80">
+                        <h3 class="text-lg font-bold text-white">Historial de Atención (Últimos {{ periodo }})</h3>
+                    </div>
+                    <div class="p-0">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-slate-300">
+                                <thead class="bg-slate-800/50 text-xs uppercase text-slate-400">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">Folio</th>
+                                        <th scope="col" class="px-6 py-3">Cliente</th>
+                                        <th scope="col" class="px-6 py-3">Tiempo (min)</th>
+                                        <th scope="col" class="px-6 py-3">Total</th>
+                                        <th scope="col" class="px-6 py-3">Hora Entrega</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="pedido in reports.historial_atencion" :key="pedido.id" class="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
+                                        <td class="px-6 py-4 font-mono text-blue-400 font-bold">
+                                            {{ pedido.numero_folio }}
+                                        </td>
+                                        <td class="px-6 py-4 font-medium text-white">
+                                            {{ pedido.usuario?.nombre }} {{ pedido.usuario?.apellido }}
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold" :class="((new Date(pedido.confirmado_at) - new Date(pedido.created_at))/60000) > 15 ? 'bg-orange-500/20 text-orange-400' : 'bg-emerald-500/20 text-emerald-400'">
+                                                {{ Math.round((new Date(pedido.confirmado_at) - new Date(pedido.created_at)) / 60000) }} min
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 font-bold text-white">
+                                            {{ formatCurrency(pedido.total) }}
+                                        </td>
+                                        <td class="px-6 py-4 text-xs text-slate-400">
+                                            {{ new Date(pedido.confirmado_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div v-if="!reports.historial_atencion?.length" class="text-center py-8 text-slate-500 italic">
+                                No hay pedidos entregados recientemente.
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </template>
         </div>
     </AuthLayout>

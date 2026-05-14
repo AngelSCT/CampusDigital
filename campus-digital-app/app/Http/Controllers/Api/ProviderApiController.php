@@ -56,9 +56,27 @@ class ProviderApiController extends Controller
             'ventas_por_dia' => $this->getVentasPorDia($modulo, $periodo),
             'rendimiento_turno' => $this->getRendimientoTurno($modulo, $periodo),
             'ventas_por_producto' => $this->getVentasPorProducto($modulo, $periodo),
+            'historial_atencion' => $this->getHistorialAtencion($modulo, $periodo),
         ];
 
         return response()->json($reportes);
+    }
+
+    private function getHistorialAtencion($modulo, $periodo)
+    {
+        $query = Pedido::with('usuario')
+            ->where('modulo', $modulo)
+            ->where('estado', 'entregado');
+
+        if ($periodo === 'hoy') {
+            $query->whereDate('confirmado_at', now()->today());
+        } elseif ($periodo === 'semana') {
+            $query->where('confirmado_at', '>=', now()->startOfWeek());
+        } elseif ($periodo === 'mes') {
+            $query->where('confirmado_at', '>=', now()->startOfMonth());
+        }
+
+        return $query->orderByDesc('confirmado_at')->take(10)->get();
     }
 
     private function getVentasPorProducto($modulo, $periodo)

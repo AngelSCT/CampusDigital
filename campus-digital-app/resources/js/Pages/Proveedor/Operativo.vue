@@ -144,6 +144,50 @@ const setTab = (tab) => {
     fetchPedidos();
 };
 
+// Consultar Saldo Logic
+const showSaldoModal = ref(false);
+const saldoUserSearch = ref('');
+const saldoUsersFound = ref([]);
+const saldoSelectedUser = ref(null);
+const saldoActual = ref(null);
+const loadingSaldo = ref(false);
+
+watch(saldoUserSearch, async (val) => {
+    if (val.length >= 3) {
+        const res = await axios.get('/proveedor/api/users/search', { params: { q: val } });
+        saldoUsersFound.value = res.data;
+    } else {
+        saldoUsersFound.value = [];
+    }
+});
+
+const selectSaldoUser = async (user) => {
+    saldoSelectedUser.value = user;
+    saldoUsersFound.value = [];
+    saldoUserSearch.value = `${user.nombre} ${user.apellido}`;
+    
+    // Fetch saldo
+    loadingSaldo.value = true;
+    saldoActual.value = null;
+    try {
+        const response = await axios.get(`/api/saldo-monederos/usuario/${user.id}`);
+        saldoActual.value = response.data.saldo_disponible || 0;
+    } catch (error) {
+        console.error('Error fetching saldo', error);
+        saldoActual.value = 0; // Or handle better
+    } finally {
+        loadingSaldo.value = false;
+    }
+};
+
+const closeSaldoModal = () => {
+    showSaldoModal.value = false;
+    saldoSelectedUser.value = null;
+    saldoUserSearch.value = '';
+    saldoActual.value = null;
+};
+
+
 </script>
 
 <template>
@@ -157,6 +201,15 @@ const setTab = (tab) => {
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-3">
+                    <button 
+                        @click="showSaldoModal = true"
+                        class="inline-flex items-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition-all shadow-lg border border-slate-600"
+                    >
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Consultar Saldo
+                    </button>
                     <button 
                         @click="showOrderModal = true"
                         class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/20"
@@ -336,6 +389,39 @@ const setTab = (tab) => {
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Saldo Check Modal -->
+            <div v-if="showSaldoModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-white">Consultar Saldo</h2>
+                        <button @click="closeSaldoModal" class="text-slate-500 hover:text-white">&times;</button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="relative">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cliente (Buscar por nombre o email)</label>
+                            <input v-model="saldoUserSearch" type="text" placeholder="Escribe para buscar..." class="w-full bg-slate-800 border-slate-700 rounded-xl text-white focus:ring-blue-500"/>
+                            
+                            <div v-if="saldoUsersFound.length" class="absolute z-10 w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-2xl max-h-40 overflow-y-auto">
+                                <button v-for="u in saldoUsersFound" :key="u.id" type="button" @click="selectSaldoUser(u)" class="w-full px-4 py-2 text-left hover:bg-slate-700 text-sm text-white border-b border-slate-700 last:border-0 transition-colors">
+                                    {{ u.nombre }} {{ u.apellido }} <span class="text-slate-500">({{ u.email }})</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div v-if="loadingSaldo" class="py-6 flex justify-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                        </div>
+
+                        <div v-else-if="saldoSelectedUser" class="mt-4 p-5 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl text-center shadow-inner">
+                            <p class="text-sm text-slate-400 mb-1">Saldo Disponible de</p>
+                            <p class="text-lg font-bold text-white mb-3">{{ saldoSelectedUser.nombre }} {{ saldoSelectedUser.apellido }}</p>
+                            <p class="text-4xl font-black text-emerald-400 font-mono">{{ formatCurrency(saldoActual) }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
