@@ -6,31 +6,40 @@ use App\Models\Cart\Bitacora;
 use App\Models\Cart\Carrito;
 use App\Models\Cart\ConciliacionPendiente;
 use App\Models\Cart\ItemCarrito;
+use App\Modules\Cart\Contracts\PedidoCreatorInterface;
 use App\Modules\Cart\Exceptions\CartBusinessException;
+use App\Modules\Cart\Exceptions\CheckoutRevertidoException;
 use App\Modules\Cart\Exceptions\CartStateException;
 use App\Modules\Cart\Exceptions\SaldoInsufficientFundsException;
 use App\Modules\Cart\Exceptions\SaldoUnavailableException;
+use Illuminate\Support\Facades\DB;
 
 class CheckoutService
 {
     public function __construct(
-        private readonly CarritoService $carritoService,
-        private readonly SaldoClient $saldoClient,
+        private readonly CarritoService       $carritoService,
+        private readonly SaldoClient          $saldoClient,
+        private readonly PedidoCreatorInterface $pedidoCreator,
     ) {}
 
     /**
-     * Confirma el carrito.
+     * Confirma el carrito siguiendo el contrato v1.2 + integración Pedidos.
      *
-     * Flujo sección C5 / contrato v1.2:
-     *  - requiere_saldo=false → confirma directo.
-     *  - requiere_saldo=true  →
-     *      1. reservar() al módulo Saldo.
-     *      2. SaldoConfirmed  → confirmarDirecto() + confirmar(reserva_id).
-     *         - confirmar() falla (409) → revierte carrito a 'abierto', registra incidente.
-     *         - Excepción inesperada entre reservar y confirmar → liberar(reserva_id).
-     *      3. SaldoInsufficientFunds → SaldoInsufficientFundsException (→ 402).
-     *      4. SaldoUnavailable + sin diferido → SaldoUnavailableException (→ 503).
-     *      5. SaldoUnavailable + diferido + dentro de topes → confirmado_pendiente_conciliacion.
+     * Flujo según requiere_saldo:
+     *
+     *  false → confirmarSinSaldo():
+     *      DB::transaction { confirmarDirecto() + crearDesdeCarrito() }
+     *
+     *  true  →
+     *      1. [HTTP] reservar()
+     *      2. SaldoConfirmed  → confirmarConReserva():
+     *             DB::transaction { confirmarDirecto() + crearDesdeCarrito() }
+     *             [HTTP] confirmar()  ← después del commit
+     *             Si confirmar() falla → compensarPostCommit()
+     *         SaldoInsufficientFunds → SaldoInsufficientFundsException (402)
+     *         SaldoUnavailable + sin diferido → SaldoUnavailableException (503)
+     *         SaldoUnavailable + diferido + topes → confirmarPendienteConciliacion()
+     *             (el Pedido se crea cuando ReintentaConciliacion confirme el cobro)
      *
      * @throws CartStateException
      * @throws CartBusinessException
@@ -51,11 +60,12 @@ class CheckoutService
         }
 
         if (!$carrito->requiere_saldo) {
-            return $this->confirmarDirecto($carrito, $data);
+            return $this->confirmarSinSaldo($carrito, $data);
         }
 
-        // ── Integración con Saldo ──────────────────────────────────────────
-        $total     = (float) $carrito->total;
+        // ── Integración con Saldo ──────────────────────────────────────────────
+        // Paso 1: reservar [HTTP, ANTES de cualquier transacción de BD]
+        $total      = (float) $carrito->total;
         $moduloSlug = $carrito->modulo?->slug ?? '';
 
         $result = $this->saldoClient->reservar(
@@ -84,7 +94,6 @@ class CheckoutService
             throw new SaldoUnavailableException('Servicio de saldo no disponible, intenta más tarde.');
         }
 
-        // Verificar topes de exposición (sección 5.3 del cambio C5).
         $topeUsuario = (float) config('cart.saldo.tope_pendiente_por_usuario', 200);
         $topeGlobal  = (float) config('cart.saldo.tope_pendiente_global', 50000);
 
@@ -109,41 +118,162 @@ class CheckoutService
     // ─────────────────────────────────────────────────────────────────────────
 
     /**
-     * Confirma el carrito y ejecuta la reserva en Saldo.
-     * Si confirmar() falla (409) revierte el carrito a abierto y registra incidente.
-     * Si hay una excepción inesperada ANTES de llamar a confirmar(), libera la reserva.
+     * Path sin Saldo.
+     *
+     * La transacción garantiza atomicidad: si crearDesdeCarrito() lanza,
+     * la confirmación del Carrito también se revierte. El Carrito pasa a
+     * 'revertido' para señalizar que este intento de checkout falló de
+     * forma irrecuperable (el usuario debe crear uno nuevo).
+     */
+    private function confirmarSinSaldo(Carrito $carrito, array $data): Carrito
+    {
+        try {
+            DB::transaction(function () use ($carrito, $data) {
+                $this->confirmarDirecto($carrito, $data);
+                $this->pedidoCreator->crearDesdeCarrito($carrito);
+                Bitacora::create([
+                    'accion'       => Bitacora::ACCION_PEDIDO_CREADO,
+                    'modulo_id'    => $carrito->modulo_id,
+                    'carrito_uuid' => $carrito->uuid,
+                    'payload'      => ['usuario_ref' => $carrito->usuario_ref, 'tipo' => 'directo'],
+                ]);
+            });
+        } catch (\Throwable $e) {
+            // Rollback automático: carrito NO está confirmado en BD.
+            // Lo marcamos 'revertido' para que no quede en estado ambiguo.
+            try {
+                $carrito->update(['estado' => Carrito::ESTADO_REVERTIDO]);
+                Bitacora::create([
+                    'accion'       => Bitacora::ACCION_CARRITO_REVERTIDO,
+                    'modulo_id'    => $carrito->modulo_id,
+                    'carrito_uuid' => $carrito->uuid,
+                    'payload'      => ['motivo' => 'pedido_creation_failed'],
+                ]);
+            } catch (\Throwable) {}
+            throw $e;
+        }
+
+        return $carrito->fresh();
+    }
+
+    /**
+     * Path con reserva de Saldo confirmada.
+     *
+     * Orden garantizado (ninguna llamada HTTP dentro de la transacción):
+     *   1. [HTTP] reservar()  ← ya ejecutado por confirmar() antes de llamar aquí
+     *   2. DB::transaction { confirmarDirecto() + crearDesdeCarrito() }
+     *   3. [HTTP] confirmar(reservaId)  ← después del commit
+     *
+     * Compensación:
+     *   - Si la transacción falla (pre-commit) → liberar reserva + carrito='revertido'
+     *   - Si confirmar() retorna false/409 post-commit → cancelar Pedido + liberar + carrito='revertido'
+     *   - Si confirmar() lanza post-commit → idem
      */
     private function confirmarConReserva(Carrito $carrito, array $data, ?string $reservaId): Carrito
     {
-        // True solo cuando confirmar() retornó normalmente (true o false).
-        // Si lanza excepción, permanece false → finally libera la reserva.
-        $confirmarCompletado = false;
+        $transaccionCompletada = false;
 
         try {
-            $this->confirmarDirecto($carrito, $data);
-
-            $ok = $this->saldoClient->confirmar($reservaId, $carrito->uuid);
-            $confirmarCompletado = true;
-
-            if (!$ok) {
-                // 409 — reserva expirada o ya consumida: revertir carrito
-                $carrito->update(['estado' => Carrito::ESTADO_ABIERTO, 'confirmed_at' => null]);
-
+            // Paso 2: transacción de BD [sin llamadas HTTP]
+            DB::transaction(function () use ($carrito, $data) {
+                $this->confirmarDirecto($carrito, $data);
+                $this->pedidoCreator->crearDesdeCarrito($carrito);
                 Bitacora::create([
-                    'accion'       => 'saldo.confirmar_fallido',
+                    'accion'       => Bitacora::ACCION_PEDIDO_CREADO,
                     'modulo_id'    => $carrito->modulo_id,
                     'carrito_uuid' => $carrito->uuid,
-                    'payload'      => ['reserva_id' => $reservaId, 'motivo' => 'confirmar_409'],
+                    'payload'      => ['usuario_ref' => $carrito->usuario_ref, 'tipo' => 'con_saldo'],
                 ]);
+            });
+            $transaccionCompletada = true;
+
+            // Paso 3: confirmar Saldo [HTTP, DESPUÉS del commit de BD]
+            $ok = $this->saldoClient->confirmar($reservaId, $carrito->uuid);
+
+            if (!$ok) {
+                // 409 — reserva expirada: Pedido creado pero cobro rechazado → compensar
+                $this->compensarPostCommit($carrito, $reservaId, 'confirmar_409');
+                // Ambos modos de fallo post-commit lanzan la misma excepción → 409 en el controller
+                throw new CheckoutRevertidoException('La confirmación del cobro fue rechazada; el checkout fue revertido.');
             }
 
             return $carrito->fresh();
-        } finally {
-            // Excepción inesperada (incluyendo dentro de confirmar()) → liberar fondos retenidos.
-            if (!$confirmarCompletado && $reservaId) {
-                $this->saldoClient->liberar($reservaId);
+
+        } catch (CheckoutRevertidoException $e) {
+            throw $e; // Ya compensado arriba, propagar sin envolver de nuevo
+        } catch (\Throwable $e) {
+            if (!$transaccionCompletada) {
+                // La transacción falló (rollback automático) → liberar fondos retenidos + revertir
+                try { $this->saldoClient->liberar($reservaId); } catch (\Throwable) {}
+                try {
+                    $carrito->update(['estado' => Carrito::ESTADO_REVERTIDO]);
+                    Bitacora::create([
+                        'accion'       => Bitacora::ACCION_CARRITO_REVERTIDO,
+                        'modulo_id'    => $carrito->modulo_id,
+                        'carrito_uuid' => $carrito->uuid,
+                        'payload'      => ['reserva_id' => $reservaId, 'motivo' => 'pedido_creation_failed'],
+                    ]);
+                } catch (\Throwable) {}
+                throw $e; // Pre-commit: re-throw original (CartBusinessException, RuntimeException…)
+            } else {
+                // confirmar() lanzó post-commit → compensar → unificar respuesta con el path false
+                try { $this->compensarPostCommit($carrito, $reservaId, 'confirmar_excepcion'); } catch (\Throwable) {}
+                throw new CheckoutRevertidoException('Error al confirmar el cobro; el checkout fue revertido.');
             }
         }
+    }
+
+    /**
+     * Compensación post-commit: el Carrito y el Pedido ya están en BD,
+     * pero el cobro de Saldo falló. Cancela el Pedido, libera la reserva
+     * y deja el Carrito en 'revertido'.
+     */
+    /**
+     * Compensación post-commit: Carrito y Pedido ya están en BD, cobro falló.
+     *
+     * Orden defensivo: cada paso tiene su propio try/catch para que el carrito
+     * llegue a 'revertido' incluso si pasos intermedios fallan.
+     * Los fallos de liberar() se registran en bitácora (auditable/reconciliable).
+     */
+    private function compensarPostCommit(Carrito $carrito, ?string $reservaId, string $motivo): void
+    {
+        // 1. Cancelar el Pedido (idempotente — si falla, continuar)
+        try {
+            $this->pedidoCreator->cancelarPedidoDeCarrito((string) $carrito->uuid);
+            Bitacora::create([
+                'accion'       => Bitacora::ACCION_PEDIDO_CANCELADO,
+                'modulo_id'    => $carrito->modulo_id,
+                'carrito_uuid' => $carrito->uuid,
+                'payload'      => ['motivo' => $motivo],
+            ]);
+        } catch (\Throwable) {}
+
+        // 2. Liberar la reserva de Saldo — registrar fallo para auditoría
+        if ($reservaId) {
+            try {
+                $this->saldoClient->liberar($reservaId);
+            } catch (\Throwable $e) {
+                try {
+                    Bitacora::create([
+                        'accion'       => Bitacora::ACCION_SALDO_LIBERAR_FALLIDO,
+                        'modulo_id'    => $carrito->modulo_id,
+                        'carrito_uuid' => $carrito->uuid,
+                        'payload'      => ['reserva_id' => $reservaId, 'motivo' => $motivo, 'error' => $e->getMessage()],
+                    ]);
+                } catch (\Throwable) {}
+            }
+        }
+
+        // 3. Carrito → revertido — siempre, incluso si pasos anteriores fallaron
+        try {
+            $carrito->update(['estado' => Carrito::ESTADO_REVERTIDO]);
+            Bitacora::create([
+                'accion'       => Bitacora::ACCION_CARRITO_REVERTIDO,
+                'modulo_id'    => $carrito->modulo_id,
+                'carrito_uuid' => $carrito->uuid,
+                'payload'      => ['reserva_id' => $reservaId, 'motivo' => $motivo],
+            ]);
+        } catch (\Throwable) {}
     }
 
     private function confirmarDirecto(Carrito $carrito, array $data): Carrito
@@ -167,6 +297,12 @@ class CheckoutService
         return $carrito->fresh();
     }
 
+    /**
+     * Path de pago diferido (SaldoUnavailable + permite_pago_diferido).
+     *
+     * El Pedido NO se crea aquí: el cobro aún no está confirmado.
+     * ReintentaConciliacion debe crear el Pedido cuando confirme el cargo.
+     */
     private function confirmarPendienteConciliacion(Carrito $carrito, array $data, float $total): Carrito
     {
         $carrito->update([

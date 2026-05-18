@@ -8,8 +8,10 @@ use App\Models\Cart\Carrito;
 use App\Models\Cart\Categoria;
 use App\Models\Cart\ConciliacionPendiente;
 use App\Models\Cart\ItemCarrito;
+use App\Modules\Cart\Contracts\PedidoCreatorInterface;
 use App\Modules\Cart\Services\CarritoService;
 use App\Modules\Cart\Services\ModuleTokenService;
+use App\Modules\Cart\Services\NullPedidoCreator;
 use App\Modules\Cart\Services\SaldoClient;
 use App\Modules\Cart\Services\SaldoConfirmed;
 use App\Modules\Cart\Services\SaldoInsufficientFunds;
@@ -276,9 +278,10 @@ class SaldoIntegrationTest extends CartTestCase
     // ─── Nuevos tests de ciclo reservar/confirmar/liberar ────────────────────
 
     #[Test]
-    public function reservar_exitoso_pero_confirmar_falla_devuelve_carrito_abierto_y_registra_incidente(): void
+    public function reservar_exitoso_pero_confirmar_falla_compensa_y_deja_carrito_revertido(): void
     {
-        // confirmar() devuelve false (409 simulado)
+        // confirmar() devuelve false (409 simulado): post-commit, el cobro fue rechazado.
+        // Nuevo comportamiento (Capa 8): Pedido cancelado + liberar + carrito='revertido'.
         $this->bindSaldoClientStub(
             resultReservar: new SaldoConfirmed('RSRV-FAIL', '2026-05-01T00:00:00Z'),
             confirmar:      false,
@@ -290,14 +293,19 @@ class SaldoIntegrationTest extends CartTestCase
 
         $this->withToken($this->token)
             ->postJson("/api/cart/carritos/{$carrito->uuid}/checkout")
-            ->assertOk();
+            ->assertStatus(409)
+            ->assertJsonPath('error', 'CHECKOUT_REVERTIDO');
 
-        // El carrito debe haber vuelto a abierto
-        $this->assertEquals(Carrito::ESTADO_ABIERTO, $carrito->fresh()->estado);
+        // Post-commit con confirmar_409 → carrito debe quedar en 'revertido'
+        $this->assertEquals(Carrito::ESTADO_REVERTIDO, $carrito->fresh()->estado);
 
-        // Incidente registrado en bitácora
+        // Bitácora de compensación
         $this->assertDatabaseHas('cart_bitacora', [
-            'accion'       => 'saldo.confirmar_fallido',
+            'accion'       => Bitacora::ACCION_PEDIDO_CANCELADO,
+            'carrito_uuid' => $carrito->uuid,
+        ]);
+        $this->assertDatabaseHas('cart_bitacora', [
+            'accion'       => Bitacora::ACCION_CARRITO_REVERTIDO,
             'carrito_uuid' => $carrito->uuid,
         ]);
     }
@@ -334,13 +342,14 @@ class SaldoIntegrationTest extends CartTestCase
         $this->agregarItem($carrito, 'prestamo', 50.00);
         $carrito->update(['total' => '50.00']);
 
-        // La excepción debe propagarse (500)
+        // Ambos modos de fallo post-commit devuelven 409 CHECKOUT_REVERTIDO
         $this->withToken($this->token)
             ->postJson("/api/cart/carritos/{$carrito->uuid}/checkout")
-            ->assertStatus(500);
+            ->assertStatus(409)
+            ->assertJsonPath('error', 'CHECKOUT_REVERTIDO');
 
-        // liberar() debe haber sido llamado para hacer rollback de la reserva
-        $this->assertTrue($stub->liberarLlamado, 'liberar() debe ser llamado al ocurrir una excepción inesperada');
+        // liberar() debe haber sido llamado dentro de compensarPostCommit
+        $this->assertTrue($stub->liberarLlamado, 'liberar() debe llamarse ante excepción post-commit');
     }
 
     // ─── Tests del Job ReintentaConciliacion ─────────────────────────────────
@@ -350,7 +359,7 @@ class SaldoIntegrationTest extends CartTestCase
     {
         $conciliacion = $this->crearConciliacion();
         $job          = new ReintentaConciliacion($conciliacion);
-        $job->handle($this->makeSaldoClientStub(cargoForzoso: true));
+        $job->handle($this->makeSaldoClientStub(cargoForzoso: true), new NullPedidoCreator());
 
         $conciliacion->refresh();
         $this->assertEquals(ConciliacionPendiente::ESTADO_EXITOSA, $conciliacion->estado_conciliacion);
@@ -368,7 +377,7 @@ class SaldoIntegrationTest extends CartTestCase
 
         $conciliacion = $this->crearConciliacion(intentos: 0);
         $job          = new ReintentaConciliacion($conciliacion);
-        $job->handle($this->makeSaldoClientStub(cargoForzoso: false));
+        $job->handle($this->makeSaldoClientStub(cargoForzoso: false), new NullPedidoCreator());
 
         $conciliacion->refresh();
         $this->assertEquals(1, $conciliacion->intentos);
@@ -385,11 +394,68 @@ class SaldoIntegrationTest extends CartTestCase
 
         $conciliacion = $this->crearConciliacion(intentos: 4);
         $job          = new ReintentaConciliacion($conciliacion);
-        $job->handle($this->makeSaldoClientStub(cargoForzoso: false));
+        $job->handle($this->makeSaldoClientStub(cargoForzoso: false), new NullPedidoCreator());
 
         $conciliacion->refresh();
         $this->assertEquals(5, $conciliacion->intentos);
         $this->assertEquals(ConciliacionPendiente::ESTADO_REQUIERE_REVISION, $conciliacion->estado_conciliacion);
         $this->assertDatabaseHas('cart_bitacora', ['accion' => 'conciliacion.revision_manual']);
+    }
+
+    #[Test]
+    public function conciliacion_exitosa_crea_pedido_para_el_carrito(): void
+    {
+        $pedidoSpy = new class implements PedidoCreatorInterface {
+            public int $crearCalls = 0;
+            public function crearDesdeCarrito(\App\Models\Cart\Carrito $c): void { $this->crearCalls++; }
+            public function cancelarPedidoDeCarrito(string $uuid): void {}
+        };
+
+        $conciliacion = $this->crearConciliacion();
+        $job          = new ReintentaConciliacion($conciliacion);
+        $job->handle($this->makeSaldoClientStub(cargoForzoso: true), $pedidoSpy);
+
+        $this->assertEquals(1, $pedidoSpy->crearCalls,
+            'crearDesdeCarrito debe llamarse exactamente una vez al confirmar la conciliación');
+
+        $conciliacion->refresh();
+        $this->assertEquals(ConciliacionPendiente::ESTADO_EXITOSA, $conciliacion->estado_conciliacion);
+
+        $carrito = Carrito::where('uuid', $conciliacion->carrito_uuid)->first();
+        $this->assertEquals(Carrito::ESTADO_CONFIRMADO, $carrito->estado);
+
+        $this->assertDatabaseHas('cart_bitacora', [
+            'accion'       => Bitacora::ACCION_PEDIDO_CREADO,
+            'carrito_uuid' => $conciliacion->carrito_uuid,
+        ]);
+        $this->assertDatabaseHas('cart_bitacora', ['accion' => 'conciliacion.exitosa']);
+    }
+
+    #[Test]
+    public function conciliacion_exitosa_pero_pedido_falla_escala_a_revision_manual(): void
+    {
+        $pedidoSpy = new class implements PedidoCreatorInterface {
+            public function crearDesdeCarrito(\App\Models\Cart\Carrito $c): void {
+                throw new \RuntimeException('Módulo Pedidos no disponible');
+            }
+            public function cancelarPedidoDeCarrito(string $uuid): void {}
+        };
+
+        $conciliacion = $this->crearConciliacion();
+        $job          = new ReintentaConciliacion($conciliacion);
+        $job->handle($this->makeSaldoClientStub(cargoForzoso: true), $pedidoSpy);
+
+        $conciliacion->refresh();
+        $this->assertEquals(ConciliacionPendiente::ESTADO_REQUIERE_REVISION, $conciliacion->estado_conciliacion,
+            'Debe escalar a revisión manual cuando el Pedido no se puede crear (cargo ya cobrado)');
+
+        // Carrito NO debe haberse confirmado (rollback de la transaction)
+        $carrito = Carrito::where('uuid', $conciliacion->carrito_uuid)->first();
+        $this->assertEquals(Carrito::ESTADO_CONFIRMADO_PENDIENTE_CONCILIACION, $carrito->estado);
+
+        $this->assertDatabaseHas('cart_bitacora', [
+            'accion'       => 'conciliacion.pedido_creation_failed',
+            'carrito_uuid' => $conciliacion->carrito_uuid,
+        ]);
     }
 }

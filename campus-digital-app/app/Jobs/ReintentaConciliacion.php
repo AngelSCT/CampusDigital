@@ -5,12 +5,14 @@ namespace App\Jobs;
 use App\Models\Cart\Bitacora;
 use App\Models\Cart\Carrito;
 use App\Models\Cart\ConciliacionPendiente;
+use App\Modules\Cart\Contracts\PedidoCreatorInterface;
 use App\Modules\Cart\Services\SaldoClient;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 
 class ReintentaConciliacion implements ShouldQueue
 {
@@ -21,8 +23,13 @@ class ReintentaConciliacion implements ShouldQueue
     /**
      * Usa cargoForzoso() directamente porque el servicio ya fue entregado
      * y la deuda necesita cobrarse sin importar el saldo disponible.
+     *
+     * Si el cargo es exitoso, crea el Pedido dentro de una DB::transaction
+     * junto con el cambio de estado del Carrito (atómico).
+     * Si la creación del Pedido falla, el cargoForzoso ya fue cobrado y NO
+     * se puede revertir: se escala a revisión manual sin reintentar el job.
      */
-    public function handle(SaldoClient $saldo): void
+    public function handle(SaldoClient $saldo, PedidoCreatorInterface $pedidoCreator): void
     {
         $conciliacion = $this->conciliacion->fresh();
 
@@ -39,25 +46,72 @@ class ReintentaConciliacion implements ShouldQueue
         );
 
         if ($ok) {
-            $this->onConfirmado($conciliacion);
+            $this->onConfirmado($conciliacion, $pedidoCreator);
             return;
         }
 
-        // cargoForzoso() falló → Saldo no disponible → reagendar o escalar.
         $this->onNoDisponible($conciliacion);
     }
 
-    private function onConfirmado(ConciliacionPendiente $conciliacion): void
+    /**
+     * El cargo fue confirmado. Actualiza la conciliación, el Carrito y crea el Pedido
+     * en una única DB::transaction (atómica).
+     *
+     * Si crearDesdeCarrito() falla: la transacción hace rollback (carrito y conciliación
+     * no se actualizan), se registra el incidente y se escala a REQUIERE_REVISION.
+     * El job NO se reintenta porque el cargo de saldo YA fue cobrado.
+     */
+    private function onConfirmado(ConciliacionPendiente $conciliacion, PedidoCreatorInterface $pedidoCreator): void
     {
-        $conciliacion->update([
-            'estado_conciliacion' => ConciliacionPendiente::ESTADO_EXITOSA,
-            'ultimo_intento_at'   => now(),
-        ]);
+        $carrito = Carrito::where('uuid', $conciliacion->carrito_uuid)
+            ->with('modulo')
+            ->first();
 
-        Carrito::where('uuid', $conciliacion->carrito_uuid)->update([
-            'estado'       => Carrito::ESTADO_CONFIRMADO,
-            'confirmed_at' => now(),
-        ]);
+        if (!$carrito) {
+            $conciliacion->update([
+                'estado_conciliacion' => ConciliacionPendiente::ESTADO_REQUIERE_REVISION,
+                'ultimo_intento_at'   => now(),
+            ]);
+            return;
+        }
+
+        try {
+            DB::transaction(function () use ($conciliacion, $carrito, $pedidoCreator) {
+                $conciliacion->update([
+                    'estado_conciliacion' => ConciliacionPendiente::ESTADO_EXITOSA,
+                    'ultimo_intento_at'   => now(),
+                ]);
+
+                $carrito->update([
+                    'estado'       => Carrito::ESTADO_CONFIRMADO,
+                    'confirmed_at' => now(),
+                ]);
+
+                $pedidoCreator->crearDesdeCarrito($carrito);
+
+                Bitacora::create([
+                    'accion'       => Bitacora::ACCION_PEDIDO_CREADO,
+                    'modulo_id'    => $conciliacion->modulo_id,
+                    'carrito_uuid' => $conciliacion->carrito_uuid,
+                    'payload'      => ['monto' => $conciliacion->monto, 'tipo' => 'conciliacion_diferida'],
+                ]);
+            });
+        } catch (\Throwable $e) {
+            // El cargo YA fue cobrado pero el Pedido no pudo crearse.
+            // NO reintentar (evitar doble cobro). Escalar a revisión manual.
+            Bitacora::create([
+                'accion'       => 'conciliacion.pedido_creation_failed',
+                'modulo_id'    => $conciliacion->modulo_id,
+                'carrito_uuid' => $conciliacion->carrito_uuid,
+                'payload'      => ['error' => $e->getMessage()],
+            ]);
+
+            $conciliacion->update([
+                'estado_conciliacion' => ConciliacionPendiente::ESTADO_REQUIERE_REVISION,
+                'ultimo_intento_at'   => now(),
+            ]);
+            return;
+        }
 
         Bitacora::create([
             'accion'       => 'conciliacion.exitosa',

@@ -40,6 +40,10 @@ class Bitacora extends Model
     const ACCION_ITEM_REMOVIDO         = 'item.removido';
     const ACCION_ITEM_DEVUELTO         = 'item.devuelto';
     const ACCION_AUTH_FALLO            = 'auth.fallo';
+    const ACCION_PEDIDO_CREADO          = 'pedido.creado';
+    const ACCION_PEDIDO_CANCELADO       = 'pedido.cancelado';
+    const ACCION_CARRITO_REVERTIDO      = 'carrito.revertido';
+    const ACCION_SALDO_LIBERAR_FALLIDO  = 'saldo.liberar_fallido';
 
     public function modulo(): BelongsTo
     {

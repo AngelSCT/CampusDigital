@@ -9,6 +9,7 @@ use App\Models\Cart\ModuloCliente;
 use App\Modules\Cart\Exceptions\CartBusinessException;
 use App\Modules\Cart\Exceptions\CartOwnershipException;
 use App\Modules\Cart\Exceptions\CartStateException;
+use App\Modules\Cart\Exceptions\CheckoutRevertidoException;
 use App\Modules\Cart\Exceptions\SaldoInsufficientFundsException;
 use App\Modules\Cart\Exceptions\SaldoUnavailableException;
 use App\Modules\Cart\Services\CarritoService;
@@ -31,6 +32,12 @@ class CheckoutController extends Controller
         try {
             $carrito = $this->carritoService->obtenerPorUuid($uuid, $modulo);
             $carrito = $this->checkoutService->confirmar($carrito, $request->validated());
+        } catch (CheckoutRevertidoException $e) {
+            return response()->json([
+                'error'   => 'CHECKOUT_REVERTIDO',
+                'estado'  => Carrito::ESTADO_REVERTIDO,
+                'mensaje' => $e->getMessage(),
+            ], 409);
         } catch (ModelNotFoundException) {
             return response()->json(['mensaje' => 'Carrito no encontrado.'], 404);
         } catch (CartOwnershipException) {
