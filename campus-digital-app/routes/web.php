@@ -340,11 +340,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         Route::prefix('tickets')->name('tickets.')->group(function () {
-            Route::get('/',          [TicketController::class, 'index'])->name('index');
-            Route::post('/',         [TicketController::class, 'store'])->name('store');
-            Route::get('/{ticket}',  [TicketController::class, 'show'])->name('show');
-            Route::put('/{ticket}',  [TicketController::class, 'update'])->name('update');
-            Route::delete('/{ticket}',[TicketController::class, 'destroy'])->name('destroy');
+            Route::get('/',               [TicketController::class, 'index'])->name('index');
+            Route::post('/',              [TicketController::class, 'store'])->name('store');
+            Route::get('/{ticket}/pdf',   [TicketController::class, 'pdf'])->name('pdf');
+            Route::get('/{ticket}',       [TicketController::class, 'show'])->name('show');
+            Route::put('/{ticket}',       [TicketController::class, 'update'])->name('update');
+            Route::delete('/{ticket}',    [TicketController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('asignaciones-tecnicas')->name('asignaciones-tecnicas.')->group(function () {
