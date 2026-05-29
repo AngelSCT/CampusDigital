@@ -127,6 +127,14 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'bitacora' => [
+        'driver' => 'daily',
+        'path'   => storage_path('logs/bitacora.log'),
+        'level'  => 'info',
+        'days'   => env('LOG_DAILY_DAYS', 14),
+        'replace_placeholders' => true,
+        ],
+
     ],
 
 ];
