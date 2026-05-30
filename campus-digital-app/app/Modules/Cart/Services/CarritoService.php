@@ -139,5 +139,26 @@ class CarritoService
         if ($carrito->estaEnEstadoTerminal()) {
             throw new CartStateException("El carrito está en estado '{$carrito->estado}'.");
         }
+        // procesando_checkout bloquea operaciones externas (agregar ítems, cancelar, segundo checkout)
+        // mientras un checkout está en vuelo.
+        if ($carrito->estado === Carrito::ESTADO_PROCESANDO_CHECKOUT) {
+            throw new CartStateException("El carrito está siendo procesado en checkout.");
+        }
+    }
+
+    /**
+     * Guard exclusivo para métodos INTERNOS de CheckoutService.
+     * Verifica que el carrito esté en estado 'procesando_checkout' — es decir,
+     * que TX1 ya marcó el carrito y estamos en el camino correcto.
+     *
+     * @throws CartStateException
+     */
+    public function assertCheckoutInProgress(Carrito $carrito): void
+    {
+        if ($carrito->estado !== Carrito::ESTADO_PROCESANDO_CHECKOUT) {
+            throw new CartStateException(
+                "El carrito no está en proceso de checkout (estado actual: '{$carrito->estado}')."
+            );
+        }
     }
 }

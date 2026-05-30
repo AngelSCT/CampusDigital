@@ -34,6 +34,7 @@ class Carrito extends Model
     ];
 
     const ESTADO_ABIERTO                           = 'abierto';
+    const ESTADO_PROCESANDO_CHECKOUT               = 'procesando_checkout';
     const ESTADO_CONFIRMADO                        = 'confirmado';
     const ESTADO_CANCELADO                         = 'cancelado';
     const ESTADO_EXPIRADO                          = 'expirado';
