@@ -184,6 +184,14 @@ const page = usePage()
                     </div>
                 </div>
 
+                <!-- Botón descargar ticket PDF -->
+                <div class="flex justify-end gap-2 mb-4">
+                    <a :href="`/pedidos/${pedido.id}/ticket-pdf`"
+                       class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition"
+                       target="_blank">
+                        📄 Descargar Ticket PDF
+                    </a>
+                </div>
                 <!-- Botón cancelar -->
                 <div v-if="puedeCancelar && !showCancelar" class="flex justify-end">
                     <button @click="showCancelar = true"

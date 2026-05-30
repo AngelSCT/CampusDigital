@@ -70,6 +70,7 @@ Route::middleware('api.key')->group(function () {
     Route::get ('saldo-movimientos',      [SaldoMovimientoApiController::class, 'index']);
     Route::post('saldo-movimientos',      [SaldoMovimientoApiController::class, 'store']);
     Route::get ('saldo-movimientos/{id}', [SaldoMovimientoApiController::class, 'show']);
+    Route::get('pedidos/retrasados', [\App\Http\Controllers\Pedidos\PedidoDashboardController::class, 'retrasados']);
 
     // ── Pedidos ──────────────────────────────────────────────────
 // Rutas FIJAS primero (antes de /{id}) para evitar que 'operador' se interprete como ID
@@ -87,4 +88,8 @@ Route::get   ('pedidos/{id}/historial',         [PedidoApiController::class, 'hi
 Route::post  ('pedidos/{id}/estado',            [PedidoApiController::class, 'cambiarEstado'])->whereNumber('id');
 Route::post  ('pedidos/{id}/cancelar',          [PedidoApiController::class, 'cancelar'])->whereNumber('id');
 Route::post  ('pedidos/{id}/confirmar-tarjeta', [PedidoApiController::class, 'confirmarConTarjeta'])->whereNumber('id');
+
+// ── CHECKOUT (M4.4 y consumidores externos) ──
+Route::post('pedidos/checkout',           [\App\Http\Controllers\Api\CheckoutApiController::class, 'checkout']);
+Route::post('pedidos/checkout/cancelar',  [\App\Http\Controllers\Api\CheckoutApiController::class, 'cancelar']);
 });

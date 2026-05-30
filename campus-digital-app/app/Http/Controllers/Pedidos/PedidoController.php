@@ -212,4 +212,19 @@ class PedidoController extends Controller
             ],
         ]);
     }
+
+    /**
+     * GET /pedidos/{id}/ticket-pdf
+     * Genera un PDF individual del pedido.
+     */
+    public function ticketPdf($id)
+    {
+        $pedido = Pedido::with(['usuario', 'items', 'historial'])->findOrFail($id);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pedidos.ticket-pdf', [
+            'pedido' => $pedido,
+        ]);
+
+        return $pdf->download("ticket-{$pedido->numero_folio}.pdf");
+    }
 }

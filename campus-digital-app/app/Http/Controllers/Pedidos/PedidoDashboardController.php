@@ -82,4 +82,48 @@ class PedidoDashboardController extends Controller
             'modulos'         => Pedido::MODULOS,
         ]);
     }
+
+    /**
+     * Pedidos retrasados: llevan más de X minutos sin cambiar de estado.
+     * Criterio: pedido en estado no-terminal con updated_at > umbral.
+     */
+    public function retrasados(Request $request)
+    {
+        $umbralMinutos = $request->input('umbral', 30); // default 30 min
+
+        $retrasados = \App\Models\Pedido::whereNotIn('estado', ['entregado', 'cancelado'])
+            ->where('updated_at', '<=', now()->subMinutes($umbralMinutos))
+            ->with(['usuario', 'items'])
+            ->orderBy('updated_at', 'asc')
+            ->get()
+            ->map(function ($pedido) {
+                $minutosRetraso = now()->diffInMinutes($pedido->updated_at);
+                return [
+                    'id'              => $pedido->id,
+                    'numero_folio'    => $pedido->numero_folio,
+                    'estado'          => $pedido->estado,
+                    'modulo'          => $pedido->modulo,
+                    'total'           => $pedido->total,
+                    'usuario'         => $pedido->usuario->nombre ?? 'N/A',
+                    'minutos_retraso' => $minutosRetraso,
+                    'tiempo_retraso'  => $this->formatearTiempo($minutosRetraso),
+                    'created_at'      => $pedido->created_at->format('d/m/Y H:i'),
+                    'updated_at'      => $pedido->updated_at->format('d/m/Y H:i'),
+                ];
+            });
+
+        return response()->json([
+            'umbral_minutos'    => $umbralMinutos,
+            'total_retrasados'  => $retrasados->count(),
+            'pedidos_retrasados' => $retrasados,
+        ]);
+    }
+
+    private function formatearTiempo(int $minutos): string
+    {
+        if ($minutos < 60) return "{$minutos} min";
+        $horas = intdiv($minutos, 60);
+        $mins = $minutos % 60;
+        return "{$horas}h {$mins}m";
+    }
 }

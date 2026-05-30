@@ -256,5 +256,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{pedido}/cancelar',   [PedidoController::class, 'cancelar'])->name('cancelar')->whereNumber('pedido');
         Route::get('/{pedido}/estado-json', [PedidoController::class, 'estadoJson'])->name('estado-json')->whereNumber('pedido');
         Route::post('/{pedido}/estado',     [PedidoController::class, 'cambiarEstado'])->name('cambiar-estado')->whereNumber('pedido');
+        Route::get('/{id}/ticket-pdf', [PedidoController::class, 'ticketPdf'])->name('ticket-pdf')->whereNumber('id');
+        Route::get('/panel/retrasados', [PedidoDashboardController::class, 'retrasados'])->name('retrasados');    
     });
 });
