@@ -23,7 +23,7 @@ return [
     ],
 
     'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
+        'key'    => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
@@ -31,8 +31,22 @@ return [
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
-            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
+            'channel'              => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Módulo 2 — API REST (Recargas, Saldo, Pedidos)
+    |--------------------------------------------------------------------------
+    |
+    | MODULO2_API_URL  → URL base del servidor del Módulo 2
+    | MODULO2_API_KEY  → Clave para el header X-API-KEY
+    |
+    */
+    'modulo2_api' => [
+        'base_url' => env('MODULO2_API_URL', 'http://localhost:8001'),
+        'api_key'  => env('MODULO2_API_KEY', ''),
     ],
 
 ];

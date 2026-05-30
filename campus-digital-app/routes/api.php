@@ -1,5 +1,8 @@
 <?php
 
+// MÓDULO 8
+use App\Http\Controllers\Api\Modulo8ApiController;
+
 //RUTAS DE LA API REST DE LA APLICACION ANADIR EN EL ORDEN CORRESPONDIENTE PORFAVOR
 
 use Illuminate\Support\Facades\Route;
@@ -112,6 +115,12 @@ Route::middleware('api.key')->group(function () {
     Route::post('recargas',                      [RecargaApiController::class, 'store']);
     Route::get ('recargas/{id}',                 [RecargaApiController::class, 'show']);
     Route::get ('recargas/usuario/{usuario_id}', [RecargaApiController::class, 'porUsuario']);
+    // ── MÓDULO 8: Pagos y Recargas ───────────────────────────────────────────
+    Route::get ('modulo8/pagos/{id}/status',          [Modulo8ApiController::class, 'statusPago']);
+    Route::get ('modulo8/pagos/{id}/detalle',         [Modulo8ApiController::class, 'detallePago']);
+    Route::post('modulo8/recargas/iniciar',           [Modulo8ApiController::class, 'iniciarRecarga']);
+    Route::get ('modulo8/usuarios/{usuario_id}/pagos',[Modulo8ApiController::class, 'pagosPorUsuario']);
+
 });
 
 Route::prefix('rfid')->group(function () {

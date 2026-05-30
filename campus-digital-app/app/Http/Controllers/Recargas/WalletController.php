@@ -2,79 +2,65 @@
 
 namespace App\Http\Controllers\Recargas;
 
+use App\Http\Controllers\Controller;
 use App\Services\WalletService;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 
 class WalletController extends Controller
 {
-    public function index(Request $request, WalletService $service)
+    public function __construct(protected WalletService $walletService) {}
+
+    /**
+     * Saldo actual del usuario autenticado (JSON — para llamadas AJAX).
+     */
+    public function saldo(Request $request)
     {
-        $saldo = $service->obtenerSaldo(auth()->user());
+        $saldo = $this->walletService->obtenerSaldo($request->user());
 
-        $movimientos = $service->movimientos(auth()->user());
-
-        return Inertia::render('Recargas/Recargas', [
-            'saldo' => $saldo,
-            'movimientos' => $movimientos,
-        ]);
+        return response()->json($saldo);
     }
 
-    public function saldo(Request $request, WalletService $service)
-    {
-        return response()->json(
-            $service->obtenerSaldo($request->user())
-        );
-    }
-
-    public function recargar(Request $request, WalletService $service)
-{
-    $request->validate([
-        'monto' => 'required|numeric|min:1',
-        'metodo_pago' => 'required|string'
-    ]);
-
-    $service->recargar(
-        auth()->user(),
-        $request->only(['monto', 'metodo_pago'])
-    );
-
-    return redirect()->back()->with('success', 'Recarga exitosa');
-}
-
-    public function pagar(Request $request, WalletService $service)
+    /**
+     * Realiza un pago/cargo desde el monedero.
+     */
+    public function pagar(Request $request)
     {
         $request->validate([
-            'monto' => 'required|numeric|min:1',
-            'concepto' => 'required|string|max:100'
+            'monto'    => 'required|numeric|min:0.01',
+            'concepto' => 'required|string|max:100',
         ]);
 
         try {
-            $pago = $service->pagar($request->user(), $request->all());
+            $resultado = $this->walletService->pagar($request->user(), $request->all());
 
             return response()->json([
-                'message' => 'Pago realizado',
-                'data' => $pago
+                'message' => 'Pago realizado exitosamente.',
+                'data'    => $resultado,
             ]);
+
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 400);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
 
-    public function movimientos(Request $request, WalletService $service)
+    /**
+     * Historial de movimientos del monedero.
+     */
+    public function movimientos(Request $request)
     {
-        return response()->json(
-            $service->movimientos($request->user())
-        );
+        $movimientos = $this->walletService->movimientos($request->user());
+
+        return response()->json($movimientos);
     }
 
-    public function comprobantes(Request $request, WalletService $service)
+    /**
+     * Lista de comprobantes de recargas exitosas.
+     */
+    public function comprobantes(Request $request)
     {
-        return response()->json(
-            $service->comprobantes($request->user())
-        );
+        $comprobantes = $this->walletService->comprobantes($request->user());
+
+        return response()->json($comprobantes);
     }
 }
