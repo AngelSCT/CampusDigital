@@ -105,7 +105,7 @@ class CrearPedidoDesdeCheckout
         $resueltos = [];
 
         foreach ($items as $item) {
-            $producto = $this->consultarProductoMock($item['producto_id']);
+            $producto = $this->consultarProducto($item['producto_id']);
             $precioUnitario = $producto['precio'];
             $cantidad = $item['cantidad'];
             $aplicaIva = $producto['aplica_iva'];
@@ -133,27 +133,48 @@ class CrearPedidoDesdeCheckout
      * MOCK temporal del catálogo del M4.3.
      * Sustituir por consultas reales cuando ellos suban migraciones.
      */
-    private function consultarProductoMock(int $productoId): array
+    /**
+     * Consulta real al catálogo del M4.3.
+     * Trae nombre, IVA aplicable y precio vigente del producto.
+     *
+     * Reemplaza el mock anterior por consultas reales a:
+     *   - Catalogo: nombre, descripcion, aplica_iva
+     *   - Precio: precio vigente según fecha_inicio/fecha_fin
+     */
+    private function consultarProducto(int $productoId): array
     {
-        // Productos hardcoded de prueba
-        $catalogo = [
-            1 => ['nombre' => 'Café americano',     'precio' => 35.00, 'aplica_iva' => false],
-            2 => ['nombre' => 'Café con leche',     'precio' => 40.00, 'aplica_iva' => false],
-            3 => ['nombre' => 'Dona glaseada',      'precio' => 20.00, 'aplica_iva' => false],
-            4 => ['nombre' => 'Sandwich de jamón',  'precio' => 55.00, 'aplica_iva' => false],
-            5 => ['nombre' => 'Agua mineral',       'precio' => 15.00, 'aplica_iva' => false],
-            10 => ['nombre' => 'Copia B/N',          'precio' => 1.00,  'aplica_iva' => true],
-            11 => ['nombre' => 'Copia a color',      'precio' => 3.00,  'aplica_iva' => true],
-            12 => ['nombre' => 'Impresión doble carta', 'precio' => 5.00, 'aplica_iva' => true],
-            20 => ['nombre' => 'Playera Campus',     'precio' => 250.00,'aplica_iva' => true],
-            21 => ['nombre' => 'Termo institucional','precio' => 180.00,'aplica_iva' => true],
-        ];
-
-        if (!isset($catalogo[$productoId])) {
+        // 1. Buscar el producto en el catálogo
+        $producto = \App\Models\Catalogo::find($productoId);
+        
+        if (!$producto) {
             throw ProductoNoDisponibleException::noEncontrado($productoId);
         }
-
-        return $catalogo[$productoId];
+        
+        if (!$producto->activo) {
+            throw ProductoNoDisponibleException::inactivo($productoId);
+        }
+        
+        // 2. Buscar el precio vigente del producto
+        // (fecha_inicio <= hoy <= fecha_fin, o fecha_fin NULL = vigente indefinidamente)
+        $hoy = now()->toDateString();
+        $precioVigente = \App\Models\Precio::where('id_catalogo', $productoId)
+            ->where('fecha_inicio', '<=', $hoy)
+            ->where(function ($query) use ($hoy) {
+                $query->whereNull('fecha_fin')
+                      ->orWhere('fecha_fin', '>=', $hoy);
+            })
+            ->orderByDesc('fecha_inicio')
+            ->first();
+        
+        if (!$precioVigente) {
+            throw ProductoNoDisponibleException::noEncontrado($productoId);
+        }
+        
+        return [
+            'nombre'     => $producto->nombre,
+            'precio'     => (float) $precioVigente->precio,
+            'aplica_iva' => (bool) $producto->aplica_iva,
+        ];
     }
 
     // ────────────────────────────────────────────────────────────
