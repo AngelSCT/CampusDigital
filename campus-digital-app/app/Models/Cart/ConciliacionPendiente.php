@@ -30,6 +30,7 @@ class ConciliacionPendiente extends Model
     ];
 
     const ESTADO_PENDIENTE              = 'pendiente';
+    const ESTADO_PROCESANDO             = 'procesando';       // job en vuelo: TX1 marcó, HTTP aún no respondió
     const ESTADO_EXITOSA                = 'exitosa';
     const ESTADO_DEUDA                  = 'deuda';
     const ESTADO_REQUIERE_REVISION      = 'requiere_revision_manual';

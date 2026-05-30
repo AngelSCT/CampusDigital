@@ -142,7 +142,7 @@ class PedidoIntegrationTest extends CartTestCase
             public function reservar(string $u, float $m, string $c, string $s, string $co): SaldoResult { return $this->r; }
             public function confirmar(string $reservaId, string $carritoUuid): bool { return false; } // 409
             public function liberar(string $reservaId): bool { $this->liberarLlamado = true; return true; }
-            public function cargoForzoso(string $u, float $m, string $c, string $co, ?string $e = null): bool { return true; }
+            public function cargoForzoso(string $u, float $m, string $c, string $co, ?string $e = null): \App\Modules\Cart\Services\SaldoResult { return new \App\Modules\Cart\Services\CargoForzosoCobrado(); }
         };
         $this->app->instance(SaldoClient::class, $saldoStub);
 
@@ -212,7 +212,7 @@ class PedidoIntegrationTest extends CartTestCase
             public function reservar(string $u, float $m, string $c, string $s, string $co): SaldoResult { return $this->r; }
             public function confirmar(string $reservaId, string $carritoUuid): bool { return true; }
             public function liberar(string $reservaId): bool { $this->liberarLlamado = true; return true; }
-            public function cargoForzoso(string $u, float $m, string $c, string $co, ?string $e = null): bool { return true; }
+            public function cargoForzoso(string $u, float $m, string $c, string $co, ?string $e = null): \App\Modules\Cart\Services\SaldoResult { return new \App\Modules\Cart\Services\CargoForzosoCobrado(); }
         };
         $this->app->instance(SaldoClient::class, $saldoStub);
 
@@ -312,7 +312,7 @@ class PedidoIntegrationTest extends CartTestCase
 
             public function liberar(string $reservaId): bool { return true; }
 
-            public function cargoForzoso(string $u, float $m, string $c, string $co, ?string $e = null): bool { return true; }
+            public function cargoForzoso(string $u, float $m, string $c, string $co, ?string $e = null): \App\Modules\Cart\Services\SaldoResult { return new \App\Modules\Cart\Services\CargoForzosoCobrado(); }
         };
     }
 }

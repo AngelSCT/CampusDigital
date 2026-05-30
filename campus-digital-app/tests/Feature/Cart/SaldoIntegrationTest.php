@@ -15,6 +15,9 @@ use App\Modules\Cart\Services\NullPedidoCreator;
 use App\Modules\Cart\Services\SaldoClient;
 use App\Modules\Cart\Services\SaldoConfirmed;
 use App\Modules\Cart\Services\SaldoInsufficientFunds;
+use App\Modules\Cart\Services\CargoForzosoCobrado;
+use App\Modules\Cart\Services\CargoForzosoDesconocido;
+use App\Modules\Cart\Services\CargoForzosoRechazado;
 use App\Modules\Cart\Services\SaldoResult;
 use App\Modules\Cart\Services\SaldoUnavailable;
 use Illuminate\Support\Facades\Queue;
@@ -88,9 +91,9 @@ class SaldoIntegrationTest extends CartTestCase
                 $this->liberarLlamado = true;
                 return $this->lib;
             }
-            public function cargoForzoso(string $u, float $m, string $c, string $concepto, ?string $estado = null): bool
+            public function cargoForzoso(string $u, float $m, string $c, string $concepto, ?string $estado = null): \App\Modules\Cart\Services\SaldoResult
             {
-                return $this->cargo;
+                return $this->cargo ? new \App\Modules\Cart\Services\CargoForzosoCobrado() : new \App\Modules\Cart\Services\CargoForzosoRechazado();
             }
         };
         $this->app->instance(SaldoClient::class, $stub);
@@ -101,15 +104,15 @@ class SaldoIntegrationTest extends CartTestCase
     {
         return new class($cargoForzoso) extends SaldoClient {
             public function __construct(private readonly bool $cargo) {}
-            public function reservar(string $u, float $m, string $c, string $slug, string $concepto): SaldoResult
+            public function reservar(string $u, float $m, string $c, string $slug, string $concepto): \App\Modules\Cart\Services\SaldoResult
             {
-                return new SaldoUnavailable();
+                return new \App\Modules\Cart\Services\SaldoUnavailable();
             }
             public function confirmar(string $reservaId, string $carritoUuid): bool { return true; }
             public function liberar(string $reservaId): bool                        { return true; }
-            public function cargoForzoso(string $u, float $m, string $c, string $concepto, ?string $estado = null): bool
+            public function cargoForzoso(string $u, float $m, string $c, string $concepto, ?string $estado = null): \App\Modules\Cart\Services\SaldoResult
             {
-                return $this->cargo;
+                return $this->cargo ? new \App\Modules\Cart\Services\CargoForzosoCobrado() : new \App\Modules\Cart\Services\CargoForzosoRechazado();
             }
         };
     }
@@ -331,9 +334,9 @@ class SaldoIntegrationTest extends CartTestCase
                 $this->liberarLlamado = true;
                 return true;
             }
-            public function cargoForzoso(string $u, float $m, string $c, string $concepto, ?string $estado = null): bool
+            public function cargoForzoso(string $u, float $m, string $c, string $concepto, ?string $estado = null): \App\Modules\Cart\Services\SaldoResult
             {
-                return true;
+                return new \App\Modules\Cart\Services\CargoForzosoCobrado();
             }
         };
         $this->app->instance(SaldoClient::class, $stub);

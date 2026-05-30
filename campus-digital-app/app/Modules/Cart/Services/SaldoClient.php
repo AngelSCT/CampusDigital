@@ -118,7 +118,12 @@ class SaldoClient
      * Usado por el job de conciliación diferida.
      *
      * POST /api/internal/saldo/cargo-forzoso
-     * 200 → ok
+     *
+     * Retorna:
+     *   CargoForzosoCobrado   — HTTP 2xx: cargo confirmado.
+     *   CargoForzosoRechazado — HTTP 400/402/422: Saldo rechazó explícitamente (no cobró).
+     *   CargoForzosoDesconocido — HTTP 409/5xx, timeout, excepción, respuesta ambigua.
+     *       NO tratar como fallo seguro: el cargo pudo haberse ejecutado.
      */
     public function cargoForzoso(
         string  $usuarioRef,
@@ -126,24 +131,37 @@ class SaldoClient
         string  $carritoUuid,
         string  $concepto,
         ?string $carritoEstado = null,
-    ): bool {
+    ): SaldoResult {
         $endpoint = (string) config(
             'cart.saldo.endpoint_cargo_forzoso',
             '/api/internal/saldo/cargo-forzoso'
         );
 
         try {
-            return $this->http()
+            $response = $this->http()
                 ->post($this->baseUrl . $endpoint, array_filter([
                     'usuario_ref'    => $usuarioRef,
                     'monto'          => $monto,
                     'carrito_uuid'   => $carritoUuid,
                     'concepto'       => $concepto,
                     'carrito_estado' => $carritoEstado,
-                ]))
-                ->successful();
+                ]));
+
+            if ($response->successful()) {
+                return new CargoForzosoCobrado();
+            }
+
+            // Rechazo explícito: Saldo confirmó que NO cobró
+            if (in_array($response->status(), [400, 402, 422], true)) {
+                return new CargoForzosoRechazado();
+            }
+
+            // 409, 5xx, respuesta ambigua → resultado desconocido
+            return new CargoForzosoDesconocido();
+
         } catch (\Exception) {
-            return false;
+            // Timeout, ConnectionException, excepción inesperada → desconocido
+            return new CargoForzosoDesconocido();
         }
     }
 

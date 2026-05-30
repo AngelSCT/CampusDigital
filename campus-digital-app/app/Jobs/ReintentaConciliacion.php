@@ -6,6 +6,9 @@ use App\Models\Cart\Bitacora;
 use App\Models\Cart\Carrito;
 use App\Models\Cart\ConciliacionPendiente;
 use App\Modules\Cart\Contracts\PedidoCreatorInterface;
+use App\Modules\Cart\Services\CargoForzosoCobrado;
+use App\Modules\Cart\Services\CargoForzosoDesconocido;
+use App\Modules\Cart\Services\CargoForzosoRechazado;
 use App\Modules\Cart\Services\SaldoClient;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,23 +24,41 @@ class ReintentaConciliacion implements ShouldQueue
     public function __construct(public readonly ConciliacionPendiente $conciliacion) {}
 
     /**
-     * Usa cargoForzoso() directamente porque el servicio ya fue entregado
-     * y la deuda necesita cobrarse sin importar el saldo disponible.
+     * Flujo de dos TX cortas (sin HTTP dentro de transacción):
      *
-     * Si el cargo es exitoso, crea el Pedido dentro de una DB::transaction
-     * junto con el cambio de estado del Carrito (atómico).
-     * Si la creación del Pedido falla, el cargoForzoso ya fue cobrado y NO
-     * se puede revertir: se escala a revisión manual sin reintentar el job.
+     * TX1 (corta): lockForUpdate → verificar PENDIENTE → marcar PROCESANDO → commit
+     *   Si estado ≠ PENDIENTE → return silencioso (otro worker ya lo tomó).
+     *
+     * HTTP (fuera de TX): cargoForzoso()
+     *   CargoForzosoCobrado   → onConfirmado(): crear Pedido + marcar EXITOSA
+     *   CargoForzosoRechazado → onRechazado(): reagendar como PENDIENTE (backoff)
+     *   CargoForzosoDesconocido → onDesconocido(): REQUIERE_REVISION, no reintentar
+     *
+     * Si el worker muere entre TX1 y TX2: conciliación queda en PROCESANDO.
+     * ReconciliarSaldoCommand limpia PROCESANDO > TTL → REQUIERE_REVISION (nunca → PENDIENTE).
      */
     public function handle(SaldoClient $saldo, PedidoCreatorInterface $pedidoCreator): void
     {
-        $conciliacion = $this->conciliacion->fresh();
+        // ── TX1: lock + verificar PENDIENTE + marcar PROCESANDO ──────────────
+        $conciliacion = DB::transaction(function () {
+            $locked = ConciliacionPendiente::where('id', $this->conciliacion->id)
+                ->lockForUpdate()
+                ->first();
 
-        if (!$conciliacion || $conciliacion->estado_conciliacion !== ConciliacionPendiente::ESTADO_PENDIENTE) {
+            if (!$locked || $locked->estado_conciliacion !== ConciliacionPendiente::ESTADO_PENDIENTE) {
+                return null; // otro worker ya procesó esto
+            }
+
+            $locked->update(['estado_conciliacion' => ConciliacionPendiente::ESTADO_PROCESANDO]);
+            return $locked->fresh();
+        });
+
+        if ($conciliacion === null) {
             return;
         }
 
-        $ok = $saldo->cargoForzoso(
+        // ── HTTP: cargoForzoso (FUERA de TX) ─────────────────────────────────
+        $result = $saldo->cargoForzoso(
             $conciliacion->usuario_ref,
             (float) $conciliacion->monto,
             $conciliacion->carrito_uuid,
@@ -45,21 +66,24 @@ class ReintentaConciliacion implements ShouldQueue
             Carrito::ESTADO_CONFIRMADO_PENDIENTE_CONCILIACION,
         );
 
-        if ($ok) {
+        // ── TX2: guardar resultado ────────────────────────────────────────────
+        if ($result instanceof CargoForzosoCobrado) {
             $this->onConfirmado($conciliacion, $pedidoCreator);
-            return;
+        } elseif ($result instanceof CargoForzosoRechazado) {
+            $this->onRechazado($conciliacion);
+        } else {
+            $this->onDesconocido($conciliacion);
         }
-
-        $this->onNoDisponible($conciliacion);
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
 
     /**
      * El cargo fue confirmado. Actualiza la conciliación, el Carrito y crea el Pedido
      * en una única DB::transaction (atómica).
      *
-     * Si crearDesdeCarrito() falla: la transacción hace rollback (carrito y conciliación
-     * no se actualizan), se registra el incidente y se escala a REQUIERE_REVISION.
-     * El job NO se reintenta porque el cargo de saldo YA fue cobrado.
+     * Si crearDesdeCarrito() falla: cargo cobrado pero Pedido no creado → REQUIERE_REVISION.
+     * El job NO se reintenta para evitar doble cobro.
      */
     private function onConfirmado(ConciliacionPendiente $conciliacion, PedidoCreatorInterface $pedidoCreator): void
     {
@@ -97,8 +121,7 @@ class ReintentaConciliacion implements ShouldQueue
                 ]);
             });
         } catch (\Throwable $e) {
-            // El cargo YA fue cobrado pero el Pedido no pudo crearse.
-            // NO reintentar (evitar doble cobro). Escalar a revisión manual.
+            // Cargo cobrado pero Pedido no creado: no reintentar → REQUIERE_REVISION
             Bitacora::create([
                 'accion'       => 'conciliacion.pedido_creation_failed',
                 'modulo_id'    => $conciliacion->modulo_id,
@@ -121,7 +144,11 @@ class ReintentaConciliacion implements ShouldQueue
         ]);
     }
 
-    private function onNoDisponible(ConciliacionPendiente $conciliacion): void
+    /**
+     * Saldo rechazó explícitamente (HTTP 400/402/422): cobro no ejecutado → seguro reintentar.
+     * Reagenda con backoff exponencial. Al agotar reintentos → REQUIERE_REVISION.
+     */
+    private function onRechazado(ConciliacionPendiente $conciliacion): void
     {
         $intentosNuevos = $conciliacion->intentos + 1;
         $reintentosMax  = (int) config('cart.saldo.reintentos_max', 5);
@@ -139,7 +166,6 @@ class ReintentaConciliacion implements ShouldQueue
                 'carrito_uuid' => $conciliacion->carrito_uuid,
                 'payload'      => ['intentos' => $intentosNuevos],
             ]);
-
             return;
         }
 
@@ -147,11 +173,31 @@ class ReintentaConciliacion implements ShouldQueue
         $proximoIntento = now()->addMinutes($backoffMinutos);
 
         $conciliacion->update([
-            'intentos'           => $intentosNuevos,
-            'ultimo_intento_at'  => now(),
-            'proximo_intento_at' => $proximoIntento,
+            'intentos'            => $intentosNuevos,
+            'ultimo_intento_at'   => now(),
+            'proximo_intento_at'  => $proximoIntento,
+            'estado_conciliacion' => ConciliacionPendiente::ESTADO_PENDIENTE, // reset desde PROCESANDO
         ]);
 
         static::dispatch($conciliacion->fresh())->delay($proximoIntento);
+    }
+
+    /**
+     * Resultado desconocido (timeout, 409, 5xx, red caída):
+     * el cargo pudo haberse ejecutado → NO reintentar → REQUIERE_REVISION.
+     */
+    private function onDesconocido(ConciliacionPendiente $conciliacion): void
+    {
+        $conciliacion->update([
+            'ultimo_intento_at'   => now(),
+            'estado_conciliacion' => ConciliacionPendiente::ESTADO_REQUIERE_REVISION,
+        ]);
+
+        Bitacora::create([
+            'accion'       => 'conciliacion.resultado_desconocido',
+            'modulo_id'    => $conciliacion->modulo_id,
+            'carrito_uuid' => $conciliacion->carrito_uuid,
+            'payload'      => ['motivo' => 'cargo_forzoso_desconocido'],
+        ]);
     }
 }
