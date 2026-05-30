@@ -27,6 +27,18 @@ return [
         'tope_pendiente_global'      => (float) env('CART_SALDO_TOPE_GLOBAL', 50000),
         // Reintentos máximos antes de marcar como requiere_revision_manual
         'reintentos_max'             => (int) env('CART_SALDO_REINTENTOS_MAX', 5),
+        // TTL (minutos) para limpiar conciliaciones huérfanas en estado 'procesando'.
+        // Si un job muere entre TX1 y TX2, la conciliación queda en 'procesando'.
+        // Pasado este TTL → requiere_revision_manual (NUNCA → pendiente).
+        'procesando_ttl_minutos'     => (int) env('CART_SALDO_PROCESANDO_TTL', 10),
+    ],
+
+    // Configuración del checkout del Carrito
+    'checkout' => [
+        // TTL (minutos) para limpiar carritos huérfanos en estado 'procesando_checkout'.
+        // DEBE ser mayor al TTL de reserva del Módulo 4.2 para garantizar que
+        // la reserva expiró antes de reabrir el carrito.
+        'procesando_ttl_minutos' => (int) env('CART_CHECKOUT_PROCESANDO_TTL', 10),
     ],
 
     // Configuración para módulos CLIENTES que consumen la API del Carrito

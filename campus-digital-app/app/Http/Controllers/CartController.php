@@ -22,6 +22,12 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
+/**
+ * @deprecated Sistema legacy de carrito.
+ * No agregar nuevas funcionalidades aquí.
+ * Usar el sistema nuevo en app/Modules/Cart y app/Http/Controllers/Api/Cart.
+ * Congelado durante Fase 0. Pendiente de migración en Fase 2.
+ */
 class CartController extends Controller
 {
     // -------------------------------------------------------------------------
