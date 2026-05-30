@@ -122,7 +122,7 @@ class WalletService
                     );
 
                     $recargaLocal->update([
-                        'estado' => 'exitosa',
+                        'estado' => Recarga::ESTADO_EXITOSO,
                     ]);
 
                     return [
@@ -176,7 +176,7 @@ class WalletService
             );
 
             $recargaLocal->update([
-                'estado' => 'exitosa',
+                'estado' => Recarga::ESTADO_EXITOSO,
             ]);
 
             return [
