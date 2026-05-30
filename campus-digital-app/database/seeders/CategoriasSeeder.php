@@ -9,6 +9,18 @@ use Illuminate\Database\Seeder;
 /**
  * Inserta las 5 categorías base del módulo Carrito y sus reglas de negocio.
  *
+ * ROL EN EL CICLO DE VIDA
+ * -----------------------
+ * - Tests / dev: fuente de datos para cualquier test que llame seedCategorias().
+ * - BD fresca en producción: debe correrse OBLIGATORIAMENTE tras php artisan migrate.
+ *   Comando: php artisan db:seed --class=CategoriasSeeder  (o php artisan migrate --seed)
+ * - BD existente en producción: la data migration 2026_05_30_100000 parchea
+ *   las reglas de precio en categorías ya existentes. El seeder no es necesario
+ *   en este caso, pero es idempotente y puede correrse sin riesgo.
+ *
+ * Categorías base (5): prestamo, reserva, producto, servicio, ticket.
+ * copias e impresiones NO son categorías base; se definen en migraciones separadas.
+ *
  * CRITERIO PARA permite_pago_diferido
  * ------------------------------------
  * true  → Categorías de monto típicamente bajo donde la universidad asume
@@ -35,8 +47,9 @@ class CategoriasSeeder extends Seeder
                     [ReglaCategoria::CLAVE_CANTIDAD_MAXIMA,       '10',    ReglaCategoria::TIPO_INT],
                     [ReglaCategoria::CLAVE_REQUIERE_SALDO,        'true',  ReglaCategoria::TIPO_BOOL],
                     [ReglaCategoria::CLAVE_PERMITE_DEVOLUCION,    'false', ReglaCategoria::TIPO_BOOL],
-                    // true: montos bajos (café, copias) → diferir pago si Saldo no responde.
                     [ReglaCategoria::CLAVE_PERMITE_PAGO_DIFERIDO, 'true',  ReglaCategoria::TIPO_BOOL],
+                    [ReglaCategoria::CLAVE_PERMITE_PRECIO_CERO,   'false', ReglaCategoria::TIPO_BOOL],
+                    [ReglaCategoria::CLAVE_PRECIO_MINIMO,         '0.01',  ReglaCategoria::TIPO_STRING],
                 ],
             ],
             [
@@ -47,8 +60,9 @@ class CategoriasSeeder extends Seeder
                     [ReglaCategoria::CLAVE_CANTIDAD_MAXIMA,       '1',     ReglaCategoria::TIPO_INT],
                     [ReglaCategoria::CLAVE_REQUIERE_SALDO,        'true',  ReglaCategoria::TIPO_BOOL],
                     [ReglaCategoria::CLAVE_PERMITE_DEVOLUCION,    'false', ReglaCategoria::TIPO_BOOL],
-                    // false: servicios pueden tener costo alto; no diferir sin garantía de cobro.
                     [ReglaCategoria::CLAVE_PERMITE_PAGO_DIFERIDO, 'false', ReglaCategoria::TIPO_BOOL],
+                    [ReglaCategoria::CLAVE_PERMITE_PRECIO_CERO,   'false', ReglaCategoria::TIPO_BOOL],
+                    [ReglaCategoria::CLAVE_PRECIO_MINIMO,         '0.01',  ReglaCategoria::TIPO_STRING],
                 ],
             ],
             [
@@ -60,8 +74,9 @@ class CategoriasSeeder extends Seeder
                     [ReglaCategoria::CLAVE_REQUIERE_SALDO,        'false', ReglaCategoria::TIPO_BOOL],
                     [ReglaCategoria::CLAVE_PERMITE_DEVOLUCION,    'true',  ReglaCategoria::TIPO_BOOL],
                     ['duracion_maxima_horas',                      '4',     ReglaCategoria::TIPO_INT],
-                    // false: recursos escasos y potencialmente costosos; checkout debe garantizarse.
                     [ReglaCategoria::CLAVE_PERMITE_PAGO_DIFERIDO, 'false', ReglaCategoria::TIPO_BOOL],
+                    // Reservas de sala de estudio son gratuitas; permitir precio 0.
+                    [ReglaCategoria::CLAVE_PERMITE_PRECIO_CERO,   'true',  ReglaCategoria::TIPO_BOOL],
                 ],
             ],
             [
@@ -73,8 +88,9 @@ class CategoriasSeeder extends Seeder
                     [ReglaCategoria::CLAVE_REQUIERE_SALDO,        'false', ReglaCategoria::TIPO_BOOL],
                     [ReglaCategoria::CLAVE_PERMITE_DEVOLUCION,    'true',  ReglaCategoria::TIPO_BOOL],
                     ['duracion_maxima_horas',                      '168',   ReglaCategoria::TIPO_INT], // 7 días
-                    // true: préstamos son generalmente gratuitos → no hay monto en riesgo.
                     [ReglaCategoria::CLAVE_PERMITE_PAGO_DIFERIDO, 'true',  ReglaCategoria::TIPO_BOOL],
+                    // Préstamos bibliográficos son gratuitos.
+                    [ReglaCategoria::CLAVE_PERMITE_PRECIO_CERO,   'true',  ReglaCategoria::TIPO_BOOL],
                 ],
             ],
             [
@@ -85,8 +101,9 @@ class CategoriasSeeder extends Seeder
                     [ReglaCategoria::CLAVE_CANTIDAD_MAXIMA,       '3',     ReglaCategoria::TIPO_INT],
                     [ReglaCategoria::CLAVE_REQUIERE_SALDO,        'true',  ReglaCategoria::TIPO_BOOL],
                     [ReglaCategoria::CLAVE_PERMITE_DEVOLUCION,    'false', ReglaCategoria::TIPO_BOOL],
-                    // false: precio variable; un evento con aforo limitado no puede arriesgar plazas sin cobro garantizado.
                     [ReglaCategoria::CLAVE_PERMITE_PAGO_DIFERIDO, 'false', ReglaCategoria::TIPO_BOOL],
+                    [ReglaCategoria::CLAVE_PERMITE_PRECIO_CERO,   'false', ReglaCategoria::TIPO_BOOL],
+                    [ReglaCategoria::CLAVE_PRECIO_MINIMO,         '0.01',  ReglaCategoria::TIPO_STRING],
                 ],
             ],
         ];

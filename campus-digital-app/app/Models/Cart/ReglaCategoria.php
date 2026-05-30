@@ -22,6 +22,8 @@ class ReglaCategoria extends Model
     const CLAVE_PERMITE_DEVOLUCION     = 'permite_devolucion';
     const CLAVE_DURACION_MAXIMA_HORAS  = 'duracion_maxima_horas';
     const CLAVE_PERMITE_PAGO_DIFERIDO  = 'permite_pago_diferido';
+    const CLAVE_PRECIO_MINIMO          = 'precio_minimo';
+    const CLAVE_PERMITE_PRECIO_CERO    = 'permite_precio_cero';
 
     const TIPO_INT    = 'int';
     const TIPO_BOOL   = 'bool';
