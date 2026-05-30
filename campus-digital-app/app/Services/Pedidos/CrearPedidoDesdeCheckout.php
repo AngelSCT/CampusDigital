@@ -37,6 +37,16 @@ class CrearPedidoDesdeCheckout
      */
     public function ejecutar(CheckoutPedidoDTO $dto): Pedido
     {
+        // 0) Idempotencia: si ya existe un pedido para este carrito, retornarlo
+        if ($dto->carritoUuid) {
+            $existente = Pedido::where('carrito_uuid', $dto->carritoUuid)->first();
+            if ($existente) {
+                return $existente->load('items', 'historial');
+            }
+        }
+
+        // 1) Resolver items contra el catálogo y calcular totales
+        // 1) Resolver items contra el catálogo y calcular totales
         // 1) Resolver items contra el catálogo y calcular totales
         $itemsResueltos = $this->resolverItems($dto->items);
         $totalPedido = $this->calcularTotal($itemsResueltos);
@@ -48,14 +58,15 @@ class CrearPedidoDesdeCheckout
         return DB::transaction(function () use ($dto, $itemsResueltos, $totalPedido) {
             // 3.1) Crear el pedido (Pedido::generarFolio ya hace lockForUpdate)
             $pedido = Pedido::create([
-                'usuario_id'  => $dto->usuarioId,
+                'usuario_id'   => $dto->usuarioId,
                 'numero_folio' => Pedido::generarFolio(),
-                'estado'      => 'creado',
-                'modulo'      => $dto->modulo,
-                'total'       => $totalPedido,
-                'descripcion' => $dto->descripcion ?? "Pedido desde checkout",
-                'notas'       => '',
-                'meta_json'   => $dto->metaJson ?? ['origen' => 'checkout_service'],
+                'estado'       => 'creado',
+                'modulo'       => $dto->modulo,
+                'total'        => $totalPedido,
+                'descripcion'  => $dto->descripcion ?? "Pedido desde checkout",
+                'notas'        => '',
+                'meta_json'    => $dto->metaJson ?? ['origen' => 'checkout_service'],
+                'carrito_uuid' => $dto->carritoUuid,
             ]);
 
             // 3.2) Crear los items con snapshot histórico

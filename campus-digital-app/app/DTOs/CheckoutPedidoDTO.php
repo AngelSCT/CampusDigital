@@ -29,6 +29,7 @@ class CheckoutPedidoDTO
         public readonly array $items,
         public readonly ?string $descripcion = null,
         public readonly ?array $metaJson = null,
+        public readonly ?string $carritoUuid = null,
     ) {
         $this->validar();
     }
@@ -79,6 +80,7 @@ class CheckoutPedidoDTO
             items:       $data['items'] ?? [],
             descripcion: $data['descripcion'] ?? null,
             metaJson:    $data['meta_json'] ?? null,
+            carritoUuid: $data['carrito_uuid'] ?? null,
         );
     }
 }

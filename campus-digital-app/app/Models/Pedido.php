@@ -27,6 +27,7 @@ class Pedido extends Model
         'cobrado_de_saldo',
         'saldo_movimiento_id',
         'meta_json',
+        'carrito_uuid',
     ];
 
     protected $casts = [
