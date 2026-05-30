@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Request;
  *  1. Recibe un DTO validado con usuario, módulo e items {producto_id, cantidad}
  *  2. Resuelve cada item contra el catálogo (M4.3) — hoy mock, mañana real
  *  3. Calcula total con IVA cuando aplique
- *  4. Valida saldo del usuario contra M4.2 (hoy mock, mañana real)
+ *  4. Valida y cobra saldo del usuario contra M4.8 (SaldoMonedero real)
  *  5. Crea Pedido + PedidoItems + Historial + Bitácora en UNA SOLA transacción
  *  6. Devuelve el Pedido completo con sus items cargados
  *
@@ -41,8 +41,8 @@ class CrearPedidoDesdeCheckout
         $itemsResueltos = $this->resolverItems($dto->items);
         $totalPedido = $this->calcularTotal($itemsResueltos);
 
-        // 2) Validar saldo (mock por ahora)
-        $this->validarSaldo($dto->usuarioId, $totalPedido);
+        // 2) Validar saldo contra M4.8 (SaldoMonedero real)
+        $this->validarSaldo($dto->usuarioId, $totalPedido, true, null, $dto->modulo);
 
         // 3) Crear todo en una sola transacción
         return DB::transaction(function () use ($dto, $itemsResueltos, $totalPedido) {
@@ -190,20 +190,33 @@ class CrearPedidoDesdeCheckout
     }
 
     /**
-     * Validar saldo del usuario contra el M4.2.
+     * Validar y cargar saldo del usuario contra el M4.8 (Saldo Digital).
      *
-     * 🔧 TODO: cuando el M4.2 esté listo, reemplazar el mock por:
-     *      Http::get("M4.2/saldo/{$usuarioId}") o servicio compartido
+     * Usa el modelo SaldoMonedero que ya existe en el proyecto:
+     *   - obtenerOCrear(): crea monedero si el usuario no tiene uno
+     *   - tieneSaldo(): valida que tenga saldo suficiente
+     *   - cargar(): descuenta el monto con transacción atómica
      *
-     * Por ahora siempre aprueba (mock).
+     * Si cobrarSaldo es false (ej: el M4.4 ya cobró), solo valida sin descontar.
      */
-    private function validarSaldo(int $usuarioId, float $totalPedido): void
+    private function validarSaldo(int $usuarioId, float $totalPedido, bool $cobrarSaldo = true, ?string $folio = null, ?string $modulo = null): void
     {
-        // MOCK: siempre tiene saldo suficiente
-        $saldoActual = 9999.99;
+        $monedero = \App\Models\SaldoMonedero::obtenerOCrear($usuarioId);
 
-        if ($saldoActual < $totalPedido) {
-            throw new SaldoInsuficienteException($saldoActual, $totalPedido);
+        if (!$monedero->tieneSaldo($totalPedido)) {
+            throw new SaldoInsuficienteException(
+                (float) $monedero->saldo_disponible,
+                $totalPedido
+            );
+        }
+
+        // Solo descontar si se indica (cuando el M4.4 ya cobró, no se vuelve a cobrar)
+        if ($cobrarSaldo) {
+            $monedero->cargar(
+                $totalPedido,
+                "Pago de pedido " . ($folio ?? 'nuevo'),
+                $modulo ?? 'otro'
+            );
         }
     }
 
