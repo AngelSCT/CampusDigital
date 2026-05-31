@@ -129,3 +129,28 @@ Route::prefix('rfid')->group(function () {
         Route::get ('/lecturas/{uid}',   [RfidApiController::class, 'lecturas']);
     });
 });
+
+// ── MÓDULO 4.2: MONEDERO DIGITAL (ADMIN) ──────────────────────────────────────
+Route::prefix('admin/monedero')->middleware(['auth:sanctum', 'admin'])->group(function () {
+    // Analytics
+    Route::get('analytics/dashboard',       [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'dashboard']);
+    Route::get('analytics/top-usuarios',    [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'topUsuarios']);
+    Route::get('analytics/movimientos-modulo', [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'movimientosPorModulo']);
+    Route::get('analytics/timeseries',      [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'timeseriesData']);
+
+    // Reportes
+    Route::get('reportes/estado-cuenta',    [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'estadoCuenta']);
+    Route::get('reportes/movimientos',      [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'movimientos']);
+    Route::get('reportes/uso-categoria',    [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'usoCategoria']);
+
+    // Exportes
+    Route::get('exportes/estado-cuenta/pdf', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportEstadoCuentaPDF']);
+    Route::get('exportes/estado-cuenta/csv', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportEstadoCuentaCSV']);
+    Route::get('exportes/movimientos/pdf',   [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportMovimientosPDF']);
+    Route::get('exportes/movimientos/csv',   [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportMovimientosCSV']);
+    Route::get('exportes/uso-categoria/pdf', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportUsoCategoriaaPDF']);
+    Route::get('exportes/uso-categoria/csv', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportUsoCategoriaCSV']);
+
+    // Reglas (CRUD)
+    Route::apiResource('reglas', App\Http\Controllers\Api\Admin\MonederoReglasApiController::class);
+});

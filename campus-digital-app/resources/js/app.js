@@ -209,6 +209,33 @@ window.route = (name, params) => {
         "archivos.marcar-visto": "/archivos/:id/marcar-visto",
         "archivos.desmarcar-visto": "/archivos/:id/desmarcar-visto",
         "archivos.nota": "/archivos/:id/nota",
+
+        // Monedero - Recargas (estudiante)
+        "monedero.recargas.index": "/monedero/recargas",
+        "monedero.recargas.store": "/monedero/recargas",
+
+        // ── MÓDULO 4.2: MONEDERO DIGITAL (ADMIN) ──────────────────────────────
+        "admin.monedero.dashboard": "/admin/monedero/dashboard",
+
+        "admin.monedero.reportes.index": "/admin/monedero/reportes",
+        "admin.monedero.reportes.estado-cuenta": "/admin/monedero/reportes/estado-cuenta",
+        "admin.monedero.reportes.movimientos": "/admin/monedero/reportes/movimientos",
+        "admin.monedero.reportes.uso-categoria": "/admin/monedero/reportes/uso-categoria",
+
+        "admin.monedero.exportes.estado-cuenta-pdf": "/admin/monedero/exportes/estado-cuenta/pdf",
+        "admin.monedero.exportes.estado-cuenta-csv": "/admin/monedero/exportes/estado-cuenta/csv",
+        "admin.monedero.exportes.movimientos-pdf": "/admin/monedero/exportes/movimientos/pdf",
+        "admin.monedero.exportes.movimientos-csv": "/admin/monedero/exportes/movimientos/csv",
+        "admin.monedero.exportes.uso-categoria-pdf": "/admin/monedero/exportes/uso-categoria/pdf",
+        "admin.monedero.exportes.uso-categoria-csv": "/admin/monedero/exportes/uso-categoria/csv",
+
+        "admin.monedero.reglas.index": "/admin/monedero/reglas",
+        "admin.monedero.reglas.create": "/admin/monedero/reglas/create",
+        "admin.monedero.reglas.store": "/admin/monedero/reglas",
+        "admin.monedero.reglas.show": "/admin/monedero/reglas/:id",
+        "admin.monedero.reglas.edit": "/admin/monedero/reglas/:id/edit",
+        "admin.monedero.reglas.update": "/admin/monedero/reglas/:id",
+        "admin.monedero.reglas.destroy": "/admin/monedero/reglas/:id",
     };
 
     let url = routes[name] || "/";
