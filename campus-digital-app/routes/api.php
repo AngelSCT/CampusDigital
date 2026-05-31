@@ -50,6 +50,9 @@ use App\Http\Controllers\Api\DisponibilidadApiController;
 use App\Http\Controllers\Api\ReglaApiController;
 use App\Http\Controllers\Api\MovimientoApiController;
 
+// ── INTEGRACIÓN 4.3 → 4.9 ────────────────────────────────────────────────────
+use App\Http\Controllers\Api\CatalogoIntegracionApiController;
+
 Route::middleware('api.key')->group(function () {
 
     Route::apiResource('areas', AreaApiController::class);
@@ -136,6 +139,12 @@ Route::middleware('api.key')->group(function () {
     Route::post('recargas',                      [RecargaApiController::class, 'store']);
     Route::get ('recargas/{id}',                 [RecargaApiController::class, 'show']);
     Route::get ('recargas/usuario/{usuario_id}', [RecargaApiController::class, 'porUsuario']);
+
+    // ── INTEGRACIÓN MÓDULO 4.3 → 4.9 ─────────────────────────────────────────
+    // Catálogo por vendedor: precio + disponibilidad + regla ya resueltos.
+    // Consumido por el panel operativo del módulo 4.9 (ProductoController).
+    Route::get('catalogo-integracion/vendedores',             [CatalogoIntegracionApiController::class, 'vendedores']);
+    Route::get('catalogo-integracion/vendedor/{id_vendedor}', [CatalogoIntegracionApiController::class, 'porVendedor']);
 });
 
 
