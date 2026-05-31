@@ -39,6 +39,9 @@ use App\Http\Controllers\Api\RecargaApiController;
 // RUTAS EXTRA CON UID Y EL PIN
 use App\Http\Controllers\Api\RfidApiController;
 
+// ENDPOINTS INTERNOS — Módulo 4.4 Carrito/Checkout
+use App\Http\Controllers\Api\Internal\SaldoInternalApiController;
+
 Route::middleware('api.key')->group(function () {
 
     Route::apiResource('areas', AreaApiController::class);
@@ -111,8 +114,8 @@ Route::middleware('api.key')->group(function () {
     // ── RECARGAS (US2) ──────────────────────────────────────────────────────────
     Route::get ('recargas',                      [RecargaApiController::class, 'index']);
     Route::post('recargas',                      [RecargaApiController::class, 'store']);
+    Route::get ('recargas/usuario/{usuario_id}', [RecargaApiController::class, 'porUsuario']); // ANTES de /{id}
     Route::get ('recargas/{id}',                 [RecargaApiController::class, 'show']);
-    Route::get ('recargas/usuario/{usuario_id}', [RecargaApiController::class, 'porUsuario']);
 });
 
 
@@ -154,3 +157,21 @@ Route::prefix('admin/monedero')->middleware(['auth:sanctum', 'admin'])->group(fu
     // Reglas (CRUD)
     Route::apiResource('reglas', App\Http\Controllers\Api\Admin\MonederoReglasApiController::class);
 });
+
+// ── MÓDULO 4.4 CARRITO — Endpoints internos de Saldo (X-Internal-Token) ──────
+//
+// Llamados por SaldoClient del módulo 4.4 (Carrito/Checkout).
+// Requieren el header X-Internal-Token con el secreto compartido.
+// NO están bajo 'api.key' ni 'auth:sanctum' — usan su propio middleware.
+//
+// Configurar en .env (ambos módulos deben tener el mismo valor):
+//   CART_SALDO_INTERNAL_TOKEN=tu_secreto_de_256_bits
+//
+Route::prefix('internal/saldo')
+    ->middleware('internal.token')
+    ->group(function () {
+        Route::post('reservar',                          [SaldoInternalApiController::class, 'reservar']);
+        Route::post('confirmar/{reserva_id}',            [SaldoInternalApiController::class, 'confirmar']);
+        Route::post('liberar/{reserva_id}',              [SaldoInternalApiController::class, 'liberar']);
+        Route::post('cargo-forzoso',                     [SaldoInternalApiController::class, 'cargoForzoso']);
+    });
