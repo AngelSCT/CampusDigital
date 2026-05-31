@@ -17,7 +17,6 @@ use App\Http\Controllers\TarjetaLecturaController;
 use App\Http\Controllers\Auth\RfidLoginController;
 use App\Http\Controllers\MiTarjetaController;
 use App\Http\Controllers\Archivos\ArchivoController;
-use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\CategoriaTicketController;
 use App\Http\Controllers\Admin\UbicacionController;
 use App\Http\Controllers\Admin\EquipoActivoController;
@@ -299,13 +298,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/actividad-export', [ReporteController::class, 'exportActividad'])->name('actividad.export');
         });
 
-        Route::prefix('areas')->name('areas.')->group(function () {
-            Route::get('/',          [AreaController::class, 'index'])->name('index');
-            Route::post('/',         [AreaController::class, 'store'])->name('store');
-            Route::get('/{area}',    [AreaController::class, 'show'])->name('show');
-            Route::put('/{area}',    [AreaController::class, 'update'])->name('update');
-            Route::delete('/{area}', [AreaController::class, 'destroy'])->name('destroy');
-        });
 
         Route::prefix('categorias-ticket')->name('categorias-ticket.')->group(function () {
             Route::get('/',                       [CategoriaTicketController::class, 'index'])->name('index');

@@ -2,21 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Modelo de referencia — la tabla 'area' y su gestión
+ * pertenecen al módulo externo de Areas.
+ * Este archivo solo existe para que Eloquent pueda
+ * resolver la relación en CategoriaTicket.
+ */
 class Area extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
-    protected $table      = 'area';
+    protected $table = 'area';
+
     protected $primaryKey = 'id_area';
-    const DELETED_AT      = 'deleted_at';
 
-    protected $fillable = [
-        'name_area',
-    ];
+    // Sin $fillable: este módulo no escribe en esta tabla.
+    protected $guarded = ['*'];
 
     protected $casts = [
         'created_at' => 'datetime',

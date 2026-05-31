@@ -5,7 +5,6 @@
 use Illuminate\Support\Facades\Route;
 
 // MODULO 4.1
-use App\Http\Controllers\Api\AreaApiController;
 use App\Http\Controllers\Api\UsuarioApiController;
 use App\Http\Controllers\Api\RolApiController;
 use App\Http\Controllers\Api\PermisoApiController;
@@ -38,7 +37,6 @@ use App\Http\Controllers\Api\RfidApiController;
 
 Route::middleware('api.key')->group(function () {
 
-    Route::apiResource('areas', AreaApiController::class);
     Route::apiResource('categorias-ticket', CategoriaTicketApiController::class);
     Route::apiResource('ubicaciones', UbicacionApiController::class);
     Route::apiResource('equipos-activos', EquipoActivoApiController::class);
