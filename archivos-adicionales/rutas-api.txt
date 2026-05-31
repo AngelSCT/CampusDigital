@@ -1,4 +1,4 @@
-BASE URL: http://localhost:8000/api
+BASE URL: http://localhost:8000/api/v1
 
 URLS DE LA API REST DE LA APLICACION (SE PUEDEN PROBAR CON INSOMNIA O POSTMAN)
 
@@ -8,225 +8,225 @@ HEADER 2: Accept       - application/json
 
  USUARIOS
 
-GET     http://localhost:8000/api/usuarios
-GET     http://localhost:8000/api/usuarios?search=juan
-GET     http://localhost:8000/api/usuarios?bloqueado=true
-GET     http://localhost:8000/api/usuarios?per_page=5
-GET     http://localhost:8000/api/usuarios/1
-GET     http://localhost:8000/api/usuarios/2
-GET     http://localhost:8000/api/usuarios/3
-POST    http://localhost:8000/api/usuarios
-PUT     http://localhost:8000/api/usuarios/1
-DELETE  http://localhost:8000/api/usuarios/1
-POST    http://localhost:8000/api/usuarios/1/toggle-block
+GET     http://localhost:8000/api/v1/usuarios
+GET     http://localhost:8000/api/v1/usuarios?search=juan
+GET     http://localhost:8000/api/v1/usuarios?bloqueado=true
+GET     http://localhost:8000/api/v1/usuarios?per_page=5
+GET     http://localhost:8000/api/v1/usuarios/1
+GET     http://localhost:8000/api/v1/usuarios/2
+GET     http://localhost:8000/api/v1/usuarios/3
+POST    http://localhost:8000/api/v1/usuarios
+PUT     http://localhost:8000/api/v1/usuarios/1
+DELETE  http://localhost:8000/api/v1/usuarios/1
+POST    http://localhost:8000/api/v1/usuarios/1/toggle-block
 
 
  ROLES
 
-GET     http://localhost:8000/api/roles
-GET     http://localhost:8000/api/roles/1
-GET     http://localhost:8000/api/roles/2
-GET     http://localhost:8000/api/roles/3
-POST    http://localhost:8000/api/roles
-PUT     http://localhost:8000/api/roles/1
-DELETE  http://localhost:8000/api/roles/1
+GET     http://localhost:8000/api/v1/roles
+GET     http://localhost:8000/api/v1/roles/1
+GET     http://localhost:8000/api/v1/roles/2
+GET     http://localhost:8000/api/v1/roles/3
+POST    http://localhost:8000/api/v1/roles
+PUT     http://localhost:8000/api/v1/roles/1
+DELETE  http://localhost:8000/api/v1/roles/1
 
 
  PERMISOS
 
-GET     http://localhost:8000/api/permisos
-GET     http://localhost:8000/api/permisos/1
-GET     http://localhost:8000/api/permisos/2
-GET     http://localhost:8000/api/permisos/3
-POST    http://localhost:8000/api/permisos
-PUT     http://localhost:8000/api/permisos/1
-DELETE  http://localhost:8000/api/permisos/1
+GET     http://localhost:8000/api/v1/permisos
+GET     http://localhost:8000/api/v1/permisos/1
+GET     http://localhost:8000/api/v1/permisos/2
+GET     http://localhost:8000/api/v1/permisos/3
+POST    http://localhost:8000/api/v1/permisos
+PUT     http://localhost:8000/api/v1/permisos/1
+DELETE  http://localhost:8000/api/v1/permisos/1
 
 
  ROL - PERMISO
 
-GET     http://localhost:8000/api/rol-permisos
-GET     http://localhost:8000/api/rol-permisos?rol_id=1
-GET     http://localhost:8000/api/rol-permisos?rol_id=2
-GET     http://localhost:8000/api/rol-permisos?rol_id=3
-POST    http://localhost:8000/api/rol-permisos
-DELETE  http://localhost:8000/api/rol-permisos/1
+GET     http://localhost:8000/api/v1/rol-permisos
+GET     http://localhost:8000/api/v1/rol-permisos?rol_id=1
+GET     http://localhost:8000/api/v1/rol-permisos?rol_id=2
+GET     http://localhost:8000/api/v1/rol-permisos?rol_id=3
+POST    http://localhost:8000/api/v1/rol-permisos
+DELETE  http://localhost:8000/api/v1/rol-permisos/1
 
 
  USUARIO - ROL
 
-GET     http://localhost:8000/api/usuario-roles
-GET     http://localhost:8000/api/usuario-roles?usuario_id=1
-GET     http://localhost:8000/api/usuario-roles?usuario_id=2
-GET     http://localhost:8000/api/usuario-roles?rol_id=1
-POST    http://localhost:8000/api/usuario-roles
-DELETE  http://localhost:8000/api/usuario-roles/1
+GET     http://localhost:8000/api/v1/usuario-roles
+GET     http://localhost:8000/api/v1/usuario-roles?usuario_id=1
+GET     http://localhost:8000/api/v1/usuario-roles?usuario_id=2
+GET     http://localhost:8000/api/v1/usuario-roles?rol_id=1
+POST    http://localhost:8000/api/v1/usuario-roles
+DELETE  http://localhost:8000/api/v1/usuario-roles/1
 
 
  PERFILES
 
-GET     http://localhost:8000/api/usuario-perfiles
-GET     http://localhost:8000/api/usuario-perfiles/1
-GET     http://localhost:8000/api/usuario-perfiles/2
-GET     http://localhost:8000/api/usuario-perfiles/3
-PUT     http://localhost:8000/api/usuario-perfiles/1
+GET     http://localhost:8000/api/v1/usuario-perfiles
+GET     http://localhost:8000/api/v1/usuario-perfiles/1
+GET     http://localhost:8000/api/v1/usuario-perfiles/2
+GET     http://localhost:8000/api/v1/usuario-perfiles/3
+PUT     http://localhost:8000/api/v1/usuario-perfiles/1
 
 
  SESIONES
 
-GET     http://localhost:8000/api/sesiones
-GET     http://localhost:8000/api/sesiones?activa=true
-GET     http://localhost:8000/api/sesiones?activa=false
-GET     http://localhost:8000/api/sesiones?usuario_id=1
-GET     http://localhost:8000/api/sesiones?usuario_id=4
-GET     http://localhost:8000/api/sesiones?desde=2026-02-01&hasta=2026-02-28
-GET     http://localhost:8000/api/sesiones?per_page=5
-GET     http://localhost:8000/api/sesiones/1
-GET     http://localhost:8000/api/sesiones/2
+GET     http://localhost:8000/api/v1/sesiones
+GET     http://localhost:8000/api/v1/sesiones?activa=true
+GET     http://localhost:8000/api/v1/sesiones?activa=false
+GET     http://localhost:8000/api/v1/sesiones?usuario_id=1
+GET     http://localhost:8000/api/v1/sesiones?usuario_id=4
+GET     http://localhost:8000/api/v1/sesiones?desde=2026-02-01&hasta=2026-02-28
+GET     http://localhost:8000/api/v1/sesiones?per_page=5
+GET     http://localhost:8000/api/v1/sesiones/1
+GET     http://localhost:8000/api/v1/sesiones/2
 
 
  BITÁCORA — ACCESOS
 
-GET     http://localhost:8000/api/bitacora/accesos
-GET     http://localhost:8000/api/bitacora/accesos?evento=login_success
-GET     http://localhost:8000/api/bitacora/accesos?evento=login_failed
-GET     http://localhost:8000/api/bitacora/accesos?evento=logout
-GET     http://localhost:8000/api/bitacora/accesos?evento=registro
-GET     http://localhost:8000/api/bitacora/accesos?exito=true
-GET     http://localhost:8000/api/bitacora/accesos?exito=false
-GET     http://localhost:8000/api/bitacora/accesos?usuario_id=1
-GET     http://localhost:8000/api/bitacora/accesos?usuario_id=4
-GET     http://localhost:8000/api/bitacora/accesos?email=admin@campusdigital.com
-GET     http://localhost:8000/api/bitacora/accesos?desde=2026-02-04&hasta=2026-02-04
-GET     http://localhost:8000/api/bitacora/accesos?per_page=10
-GET     http://localhost:8000/api/bitacora/accesos/1
-GET     http://localhost:8000/api/bitacora/accesos/2
-GET     http://localhost:8000/api/bitacora/accesos/7
+GET     http://localhost:8000/api/v1/bitacora/accesos
+GET     http://localhost:8000/api/v1/bitacora/accesos?evento=login_success
+GET     http://localhost:8000/api/v1/bitacora/accesos?evento=login_failed
+GET     http://localhost:8000/api/v1/bitacora/accesos?evento=logout
+GET     http://localhost:8000/api/v1/bitacora/accesos?evento=registro
+GET     http://localhost:8000/api/v1/bitacora/accesos?exito=true
+GET     http://localhost:8000/api/v1/bitacora/accesos?exito=false
+GET     http://localhost:8000/api/v1/bitacora/accesos?usuario_id=1
+GET     http://localhost:8000/api/v1/bitacora/accesos?usuario_id=4
+GET     http://localhost:8000/api/v1/bitacora/accesos?email=admin@campusdigital.com
+GET     http://localhost:8000/api/v1/bitacora/accesos?desde=2026-02-04&hasta=2026-02-04
+GET     http://localhost:8000/api/v1/bitacora/accesos?per_page=10
+GET     http://localhost:8000/api/v1/bitacora/accesos/1
+GET     http://localhost:8000/api/v1/bitacora/accesos/2
+GET     http://localhost:8000/api/v1/bitacora/accesos/7
 
 
  BITÁCORA — ACTIVIDAD
 
-GET     http://localhost:8000/api/bitacora/actividad
-GET     http://localhost:8000/api/bitacora/actividad?usuario_id=1
-GET     http://localhost:8000/api/bitacora/actividad?modulo=seguridad
-GET     http://localhost:8000/api/bitacora/actividad?accion=eliminar_usuario
-GET     http://localhost:8000/api/bitacora/actividad?accion=actualizar_usuario
-GET     http://localhost:8000/api/bitacora/actividad?accion=cambiar_estado_usuario
-GET     http://localhost:8000/api/bitacora/actividad?target_tabla=usuario
-GET     http://localhost:8000/api/bitacora/actividad?exito=true
-GET     http://localhost:8000/api/bitacora/actividad?exito=false
-GET     http://localhost:8000/api/bitacora/actividad?desde=2026-02-04&hasta=2026-02-04
-GET     http://localhost:8000/api/bitacora/actividad?per_page=5
-GET     http://localhost:8000/api/bitacora/actividad/1
-GET     http://localhost:8000/api/bitacora/actividad/5
-GET     http://localhost:8000/api/bitacora/actividad/10
+GET     http://localhost:8000/api/v1/bitacora/actividad
+GET     http://localhost:8000/api/v1/bitacora/actividad?usuario_id=1
+GET     http://localhost:8000/api/v1/bitacora/actividad?modulo=seguridad
+GET     http://localhost:8000/api/v1/bitacora/actividad?accion=eliminar_usuario
+GET     http://localhost:8000/api/v1/bitacora/actividad?accion=actualizar_usuario
+GET     http://localhost:8000/api/v1/bitacora/actividad?accion=cambiar_estado_usuario
+GET     http://localhost:8000/api/v1/bitacora/actividad?target_tabla=usuario
+GET     http://localhost:8000/api/v1/bitacora/actividad?exito=true
+GET     http://localhost:8000/api/v1/bitacora/actividad?exito=false
+GET     http://localhost:8000/api/v1/bitacora/actividad?desde=2026-02-04&hasta=2026-02-04
+GET     http://localhost:8000/api/v1/bitacora/actividad?per_page=5
+GET     http://localhost:8000/api/v1/bitacora/actividad/1
+GET     http://localhost:8000/api/v1/bitacora/actividad/5
+GET     http://localhost:8000/api/v1/bitacora/actividad/10
 
 
  TARJETAS UNIVERSITARIAS
 
-GET     http://localhost:8000/api/tarjetas
-GET     http://localhost:8000/api/tarjetas?estado=activa
-GET     http://localhost:8000/api/tarjetas?estado=bloqueada
-GET     http://localhost:8000/api/tarjetas?estado=perdida
-GET     http://localhost:8000/api/tarjetas?estado=cancelada
-GET     http://localhost:8000/api/tarjetas?usuario_id=1
-GET     http://localhost:8000/api/tarjetas?usuario_id=4
-GET     http://localhost:8000/api/tarjetas/uid/A1B2C3D4E5F6
-GET     http://localhost:8000/api/tarjetas/1
-GET     http://localhost:8000/api/tarjetas/2
-POST    http://localhost:8000/api/tarjetas
-PUT     http://localhost:8000/api/tarjetas/1
-DELETE  http://localhost:8000/api/tarjetas/1
-POST    http://localhost:8000/api/tarjetas/1/bloquear
-POST    http://localhost:8000/api/tarjetas/1/desbloquear
+GET     http://localhost:8000/api/v1/tarjetas
+GET     http://localhost:8000/api/v1/tarjetas?estado=activa
+GET     http://localhost:8000/api/v1/tarjetas?estado=bloqueada
+GET     http://localhost:8000/api/v1/tarjetas?estado=perdida
+GET     http://localhost:8000/api/v1/tarjetas?estado=cancelada
+GET     http://localhost:8000/api/v1/tarjetas?usuario_id=1
+GET     http://localhost:8000/api/v1/tarjetas?usuario_id=4
+GET     http://localhost:8000/api/v1/tarjetas/uid/A1B2C3D4E5F6
+GET     http://localhost:8000/api/v1/tarjetas/1
+GET     http://localhost:8000/api/v1/tarjetas/2
+POST    http://localhost:8000/api/v1/tarjetas
+PUT     http://localhost:8000/api/v1/tarjetas/1
+DELETE  http://localhost:8000/api/v1/tarjetas/1
+POST    http://localhost:8000/api/v1/tarjetas/1/bloquear
+POST    http://localhost:8000/api/v1/tarjetas/1/desbloquear
 
 
  LECTURAS DE TARJETA
 
-GET     http://localhost:8000/api/tarjeta-lecturas
-GET     http://localhost:8000/api/tarjeta-lecturas?tarjeta_id=1
-GET     http://localhost:8000/api/tarjeta-lecturas?uid_leido=A1B2C3D4E5F6
-GET     http://localhost:8000/api/tarjeta-lecturas?modulo=cafeteria
-GET     http://localhost:8000/api/tarjeta-lecturas?modulo=copias
-GET     http://localhost:8000/api/tarjeta-lecturas?modulo=biblioteca
-GET     http://localhost:8000/api/tarjeta-lecturas?modulo=souvenirs
-GET     http://localhost:8000/api/tarjeta-lecturas?modulo=acceso
-GET     http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=acceso
-GET     http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=consumo
-GET     http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=consulta_saldo
-GET     http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=confirmacion_entrega
-GET     http://localhost:8000/api/tarjeta-lecturas?exito=true
-GET     http://localhost:8000/api/tarjeta-lecturas?exito=false
-GET     http://localhost:8000/api/tarjeta-lecturas?pedido_id=1
-GET     http://localhost:8000/api/tarjeta-lecturas?operador_id=2
-GET     http://localhost:8000/api/tarjeta-lecturas?desde=2026-02-01&hasta=2026-02-28
-GET     http://localhost:8000/api/tarjeta-lecturas?per_page=10
-GET     http://localhost:8000/api/tarjeta-lecturas/1
-GET     http://localhost:8000/api/tarjeta-lecturas/2
-POST    http://localhost:8000/api/tarjeta-lecturas
+GET     http://localhost:8000/api/v1/tarjeta-lecturas
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?tarjeta_id=1
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?uid_leido=A1B2C3D4E5F6
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?modulo=cafeteria
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?modulo=copias
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?modulo=biblioteca
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?modulo=souvenirs
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?modulo=acceso
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?tipo_lectura=acceso
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?tipo_lectura=consumo
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?tipo_lectura=consulta_saldo
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?tipo_lectura=confirmacion_entrega
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?exito=true
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?exito=false
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?pedido_id=1
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?operador_id=2
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?desde=2026-02-01&hasta=2026-02-28
+GET     http://localhost:8000/api/v1/tarjeta-lecturas?per_page=10
+GET     http://localhost:8000/api/v1/tarjeta-lecturas/1
+GET     http://localhost:8000/api/v1/tarjeta-lecturas/2
+POST    http://localhost:8000/api/v1/tarjeta-lecturas
 
 
  SALDO MONEDERO
 
-GET     http://localhost:8000/api/saldo-monederos
-GET     http://localhost:8000/api/saldo-monederos?usuario_id=1
-GET     http://localhost:8000/api/saldo-monederos/usuario/1
-GET     http://localhost:8000/api/saldo-monederos/usuario/4
-GET     http://localhost:8000/api/saldo-monederos/1
-GET     http://localhost:8000/api/saldo-monederos/2
-POST    http://localhost:8000/api/saldo-monederos
+GET     http://localhost:8000/api/v1/saldo-monederos
+GET     http://localhost:8000/api/v1/saldo-monederos?usuario_id=1
+GET     http://localhost:8000/api/v1/saldo-monederos/usuario/1
+GET     http://localhost:8000/api/v1/saldo-monederos/usuario/4
+GET     http://localhost:8000/api/v1/saldo-monederos/1
+GET     http://localhost:8000/api/v1/saldo-monederos/2
+POST    http://localhost:8000/api/v1/saldo-monederos
 
 
  SALDO MOVIMIENTOS
 
-GET     http://localhost:8000/api/saldo-movimientos
-GET     http://localhost:8000/api/saldo-movimientos?usuario_id=1
-GET     http://localhost:8000/api/saldo-movimientos?usuario_id=4
-GET     http://localhost:8000/api/saldo-movimientos?tipo=abono
-GET     http://localhost:8000/api/saldo-movimientos?tipo=cargo
-GET     http://localhost:8000/api/saldo-movimientos?modulo=cafeteria
-GET     http://localhost:8000/api/saldo-movimientos?modulo=copias
-GET     http://localhost:8000/api/saldo-movimientos?modulo=souvenirs
-GET     http://localhost:8000/api/saldo-movimientos?modulo=recarga
-GET     http://localhost:8000/api/saldo-movimientos?saldo_monedero_id=1
-GET     http://localhost:8000/api/saldo-movimientos?desde=2026-02-01&hasta=2026-02-28
-GET     http://localhost:8000/api/saldo-movimientos?per_page=10
-GET     http://localhost:8000/api/saldo-movimientos/1
-GET     http://localhost:8000/api/saldo-movimientos/2
-POST    http://localhost:8000/api/saldo-movimientos
+GET     http://localhost:8000/api/v1/saldo-movimientos
+GET     http://localhost:8000/api/v1/saldo-movimientos?usuario_id=1
+GET     http://localhost:8000/api/v1/saldo-movimientos?usuario_id=4
+GET     http://localhost:8000/api/v1/saldo-movimientos?tipo=abono
+GET     http://localhost:8000/api/v1/saldo-movimientos?tipo=cargo
+GET     http://localhost:8000/api/v1/saldo-movimientos?modulo=cafeteria
+GET     http://localhost:8000/api/v1/saldo-movimientos?modulo=copias
+GET     http://localhost:8000/api/v1/saldo-movimientos?modulo=souvenirs
+GET     http://localhost:8000/api/v1/saldo-movimientos?modulo=recarga
+GET     http://localhost:8000/api/v1/saldo-movimientos?saldo_monedero_id=1
+GET     http://localhost:8000/api/v1/saldo-movimientos?desde=2026-02-01&hasta=2026-02-28
+GET     http://localhost:8000/api/v1/saldo-movimientos?per_page=10
+GET     http://localhost:8000/api/v1/saldo-movimientos/1
+GET     http://localhost:8000/api/v1/saldo-movimientos/2
+POST    http://localhost:8000/api/v1/saldo-movimientos
 
 
  PEDIDOS
 
-GET     http://localhost:8000/api/pedidos
-GET     http://localhost:8000/api/pedidos?usuario_id=1
-GET     http://localhost:8000/api/pedidos?usuario_id=4
-GET     http://localhost:8000/api/pedidos?estado=creado
-GET     http://localhost:8000/api/pedidos?estado=aceptado
-GET     http://localhost:8000/api/pedidos?estado=en_proceso
-GET     http://localhost:8000/api/pedidos?estado=listo
-GET     http://localhost:8000/api/pedidos?estado=entregado
-GET     http://localhost:8000/api/pedidos?estado=cancelado
-GET     http://localhost:8000/api/pedidos?modulo=cafeteria
-GET     http://localhost:8000/api/pedidos?modulo=copias
-GET     http://localhost:8000/api/pedidos?modulo=souvenirs
-GET     http://localhost:8000/api/pedidos?operador_id=2
-GET     http://localhost:8000/api/pedidos?folio=F-ABC
-GET     http://localhost:8000/api/pedidos?desde=2026-02-01&hasta=2026-02-28
-GET     http://localhost:8000/api/pedidos?per_page=5
-GET     http://localhost:8000/api/pedidos/1
-GET     http://localhost:8000/api/pedidos/2
-POST    http://localhost:8000/api/pedidos
-PUT     http://localhost:8000/api/pedidos/1
-DELETE  http://localhost:8000/api/pedidos/1
-POST    http://localhost:8000/api/pedidos/1/estado
-POST    http://localhost:8000/api/pedidos/1/confirmar-tarjeta
+GET     http://localhost:8000/api/v1/pedidos
+GET     http://localhost:8000/api/v1/pedidos?usuario_id=1
+GET     http://localhost:8000/api/v1/pedidos?usuario_id=4
+GET     http://localhost:8000/api/v1/pedidos?estado=creado
+GET     http://localhost:8000/api/v1/pedidos?estado=aceptado
+GET     http://localhost:8000/api/v1/pedidos?estado=en_proceso
+GET     http://localhost:8000/api/v1/pedidos?estado=listo
+GET     http://localhost:8000/api/v1/pedidos?estado=entregado
+GET     http://localhost:8000/api/v1/pedidos?estado=cancelado
+GET     http://localhost:8000/api/v1/pedidos?modulo=cafeteria
+GET     http://localhost:8000/api/v1/pedidos?modulo=copias
+GET     http://localhost:8000/api/v1/pedidos?modulo=souvenirs
+GET     http://localhost:8000/api/v1/pedidos?operador_id=2
+GET     http://localhost:8000/api/v1/pedidos?folio=F-ABC
+GET     http://localhost:8000/api/v1/pedidos?desde=2026-02-01&hasta=2026-02-28
+GET     http://localhost:8000/api/v1/pedidos?per_page=5
+GET     http://localhost:8000/api/v1/pedidos/1
+GET     http://localhost:8000/api/v1/pedidos/2
+POST    http://localhost:8000/api/v1/pedidos
+PUT     http://localhost:8000/api/v1/pedidos/1
+DELETE  http://localhost:8000/api/v1/pedidos/1
+POST    http://localhost:8000/api/v1/pedidos/1/estado
+POST    http://localhost:8000/api/v1/pedidos/1/confirmar-tarjeta
 
 
  BODIES JSON PARA POST / PUT
 
 
-POST /api/usuarios
+POST /api/v1/usuarios
 {
     "nombre": "Carlos",
     "apellido": "López",
@@ -235,52 +235,52 @@ POST /api/usuarios
     "telefono": "5551234567"
 }
 
-PUT /api/usuarios/{id} 
+PUT /api/v1/usuarios/{id} 
 {
     "nombre": "Carlos Alberto",
     "telefono": "5559999999"
 }
 
-POST /api/roles
+POST /api/v1/roles
 {
     "nombre": "moderador",
     "descripcion": "Rol de moderación",
     "activo": true
 }
 
-PUT /api/roles/{id} 
+PUT /api/v1/roles/{id} 
 {
     "descripcion": "Descripción actualizada",
     "activo": false
 }
 
-POST /api/permisos
+POST /api/v1/permisos
 {
     "clave": "reporte.read",
     "descripcion": "Ver reportes",
     "activo": true
 }
 
-POST /api/rol-permisos
+POST /api/v1/rol-permisos
 {
     "rol_id": 1,
     "permiso_id": 2
 }
 
-POST /api/usuario-roles
+POST /api/v1/usuario-roles
 {
     "usuario_id": 4,
     "rol_id": 2
 }
 
-PUT /api/usuario-perfiles/{id}
+PUT /api/v1/usuario-perfiles/{id}
 {
     "fecha_nacimiento": "1995-06-15",
     "genero": "masculino",
     "direccion": "Calle Falsa 123"
 }
 
-POST /api/tarjetas 
+POST /api/v1/tarjetas 
 {
     "usuario_id": 4,
     "uid": "A1B2C3D4E5F6",
@@ -288,19 +288,19 @@ POST /api/tarjetas
     "registrado_por_usuario_id": 1
 }
 
-PUT /api/tarjetas/{id} 
+PUT /api/v1/tarjetas/{id} 
 {
     "estado": "perdida",
     "motivo_bloqueo": "El usuario reporto que no encuentra su tarjeta"
 }
 
-POST /api/tarjetas/{id}/bloquear
+POST /api/v1/tarjetas/{id}/bloquear
 {
     "motivo_bloqueo": "Tarjeta reportada como robada",
     "bloqueado_por_usuario_id": 1
 }
 
-POST /api/tarjeta-lecturas 
+POST /api/v1/tarjeta-lecturas 
 {
     "uid_leido": "A1B2C3D4E5F6",
     "modulo": "cafeteria",
@@ -310,12 +310,12 @@ POST /api/tarjeta-lecturas
     "operador_usuario_id": 2
 }
 
-POST /api/saldo-monederos
+POST /api/v1/saldo-monederos
 {
     "usuario_id": 4
 }
 
-POST /api/saldo-movimientos (abono)
+POST /api/v1/saldo-movimientos (abono)
 {
     "usuario_id": 4,
     "tipo": "abono",
@@ -325,7 +325,7 @@ POST /api/saldo-movimientos (abono)
     "operador_usuario_id": 1
 }
 
-POST /api/saldo-movimientos (cargo) 
+POST /api/v1/saldo-movimientos (cargo) 
 {
     "usuario_id": 4,
     "tipo": "cargo",
@@ -338,7 +338,7 @@ POST /api/saldo-movimientos (cargo)
     "referencia_id": 5
 }
 
-POST /api/pedidos 
+POST /api/v1/pedidos 
 {
     "usuario_id": 4,
     "modulo": "cafeteria",
@@ -347,19 +347,67 @@ POST /api/pedidos
     "notas": "Sin chile"
 }
 
-PUT /api/pedidos/{id}
+PUT /api/v1/pedidos/{id}
 {
     "notas": "Sin chile y sin sal",
     "descripcion": "Comida del dia actualizada"
 }
 
-POST /api/pedidos/{id}/estado
+POST /api/v1/pedidos/{id}/estado
 {
     "estado": "aceptado",
     "operador_usuario_id": 2
 }
 
-POST /api/pedidos/{id}/confirmar-tarjeta
+POST /api/v1/pedidos/{id}/confirmar-tarjeta
 {
     "tarjeta_lectura_id": 5
+}
+
+
+
+RFID — AUTENTICACIÓN Y CONSULTA POR TARJETA
+
+POST    http://localhost:8000/api/v1/rfid/auth                         NOTA: NO REQUIERE API/v1KEY
+POST    http://localhost:8000/api/v1/rfid/verificar
+GET     http://localhost:8000/api/v1/rfid/usuario/{uid}
+GET     http://localhost:8000/api/v1/rfid/saldo/{uid}
+GET     http://localhost:8000/api/v1/rfid/historial/{uid}
+GET     http://localhost:8000/api/v1/rfid/historial/{uid}?tipo=abono
+GET     http://localhost:8000/api/v1/rfid/historial/{uid}?tipo=cargo
+GET     http://localhost:8000/api/v1/rfid/historial/{uid}?modulo=cafeteria
+GET     http://localhost:8000/api/v1/rfid/historial/{uid}?modulo=copias
+GET     http://localhost:8000/api/v1/rfid/historial/{uid}?modulo=souvenirs
+GET     http://localhost:8000/api/v1/rfid/historial/{uid}?modulo=recarga
+GET     http://localhost:8000/api/v1/rfid/historial/{uid}?per_page=5
+GET     http://localhost:8000/api/v1/rfid/pedidos/{uid}
+GET     http://localhost:8000/api/v1/rfid/pedidos/{uid}?estado=listo
+GET     http://localhost:8000/api/v1/rfid/pedidos/{uid}?estado=entregado
+GET     http://localhost:8000/api/v1/rfid/pedidos/{uid}?estado=cancelado
+GET     http://localhost:8000/api/v1/rfid/pedidos/{uid}?modulo=cafeteria
+GET     http://localhost:8000/api/v1/rfid/pedidos/{uid}?modulo=copias
+GET     http://localhost:8000/api/v1/rfid/pedidos/{uid}?modulo=souvenirs
+GET     http://localhost:8000/api/v1/rfid/pedidos/{uid}?estado=listo&modulo=cafeteria
+GET     http://localhost:8000/api/v1/rfid/pedidos/{uid}?estado=listo&modulo=copias
+GET     http://localhost:8000/api/v1/rfid/lecturas/{uid}
+GET     http://localhost:8000/api/v1/rfid/lecturas/{uid}?modulo=cafeteria
+GET     http://localhost:8000/api/v1/rfid/lecturas/{uid}?modulo=acceso
+GET     http://localhost:8000/api/v1/rfid/lecturas/{uid}?tipo_lectura=acceso
+GET     http://localhost:8000/api/v1/rfid/lecturas/{uid}?tipo_lectura=consumo
+GET     http://localhost:8000/api/v1/rfid/lecturas/{uid}?tipo_lectura=consulta_saldo
+GET     http://localhost:8000/api/v1/rfid/lecturas/{uid}?tipo_lectura=confirmacion_entrega
+GET     http://localhost:8000/api/v1/rfid/lecturas/{uid}?desde=2026-01-01&hasta=2026-12-31
+GET     http://localhost:8000/api/v1/rfid/lecturas/{uid}?per_page=10
+
+
+POST /api/v1/rfid/auth
+{
+    "uid": "A1B2C3D4",
+    "pin": "1234"
+}
+
+POST /api/v1/rfid/verificar
+{
+    "uid": "A1B2C3D4",
+    "pin": "1234"
 }

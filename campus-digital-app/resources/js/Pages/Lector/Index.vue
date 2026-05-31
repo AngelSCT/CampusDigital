@@ -70,7 +70,21 @@
                                 </div>
                             </div>
 
-                            <div>
+                            <!-- SWITCH MODO PIN -->
+                            <div class="flex items-center justify-between py-2 border-t border-slate-700/50">
+                                <div>
+                                    <p class="text-sm font-medium text-white">Validación con PIN</p>
+                                    <p class="text-xs text-slate-400">Requiere UID + PIN del titular</p>
+                                </div>
+                                <button type="button" @click="modoPinActivo = !modoPinActivo"
+                                        :class="modoPinActivo ? 'bg-cyan-600' : 'bg-slate-600'"
+                                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none">
+                                    <span :class="modoPinActivo ? 'translate-x-6' : 'translate-x-1'"
+                                        class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200"/>
+                                </button>
+                            </div>
+
+                            <div v-show="!modoPinActivo">
                                 <label class="block text-sm font-medium text-white mb-2">
                                     UID de la Tarjeta <span class="text-red-400">*</span>
                                 </label>
@@ -95,6 +109,63 @@
                                 </div>
                             </div>
 
+                            <transition name="fade">
+                                <div v-if="modoPinActivo" class="space-y-3 p-4 bg-slate-900/60 border border-cyan-500/20 rounded-lg">
+                                    <p class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">
+                                        Modo validación con PIN
+                                    </p>
+
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-300 mb-1">
+                                            UID de la Tarjeta <span class="text-red-400">*</span>
+                                        </label>
+                                        <input
+                                            ref="uidPinRef"
+                                            v-model="uidPin"
+                                            type="text"
+                                            maxlength="64"
+                                            autocomplete="off"
+                                            spellcheck="false"
+                                            placeholder="Escanea o escribe el UID..."
+                                            @keyup.enter="$refs.pinRef?.focus()"
+                                            @input="uidPin = uidPin.toUpperCase()"
+                                            class="w-full rounded-lg bg-slate-700/50 border border-slate-600 text-white placeholder-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 text-sm px-3 py-2.5 font-mono tracking-widest transition-all duration-200 text-center uppercase"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-300 mb-1">
+                                            PIN <span class="text-red-400">*</span>
+                                        </label>
+                                        <input
+                                            ref="pinRef"
+                                            v-model="pinInput"
+                                            type="password"
+                                            maxlength="4"
+                                            autocomplete="off"
+                                            inputmode="numeric"
+                                            placeholder="••••"
+                                            @keyup.enter="escanearConPin"
+                                            class="w-full rounded-lg bg-slate-700/50 border border-slate-600 text-white placeholder-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 text-sm px-3 py-2.5 font-mono tracking-widest transition-all duration-200 text-center"
+                                        />
+                                    </div>
+
+                                    <button @click="escanearConPin"
+                                            :disabled="procesando || !uidPin.trim() || !pinInput.trim()"
+                                            class="w-full py-2.5 bg-gradient-to-br from-cyan-600 to-blue-600 border border-transparent rounded-lg text-sm font-semibold text-white hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2">
+                                        <svg v-if="procesando" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                                        </svg>
+                                        <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                        </svg>
+                                        {{ procesando ? 'Validando...' : 'Validar UID + PIN' }}
+                                    </button>
+                                </div>
+                            </transition>
+
+                            <div v-show="!modoPinActivo">
                             <button @click="escanear" :disabled="procesando || !uid.trim()"
                                     class="w-full py-3 bg-gradient-to-br from-cyan-600 to-blue-600 border border-transparent rounded-lg text-sm font-semibold text-white hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2">
                                 <svg v-if="procesando" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -106,6 +177,7 @@
                                 </svg>
                                 {{ procesando ? 'Procesando...' : 'Procesar Lectura' }}
                             </button>
+                            </div>
 
                         <div class="flex flex-col items-center gap-3 pt-2 border-t border-slate-700/50">
                             <p class="text-xs text-slate-500 uppercase tracking-wider font-medium">
@@ -298,6 +370,12 @@ const uidRef             = ref(null);
 const canvasQr     = ref(null);
 const codigoLector = ref(localStorage.getItem('lector_codigo') ?? 'LECTOR01ADD09'); //*********CODIGO DEL LECTOR************
 
+const modoPinActivo = ref(false);
+const uidPin        = ref('');
+const pinInput      = ref('');
+const uidPinRef     = ref(null);
+const pinRef        = ref(null);
+
 watch(codigoLector, async (nuevoCodigo) => {
     localStorage.setItem('lector_codigo', nuevoCodigo); 
     if (canvasQr.value && nuevoCodigo.trim()) {
@@ -381,6 +459,28 @@ function escanear() {
             resultado.value = page.props.flash?.scan_result ?? page.props.scan_result ?? null;
             uid.value = '';
             uidRef.value?.focus();
+        },
+        onFinish: () => { procesando.value = false; },
+    });
+}
+
+function escanearConPin() {
+    if (!uidPin.value.trim() || !pinInput.value.trim() || procesando.value) return;
+    procesando.value         = true;
+    pedidoSeleccionado.value = null;
+
+    router.post(route('lector.leer'), {
+        uid:          uidPin.value.toUpperCase().trim(),
+        modulo:       moduloSeleccionado.value,
+        tipo_lectura: tipoSeleccionado.value,
+        pin:          pinInput.value,      
+    }, {
+        preserveScroll: true,
+        onSuccess: (page) => {
+            resultado.value = page.props.flash?.scan_result ?? page.props.scan_result ?? null;
+            uidPin.value    = '';
+            pinInput.value  = '';
+            uidPinRef.value?.focus();
         },
         onFinish: () => { procesando.value = false; },
     });

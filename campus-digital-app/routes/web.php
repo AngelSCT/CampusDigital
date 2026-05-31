@@ -19,6 +19,18 @@ use App\Http\Controllers\MiTarjetaController;
 use App\Http\Controllers\Pedidos\PedidoController;
 use App\Http\Controllers\Pedidos\PedidoDashboardController;
 use App\Http\Controllers\Pedidos\PedidoReporteController;
+use App\Http\Controllers\RecargaController;
+use App\Http\Controllers\Archivos\ArchivoController;
+use App\Http\Controllers\Admin\AreaController;
+use App\Http\Controllers\Admin\CategoriaTicketController;
+use App\Http\Controllers\Admin\UbicacionController;
+use App\Http\Controllers\Admin\EquipoActivoController;
+use App\Http\Controllers\Admin\MantenimientoPreventivoController;
+use App\Http\Controllers\Admin\TicketController;
+use App\Http\Controllers\Admin\AsignacionTecnicaController;
+use App\Http\Controllers\Admin\InsumoController;
+use App\Http\Controllers\Admin\GastoTicketController;
+use App\Http\Controllers\Admin\HistorialTicketController;
 
 
 Route::get('/', function () {
@@ -27,7 +39,7 @@ Route::get('/', function () {
 
 
 Route::post('/auth/rfid-login', [RfidLoginController::class, 'login'])
-    ->middleware('guest')
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])
     ->name('rfid.login');
 
 
@@ -57,10 +69,55 @@ Route::get('/simulador/uid-pendiente', function () {
         ]);
 })->name('simulador.uid-pendiente');
 
+Route::post('/simulador/login-rfid', function (Request $request) {
+    $uid = strtoupper(trim($request->input('uid', '')));
+    $pin = $request->input('pin', '');
+
+    if (!$uid || !$pin) {
+        return response()->json(['error' => 'Datos incompletos'], 400)
+            ->header('Access-Control-Allow-Origin', '*');
+    }
+
+    Cache::put('simulador_login_uid', $uid, 60);
+    Cache::put('simulador_login_pin', $pin, 60);
+    Cache::put('simulador_login_timestamp', now()->toIso8601String(), 60);
+
+    return response()->json(['ok' => true])
+        ->header('Access-Control-Allow-Origin', '*');
+})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
+Route::options('/simulador/login-rfid', function () {
+    return response('', 200)
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type');
+});
+
+Route::get('/simulador/login-pendiente', function () {
+    return response()->json([
+        'uid'       => Cache::get('simulador_login_uid'),
+        'pin'       => Cache::get('simulador_login_pin'),
+        'timestamp' => Cache::get('simulador_login_timestamp'),
+    ]);
+})->name('simulador.login-pendiente');
+
+Route::post('/simulador/limpiar-login', function () {
+    Cache::forget('simulador_login_uid');
+    Cache::forget('simulador_login_pin');
+    Cache::forget('simulador_login_timestamp');
+    return response()->json(['ok' => true]);
+})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // ── MONEDERO / RECARGAS ──────────────────────────────────────
+    Route::prefix('monedero')->name('monedero.')->group(function () {
+        Route::get('/recargas',  [RecargaController::class, 'index'])->name('recargas');
+        Route::post('/recargas', [RecargaController::class, 'store'])->name('recargas.store');
+    });
 
     Route::get('/sin-permiso', function () {
         return inertia('Errors/SinPermiso');
@@ -90,6 +147,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/actualizar', [PerfilController::class, 'updateProfile'])->name('update');
         Route::post('/foto',       [PerfilController::class, 'updatePhoto'])->name('photo.update');
         Route::delete('/foto',     [PerfilController::class, 'deletePhoto'])->name('photo.delete');
+    });
+
+    Route::prefix('archivos')->name('archivos.')->middleware('permission:file.read')->group(function () {
+        Route::get('/',                                    [ArchivoController::class, 'index'])->name('index');
+        Route::post('/carpeta',                            [ArchivoController::class, 'crearCarpeta'])->middleware('permission:file.write')->name('carpeta.crear');
+        Route::delete('/carpeta/{carpeta}',                [ArchivoController::class, 'eliminarCarpeta'])->middleware('permission:file.delete')->name('carpeta.eliminar');
+        Route::post('/carpeta/{carpeta}/renombrar',        [ArchivoController::class, 'renombrarCarpeta'])->middleware('permission:file.write')->name('carpeta.renombrar');
+        Route::post('/subir',                              [ArchivoController::class, 'subir'])->middleware('permission:file.write')->name('subir');
+        Route::get('/{archivo}/descargar',                 [ArchivoController::class, 'descargar'])->name('descargar');
+        Route::get('/{archivo}/previsualizar',             [ArchivoController::class, 'previsualizar'])->name('previsualizar');
+        Route::delete('/{archivo}',                        [ArchivoController::class, 'eliminarArchivo'])->middleware('permission:file.delete')->name('eliminar');
+        Route::post('/{archivo}/marcar-visto',             [ArchivoController::class, 'marcarVisto'])->middleware('permission:file.admin')->name('marcar-visto');
+        Route::post('/{archivo}/desmarcar-visto',          [ArchivoController::class, 'desmarcarVisto'])->middleware('permission:file.admin')->name('desmarcar-visto');
+        Route::post('/{archivo}/nota',                     [ArchivoController::class, 'agregarNota'])->middleware('permission:file.admin')->name('nota');
     });
 
     Route::middleware(['role:administrador'])->prefix('admin')->name('admin.')->group(function () {
@@ -236,6 +307,86 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/usuarios-export',  [ReporteController::class, 'exportUsuarios'])->name('usuarios.export');
             Route::get('/accesos-export',   [ReporteController::class, 'exportAccesos'])->name('accesos.export');
             Route::get('/actividad-export', [ReporteController::class, 'exportActividad'])->name('actividad.export');
+        });
+
+        Route::prefix('areas')->name('areas.')->group(function () {
+            Route::get('/',          [AreaController::class, 'index'])->name('index');
+            Route::post('/',         [AreaController::class, 'store'])->name('store');
+            Route::get('/{area}',    [AreaController::class, 'show'])->name('show');
+            Route::put('/{area}',    [AreaController::class, 'update'])->name('update');
+            Route::delete('/{area}', [AreaController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('categorias-ticket')->name('categorias-ticket.')->group(function () {
+            Route::get('/',                       [CategoriaTicketController::class, 'index'])->name('index');
+            Route::post('/',                      [CategoriaTicketController::class, 'store'])->name('store');
+            Route::get('/{categoriaTicket}',      [CategoriaTicketController::class, 'show'])->name('show');
+            Route::put('/{categoriaTicket}',      [CategoriaTicketController::class, 'update'])->name('update');
+            Route::delete('/{categoriaTicket}',   [CategoriaTicketController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('ubicaciones')->name('ubicaciones.')->group(function () {
+            Route::get('/',              [UbicacionController::class, 'index'])->name('index');
+            Route::post('/',             [UbicacionController::class, 'store'])->name('store');
+            Route::get('/{ubicacion}',   [UbicacionController::class, 'show'])->name('show');
+            Route::put('/{ubicacion}',   [UbicacionController::class, 'update'])->name('update');
+            Route::delete('/{ubicacion}',[UbicacionController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('equipos-activos')->name('equipos-activos.')->group(function () {
+            Route::get('/',                [EquipoActivoController::class, 'index'])->name('index');
+            Route::post('/',               [EquipoActivoController::class, 'store'])->name('store');
+            Route::get('/{equipoActivo}',  [EquipoActivoController::class, 'show'])->name('show');
+            Route::put('/{equipoActivo}',  [EquipoActivoController::class, 'update'])->name('update');
+            Route::delete('/{equipoActivo}',[EquipoActivoController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('mantenimientos-preventivos')->name('mantenimientos-preventivos.')->group(function () {
+            Route::get('/',                          [MantenimientoPreventivoController::class, 'index'])->name('index');
+            Route::post('/',                         [MantenimientoPreventivoController::class, 'store'])->name('store');
+            Route::get('/{mantenimientoPreventivo}', [MantenimientoPreventivoController::class, 'show'])->name('show');
+            Route::put('/{mantenimientoPreventivo}', [MantenimientoPreventivoController::class, 'update'])->name('update');
+            Route::delete('/{mantenimientoPreventivo}',[MantenimientoPreventivoController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('tickets')->name('tickets.')->group(function () {
+            Route::get('/',          [TicketController::class, 'index'])->name('index');
+            Route::post('/',         [TicketController::class, 'store'])->name('store');
+            Route::get('/{ticket}',  [TicketController::class, 'show'])->name('show');
+            Route::put('/{ticket}',  [TicketController::class, 'update'])->name('update');
+            Route::delete('/{ticket}',[TicketController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('asignaciones-tecnicas')->name('asignaciones-tecnicas.')->group(function () {
+            Route::get('/',                       [AsignacionTecnicaController::class, 'index'])->name('index');
+            Route::post('/',                      [AsignacionTecnicaController::class, 'store'])->name('store');
+            Route::get('/{asignacionTecnica}',    [AsignacionTecnicaController::class, 'show'])->name('show');
+            Route::put('/{asignacionTecnica}',    [AsignacionTecnicaController::class, 'update'])->name('update');
+            Route::delete('/{asignacionTecnica}', [AsignacionTecnicaController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('insumos')->name('insumos.')->group(function () {
+            Route::get('/',          [InsumoController::class, 'index'])->name('index');
+            Route::post('/',         [InsumoController::class, 'store'])->name('store');
+            Route::get('/{insumo}',  [InsumoController::class, 'show'])->name('show');
+            Route::put('/{insumo}',  [InsumoController::class, 'update'])->name('update');
+            Route::delete('/{insumo}',[InsumoController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('gastos-ticket')->name('gastos-ticket.')->group(function () {
+            Route::get('/',               [GastoTicketController::class, 'index'])->name('index');
+            Route::post('/',              [GastoTicketController::class, 'store'])->name('store');
+            Route::get('/{gastoTicket}',  [GastoTicketController::class, 'show'])->name('show');
+            Route::put('/{gastoTicket}',  [GastoTicketController::class, 'update'])->name('update');
+            Route::delete('/{gastoTicket}',[GastoTicketController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('historial-tickets')->name('historial-tickets.')->group(function () {
+            Route::get('/',                    [HistorialTicketController::class, 'index'])->name('index');
+            Route::post('/',                   [HistorialTicketController::class, 'store'])->name('store');
+            Route::get('/{historialTicket}',   [HistorialTicketController::class, 'show'])->name('show');
+            Route::put('/{historialTicket}',   [HistorialTicketController::class, 'update'])->name('update');
+            Route::delete('/{historialTicket}',[HistorialTicketController::class, 'destroy'])->name('destroy');
         });
     });
 

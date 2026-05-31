@@ -53,6 +53,7 @@ class TarjetaLecturaController extends Controller
             'uid'          => 'required|string|max:64',
             'modulo'       => 'required|string|in:' . implode(',', TarjetaLectura::MODULOS),
             'tipo_lectura' => 'required|string|in:' . implode(',', TarjetaLectura::TIPOS),
+            'pin'          => 'nullable|string|max:4',
         ]);
 
         $uid        = strtoupper(trim($request->uid));
@@ -105,6 +106,29 @@ class TarjetaLecturaController extends Controller
                 'mensaje' => "Tarjeta {$tarjeta->estado}. " . ($tarjeta->motivo_bloqueo ? "Motivo: {$tarjeta->motivo_bloqueo}" : ''),
                 'uid'     => $uid,
             ]);
+        }
+
+        if ($request->filled('pin')) {
+            if (!$tarjeta->usuario || !$tarjeta->pin_hash || !\Hash::check($request->pin, $tarjeta->pin_hash)) {
+                TarjetaLectura::create([
+                    'tarjeta_id'          => $tarjeta->id,
+                    'uid_leido'           => $uid,
+                    'modulo'              => $modulo,
+                    'tipo_lectura'        => $tipo,
+                    'exito'               => false,
+                    'detalle'             => 'PIN incorrecto.',
+                    'ip'                  => $request->ip(),
+                    'user_agent'          => $request->userAgent() ?? '',
+                    'operador_usuario_id' => $operadorId,
+                    'meta_json'           => [],
+                ]);
+
+                return redirect()->route('lector.index')->with('scan_result', [
+                    'exito'   => false,
+                    'mensaje' => 'PIN incorrecto.',
+                    'uid'     => $uid,
+                ]);
+            }
         }
 
         $usuario = $tarjeta->usuario;

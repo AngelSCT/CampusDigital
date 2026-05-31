@@ -202,7 +202,7 @@ class RfidDemoSeeder extends Seeder
 
         $lecturasTotales = 0;
 
-        foreach (range(6, 0) as $diasAtras) {
+        foreach (range(2, 1) as $diasAtras) {
             $fecha = now()->subDays($diasAtras);
 
             $cantidadDia = rand(3, 8);

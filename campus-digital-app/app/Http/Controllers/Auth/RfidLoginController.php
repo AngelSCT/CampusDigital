@@ -28,30 +28,38 @@ class RfidLoginController extends Controller
             $this->bitacoraFallida(null, '', 'rfid_login_failed',
                 'UID no registrado: ' . $uid, $request);
 
+            if ($request->expectsJson()) {
+                return response()->json(['uid' => 'Tarjeta no reconocida en el sistema.'], 422);
+            }
             return back()->withErrors(['uid' => 'Tarjeta no reconocida en el sistema.']);
         }
 
         if (!$tarjeta->pin_hash) {
             $this->bitacoraFallida($tarjeta->usuario_id,
                 $tarjeta->usuario?->email ?? '', 'rfid_login_failed',
-                'PIN no configurado para esta tarjeta.', $request);
+                'PIN no configurado.', $request);
 
+            if ($request->expectsJson()) {
+                return response()->json(['pin' => 'Esta tarjeta no tiene PIN configurado.'], 422);
+            }
             return back()->withErrors(['pin' => 'Esta tarjeta no tiene PIN configurado. Ingresa a tu perfil y configura tu PIN primero.']);
         }
 
         if (!Hash::check($data['pin'], $tarjeta->pin_hash)) {
             $this->bitacoraFallida($tarjeta->usuario_id,
                 $tarjeta->usuario?->email ?? '', 'rfid_login_failed',
-                'PIN incorrecto para tarjeta UID: ' . $uid, $request);
+                'PIN incorrecto para UID: ' . $uid, $request);
 
+            if ($request->expectsJson()) {
+                return response()->json(['pin' => 'PIN incorrecto.'], 422);
+            }
             return back()->withErrors(['pin' => 'PIN incorrecto.']);
         }
 
         if ($tarjeta->estaBloqueada()) {
             $this->bitacoraFallida($tarjeta->usuario_id,
                 $tarjeta->usuario?->email ?? '', 'rfid_login_failed',
-                'Tarjeta en estado "' . $tarjeta->estado . '". Motivo: ' . ($tarjeta->motivo_bloqueo ?? 'Sin motivo'),
-                $request);
+                'Tarjeta en estado: ' . $tarjeta->estado, $request);
 
             $msg = match ($tarjeta->estado) {
                 'bloqueada' => 'Tu tarjeta está bloqueada. Contacta a administración.',
@@ -60,6 +68,9 @@ class RfidLoginController extends Controller
                 default     => 'Tarjeta no disponible.',
             };
 
+            if ($request->expectsJson()) {
+                return response()->json(['uid' => $msg], 422);
+            }
             return back()->withErrors(['uid' => $msg]);
         }
 
@@ -68,19 +79,28 @@ class RfidLoginController extends Controller
                 $tarjeta->usuario?->email ?? '', 'rfid_login_failed',
                 'Tarjeta en estado: ' . $tarjeta->estado, $request);
 
+            if ($request->expectsJson()) {
+                return response()->json(['uid' => 'Tu tarjeta no está activa.'], 422);
+            }
             return back()->withErrors(['uid' => 'Tu tarjeta no está activa.']);
         }
 
         $usuario = $tarjeta->usuario;
 
         if (!$usuario || $usuario->deleted_at) {
-            return back()->withErrors(['uid' => 'El usuario asociado a esta tarjeta no está disponible.']);
+            if ($request->expectsJson()) {
+                return response()->json(['uid' => 'Usuario no disponible.'], 422);
+            }
+            return back()->withErrors(['uid' => 'El usuario asociado no está disponible.']);
         }
 
         if ($usuario->estaBloqueado()) {
             $this->bitacoraFallida($usuario->id, $usuario->email,
-                'rfid_login_failed', 'Usuario bloqueado. Acceso por tarjeta denegado.', $request);
+                'rfid_login_failed', 'Usuario bloqueado.', $request);
 
+            if ($request->expectsJson()) {
+                return response()->json(['uid' => 'Tu cuenta está bloqueada.'], 422);
+            }
             return back()->withErrors(['uid' => 'Tu cuenta está bloqueada. Contacta a administración.']);
         }
 
@@ -88,12 +108,14 @@ class RfidLoginController extends Controller
             $this->bitacoraFallida($usuario->id, $usuario->email,
                 'rfid_login_failed', 'Email no verificado.', $request);
 
+            if ($request->expectsJson()) {
+                return response()->json(['uid' => 'Debes verificar tu correo antes de usar la tarjeta.'], 422);
+            }
             return back()->withErrors(['uid' => 'Debes verificar tu correo electrónico antes de usar la tarjeta.']);
         }
-        
+
         Auth::login($usuario, false);
         $request->session()->regenerate();
-
         $tarjeta->update(['ultimo_uso_at' => now()]);
 
         AccesoBitacora::create([
@@ -102,10 +124,17 @@ class RfidLoginController extends Controller
             'email_intentado' => $usuario->email,
             'evento'          => 'rfid_login_success',
             'exito'           => true,
-            'detalle'         => 'Login exitoso por tarjeta RFID/NFC con PIN. UID: ' . $uid,
+            'detalle'         => 'Login exitoso por RFID con PIN. UID: ' . $uid,
             'ip'              => $request->ip(),
             'user_agent'      => $request->userAgent() ?? '',
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok'      => true,
+                'mensaje' => 'Bienvenido, ' . $usuario->nombre . '.',
+            ]);
+        }
 
         return redirect()->intended(route('dashboard'));
     }

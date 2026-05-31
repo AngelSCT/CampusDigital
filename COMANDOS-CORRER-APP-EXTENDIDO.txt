@@ -188,6 +188,10 @@ NOTA:LA CARPETA DESDE LA QUE SE TIENE QUE HACER CAMBIOS PARA
 
 
 
+php artisan storage:link --force
+
+
+
 
 
 

@@ -161,25 +161,33 @@
                             <span class="legend-dot red"></span><span>Fallidos</span>
                         </div>
                     </div>
-                    <canvas ref="chartAccesos" height="100"></canvas>
+                    <div class="chart-wrapper">
+                        <canvas ref="chartAccesos"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card">
                     <div class="chart-header"><h3 class="chart-title">Actividad por módulo (30d)</h3></div>
-                    <canvas ref="chartModulos" height="180"></canvas>
+                    <div class="chart-wrapper h-180">
+                        <canvas ref="chartModulos"></canvas>
+                    </div>
                 </div>
             </div>
 
             <div class="charts-row">
                 <div class="chart-card">
                     <div class="chart-header"><h3 class="chart-title">Crecimiento de usuarios (14d)</h3></div>
-                    <canvas ref="chartCrecimiento" height="130"></canvas>
+                    <div class="chart-wrapper">
+                        <canvas ref="chartCrecimiento"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card wide">
                     <div class="chart-header">
                         <h3 class="chart-title">Actividad por hora del día (30d)</h3>
                         <span class="chart-sub">Distribución de acciones por hora</span>
                     </div>
-                    <canvas ref="chartHoras" height="100"></canvas>
+                    <div class="chart-wrapper">
+                        <canvas ref="chartHoras"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -205,7 +213,9 @@
                 <div class="content-card center-content">
                     <div class="content-header"><h3 class="content-title">Estado de Tarjetas</h3></div>
                     <div class="content-body donut-body">
-                        <canvas ref="chartTarjetas" width="200" height="200"></canvas>
+                        <div class="chart-wrapper h-180" style="width:200px">
+                            <canvas ref="chartTarjetas"></canvas>
+                        </div>
                         <div class="donut-legend">
                             <div class="donut-item"><span class="dleg green"></span><span>Activas</span><strong>{{ stats.tarjetas_activas }}</strong></div>
                             <div class="donut-item"><span class="dleg red"></span><span>Bloqueadas</span><strong>{{ stats.tarjetas_bloqueadas }}</strong></div>
@@ -429,6 +439,8 @@ Chart.register(...registerables);
 
 const chartInstances = ref([]);
 
+const resizeObserver = ref(null);
+
 const props = defineProps({ stats: Object });
 
 const chartAccesos    = ref(null);
@@ -501,7 +513,7 @@ onMounted(async () => {
                 { label:'Fallidos', data: props.stats.accesos_por_dia.map(d => d.fallidos), borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,0.08)', fill:true, tension:0.4, pointBackgroundColor:'#ef4444', pointRadius:4 },
             ],
         },
-        options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{color:gc},ticks:{color:tc}}, y:{grid:{color:gc},ticks:{color:tc},beginAtZero:true} } },
+        options: { responsive:true,maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{ x:{grid:{color:gc},ticks:{color:tc}}, y:{grid:{color:gc},ticks:{color:tc},beginAtZero:true} } },
     }));
 
     chartInstances.value.push(new Chart(chartModulos.value, {
@@ -510,7 +522,27 @@ onMounted(async () => {
             labels: props.stats.actividad_por_modulo.map(m => m.modulo),
             datasets: [{ label:'Acciones', data: props.stats.actividad_por_modulo.map(m => m.total), backgroundColor:['rgba(59,130,246,0.7)','rgba(34,197,94,0.7)','rgba(245,158,11,0.7)','rgba(168,85,247,0.7)','rgba(6,182,212,0.7)','rgba(239,68,68,0.7)','rgba(249,115,22,0.7)','rgba(100,116,139,0.7)'], borderRadius:6 }],
         },
-        options: { indexAxis:'y', responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{color:gc},ticks:{color:tc},beginAtZero:true}, y:{grid:{display:false},ticks:{color:tc}} } },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            layout: { padding: { right: 8 } }, 
+            scales: {
+                x: {
+                    grid: { color: gc },
+                    ticks: { color: tc, beginAtZero: true }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: {
+                        color: tc,
+                        font: { size: 10 },  
+                        maxTicksLimit: 8,   
+                    }
+                }
+            }
+        },
     }));
 
     chartInstances.value.push(new Chart(chartTarjetas.value, {
@@ -519,7 +551,7 @@ onMounted(async () => {
             labels:['Activas','Bloqueadas','Perdidas'],
             datasets:[{ data:[props.stats.tarjetas_activas, props.stats.tarjetas_bloqueadas, props.stats.tarjetas_perdidas], backgroundColor:['rgba(34,197,94,0.8)','rgba(239,68,68,0.8)','rgba(234,179,8,0.8)'], borderColor:['#22c55e','#ef4444','#eab308'], borderWidth:1.5, hoverOffset:6 }],
         },
-        options: { cutout:'68%', plugins:{legend:{display:false}} },
+        options: { cutout:'68%', responsive: true,maintainAspectRatio: false,plugins:{legend:{display:false}} },
     }));
 
     chartInstances.value.push(new Chart(chartCrecimiento.value, {
@@ -528,7 +560,7 @@ onMounted(async () => {
             labels: props.stats.crecimiento_usuarios.map(d => d.dia),
             datasets:[{ label:'Nuevos', data: props.stats.crecimiento_usuarios.map(d => d.total), borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,0.15)', fill:true, tension:0.4, pointBackgroundColor:'#60a5fa', pointRadius:3 }],
         },
-        options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{color:gc},ticks:{color:tc,font:{size:10}}}, y:{grid:{color:gc},ticks:{color:tc},beginAtZero:true} } },
+        options: { responsive:true, maintainAspectRatio: false,plugins:{legend:{display:false}}, scales:{ x:{grid:{color:gc},ticks:{color:tc,font:{size:10}}}, y:{grid:{color:gc},ticks:{color:tc},beginAtZero:true} } },
     }));
 
     const horas = props.stats.actividad_por_hora ?? [];
@@ -543,13 +575,47 @@ onMounted(async () => {
                 return 'rgba(30,58,138,0.4)';
             }), borderRadius:4 }],
         },
-        options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false},ticks:{color:tc,font:{size:9}}}, y:{grid:{color:gc},ticks:{color:tc},beginAtZero:true} } },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            layout: { padding: { left: 4, right: 4 } }, 
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: tc,
+                        font: { size: 9 },
+                        maxTicksLimit: 12,    
+                        maxRotation: 0,     
+                    }
+                },
+                y: {
+                    grid: { color: gc },
+                    ticks: { color: tc },
+                    beginAtZero: true
+                }
+            }
+        },
     }));
+    resizeObserver.value = new ResizeObserver(() => {
+        setTimeout(() => {
+            chartInstances.value.forEach(c => {
+                c.resize();
+                c.update('none');
+            });
+        }, 100);
+    });
+
+    document.querySelectorAll('.chart-card').forEach(el => {
+        resizeObserver.value.observe(el);
+    });
 });
 
 onUnmounted(() => {
     chartInstances.value.forEach(c => c.destroy());
     chartInstances.value = [];
+    resizeObserver.value?.disconnect(); 
 });
 </script>
 
@@ -623,8 +689,18 @@ onUnmounted(() => {
 .quick-card.info{border-color:rgba(6,182,212,0.4)} .quick-card.info:hover{border-color:#06B6D4;background:rgba(6,182,212,0.12)} .quick-card.info .quick-icon{color:#22d3ee}
 .quick-card.accent{border-color:rgba(168,85,247,0.4)} .quick-card.accent:hover{border-color:#A855F7;background:rgba(168,85,247,0.12)} .quick-card.accent .quick-icon{color:#c084fc}
 
+.chart-wrapper {
+    position: relative;
+    height: 160px;
+    width: 100%;
+    overflow: hidden;   
+}
+.chart-wrapper.h-180 {
+    height: 180px;
+    overflow: hidden;   
+}
 .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
-.chart-card{background:#1e293b;border:1px solid rgba(30,58,138,0.35);border-radius:1.25rem;padding:1.5rem}
+.chart-card { background:#1e293b; border:1px solid rgba(30,58,138,0.35); border-radius:1.25rem; padding:1.5rem; overflow: hidden;}
 .chart-card.wide{grid-column:auto}
 .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.5rem}
 .chart-title{font-size:0.9375rem;font-weight:700;color:#fff}

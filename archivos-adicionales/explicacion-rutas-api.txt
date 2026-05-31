@@ -1,4 +1,4 @@
-BASE URL: http://localhost:8000/api
+BASE URL: http://localhost:8000/api/v1
 
 HEADER 1: X-API-KEY    - 4f8a2b1c9d3e7f6a0b5c8d2e1f4a7b3c6d9e2f5a8b1c4d7e0f3a6b9c2d5e8f1a
 HEADER 2: Accept       - application/json
@@ -7,52 +7,52 @@ URLS DE LA API REST DE LA APLICACION (SE PUEDEN PROBAR CON INSOMNIA O POSTMAN)
 
 --USUARIOS--
 
-GET  http://localhost:8000/api/usuarios
+GET  http://localhost:8000/api/v1/usuarios
      //TRAE LA LISTA COMPLETA DE USUARIOS ACTIVOS (PAGINADA DE 15 EN 15)
        ESTA SE DEBE USAR CUANDO NECESITES MOSTRAR TODOS LOS USUARIOS DEL SISTEMA
 
-GET  http://localhost:8000/api/usuarios?search=juan
+GET  http://localhost:8000/api/v1/usuarios?search=juan
      // BUSCA USUARIOS CUYO NOMBRE, APELLIDO O EMAIL CONTENGA "JUAN"
        ESTA SE DEBE USAR CUANDO QUIERAS UN BUSCADOR O FILTRO POR NOMBRE
 
-GET  http://localhost:8000/api/usuarios?bloqueado=true
+GET  http://localhost:8000/api/v1/usuarios?bloqueado=true
      // TRAE SOLO LOS USUARIOS QUE ESTAN BLOQUEADOS
        ESTA SE DEBE USAR CUANDO QUIERAS VER QUE CUENTAS ESTAN SUSPENDIDAS
 
-GET  http://localhost:8000/api/usuarios?bloqueado=false
+GET  http://localhost:8000/api/v1/usuarios?bloqueado=false
      // TRAE SOLO LOS USUARIOS QUE ESTAN ACTIVOS (NO BLOQUEADOS)
        ESTA SE DEBE USAR CUANDO QUIERAS VER CUENTAS EN BUEN ESTADO
 
-GET  http://localhost:8000/api/usuarios?per_page=5
+GET  http://localhost:8000/api/v1/usuarios?per_page=5
      // TRAE SOLO 5 USUARIOS POR PAGINA EN LUGAR DE 15
       ESTA SE DEBE USAR CUANDO QUIERAS CONTROLAR CUANTOS REGISTROS RECIBES POR LLAMADA
 
-GET  http://localhost:8000/api/usuarios/1
+GET  http://localhost:8000/api/v1/usuarios/1
      // TRAE EL DETALLE COMPLETO DEL USUARIO CON ID 1
        ESTA SE DEBE USAR CUANDO NECESITES LOS DATOS DE UN USUARIO ESPECIFICO
 
-GET  http://localhost:8000/api/usuarios/2
+GET  http://localhost:8000/api/v1/usuarios/2
      // TRAE EL DETALLE COMPLETO DEL USUARIO CON ID 2
 
-GET  http://localhost:8000/api/usuarios/3
+GET  http://localhost:8000/api/v1/usuarios/3
      // TRAE EL DETALLE COMPLETO DEL USUARIO CON ID 3
 
-POST http://localhost:8000/api/usuarios
+POST http://localhost:8000/api/v1/usuarios
      // CREA UN USUARIO NUEVO EN EL SISTEMA
        ESTA SE DEBE USAR CUANDO UN NUEVO USUARIO SE REGISTRE DESDE OTRO MODULO
        REQUIERE BODY JSON: { nombre, apellido, email, password, telefono }
 
-PUT  http://localhost:8000/api/usuarios/1
+PUT  http://localhost:8000/api/v1/usuarios/1
      // ACTUALIZA LOS DATOS DEL USUARIO CON ID 1
        ESTA SE DEBE USAR CUANDO EL USUARIO EDITE SU PERFIL O UN ADMIN MODIFIQUE SUS DATOS
        SOLO MANDA EN EL BODY LOS CAMPOS QUE QUIERES CAMBIAR
 
-DELETE http://localhost:8000/api/usuarios/1
+DELETE http://localhost:8000/api/v1/usuarios/1
      // ELIMINA (SOFT DELETE) AL USUARIO CON ID 1
        EL USUARIO NO SE BORRA FISICAMENTE, SOLO SE MARCA COMO ELIMINADO
        ESTA SE DEBE USAR CUANDO SE DEBA DAR DE BAJA UNA CUENTA
 
-POST http://localhost:8000/api/usuarios/1/toggle-block
+POST http://localhost:8000/api/v1/usuarios/1/toggle-block
      // BLOQUEA AL USUARIO SI ESTA ACTIVO, O LO DESBLOQUEA SI ESTA BLOQUEADO
        ESTA SE DEBE USAR CUANDO QUIERAS SUSPENDER O REACTIVAR UNA CUENTA SIN ELIMINARLA
 
@@ -60,30 +60,30 @@ POST http://localhost:8000/api/usuarios/1/toggle-block
  --ROLES---
 
 
-GET  http://localhost:8000/api/roles
+GET  http://localhost:8000/api/v1/roles
      // TRAE TODOS LOS ROLES DEL SISTEMA (ADMINISTRADOR, ESTUDIANTE, PROVEEDOR, ETC.)
        ESTA SE DEBE USAR CUANDO QUIERAS LLENAR UN SELECTOR DE ROLES EN UN FORMULARIO
 
-GET  http://localhost:8000/api/roles/1
+GET  http://localhost:8000/api/v1/roles/1
      // TRAE EL DETALLE DEL ROL CON ID 1 INCLUYENDO SUS PERMISOS ASIGNADOS
        ESTA SE DEBE USAR CUANDO QUIERAS VER QUE PERMISOS TIENE UN ROL ESPECIFICO
 
-GET  http://localhost:8000/api/roles/2
+GET  http://localhost:8000/api/v1/roles/2
      // TRAE EL DETALLE DEL ROL CON ID 2 CON SUS PERMISOS
 
-GET  http://localhost:8000/api/roles/3
+GET  http://localhost:8000/api/v1/roles/3
      // TRAE EL DETALLE DEL ROL CON ID 3 CON SUS PERMISOS
 
-POST http://localhost:8000/api/roles
+POST http://localhost:8000/api/v1/roles
      // CREA UN ROL NUEVO EN EL SISTEMA
        ESTA SE DEBE USAR CUANDO NECESITES AGREGAR UN NUEVO TIPO DE USUARIO
        REQUIERE BODY JSON: { nombre, descripcion, activo }
 
-PUT  http://localhost:8000/api/roles/1
+PUT  http://localhost:8000/api/v1/roles/1
      // ACTUALIZA EL NOMBRE, DESCRIPCION O ESTADO DEL ROL CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS RENOMBRAR UN ROL O DESACTIVARLO
 
-DELETE http://localhost:8000/api/roles/1
+DELETE http://localhost:8000/api/v1/roles/1
      // ELIMINA (SOFT DELETE) EL ROL CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS QUITAR UN ROL QUE YA NO SE USA
 
@@ -91,30 +91,30 @@ DELETE http://localhost:8000/api/roles/1
 --PERMISOS--
 
 
-GET  http://localhost:8000/api/permisos
+GET  http://localhost:8000/api/v1/permisos
      // TRAE TODOS LOS PERMISOS DEL SISTEMA (user.read, user.write, audit.read, ETC.)
        ESTA SE DEBE USAR CUANDO QUIERAS LLENAR UN SELECTOR DE PERMISOS AL CONFIGURAR UN ROL
 
-GET  http://localhost:8000/api/permisos/1
+GET  http://localhost:8000/api/v1/permisos/1
      // TRAE EL DETALLE DEL PERMISO CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS VERIFICAR QUE HACE UN PERMISO ESPECIFICO
 
-GET  http://localhost:8000/api/permisos/2
+GET  http://localhost:8000/api/v1/permisos/2
      // TRAE EL DETALLE DEL PERMISO CON ID 2
 
-GET  http://localhost:8000/api/permisos/3
+GET  http://localhost:8000/api/v1/permisos/3
      // TRAE EL DETALLE DEL PERMISO CON ID 3
 
-POST http://localhost:8000/api/permisos
+POST http://localhost:8000/api/v1/permisos
      // CREA UN PERMISO NUEVO EN EL SISTEMA
        ESTA SE DEBE USAR CUANDO AGREGUES UNA NUEVA FUNCIONALIDAD QUE NECESITE CONTROL DE ACCESO
        REQUIERE BODY JSON: { clave, descripcion, activo }
 
-PUT  http://localhost:8000/api/permisos/1
+PUT  http://localhost:8000/api/v1/permisos/1
      // ACTUALIZA LA DESCRIPCION O ESTADO DEL PERMISO CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS MODIFICAR UN PERMISO EXISTENTE
 
-DELETE http://localhost:8000/api/permisos/1
+DELETE http://localhost:8000/api/v1/permisos/1
      // ELIMINA (SOFT DELETE) EL PERMISO CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS QUITAR UN PERMISO QUE YA NO APLICA
 
@@ -122,77 +122,77 @@ DELETE http://localhost:8000/api/permisos/1
 --ROL - PERMISO  (QUE PERMISOS TIENE CADA ROL)--
 
 
-GET  http://localhost:8000/api/rol-permisos
+GET  http://localhost:8000/api/v1/rol-permisos
      // TRAE TODAS LAS ASIGNACIONES DE PERMISOS A ROLES QUE EXISTEN
        ESTA SE DEBE USAR CUANDO QUIERAS VER LA TABLA COMPLETA DE QUE ROL TIENE QUE PERMISO
 
-GET  http://localhost:8000/api/rol-permisos?rol_id=1
+GET  http://localhost:8000/api/v1/rol-permisos?rol_id=1
      // TRAE SOLO LOS PERMISOS ASIGNADOS AL ROL CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS SABER EXACTAMENTE QUE PUEDE HACER EL ROL ADMINISTRADOR
 
-GET  http://localhost:8000/api/rol-permisos?rol_id=2
+GET  http://localhost:8000/api/v1/rol-permisos?rol_id=2
      // TRAE SOLO LOS PERMISOS ASIGNADOS AL ROL CON ID 2
        ESTA SE DEBE USAR CUANDO QUIERAS SABER EXACTAMENTE QUE PUEDE HACER EL ROL PROVEEDOR
 
-GET  http://localhost:8000/api/rol-permisos?rol_id=3
+GET  http://localhost:8000/api/v1/rol-permisos?rol_id=3
      // TRAE SOLO LOS PERMISOS ASIGNADOS AL ROL CON ID 3
        ESTA SE DEBE USAR CUANDO QUIERAS SABER EXACTAMENTE QUE PUEDE HACER EL ROL ESTUDIANTE
 
-POST http://localhost:8000/api/rol-permisos
+POST http://localhost:8000/api/v1/rol-permisos
      // ASIGNA UN PERMISO A UN ROL
        ESTA SE DEBE USAR CUANDO QUIERAS DARLE UNA NUEVA CAPACIDAD A UN ROL
        REQUIERE BODY JSON: { rol_id, permiso_id }
 
-DELETE http://localhost:8000/api/rol-permisos/1
+DELETE http://localhost:8000/api/v1/rol-permisos/1
      // QUITA EL PERMISO DE UN ROL (POR ID DEL REGISTRO DE LA ASIGNACION)
        ESTA SE DEBE USAR CUANDO QUIERAS RESTRINGIR LO QUE PUEDE HACER UN ROL
 
 --USUARIO - ROL  (QUE ROLES TIENE CADA USUARIO)--
 
 
-GET  http://localhost:8000/api/usuario-roles
+GET  http://localhost:8000/api/v1/usuario-roles
      // TRAE TODAS LAS ASIGNACIONES DE ROLES A USUARIOS
        ESTA SE DEBE USAR CUANDO QUIERAS VER QUE ROL TIENE CADA QUIEN EN EL SISTEMA
 
-GET  http://localhost:8000/api/usuario-roles?usuario_id=1
+GET  http://localhost:8000/api/v1/usuario-roles?usuario_id=1
      // TRAE LOS ROLES ASIGNADOS AL USUARIO CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS SABER QUE ROLES TIENE EL ADMIN
 
-GET  http://localhost:8000/api/usuario-roles?usuario_id=2
+GET  http://localhost:8000/api/v1/usuario-roles?usuario_id=2
      // TRAE LOS ROLES ASIGNADOS AL USUARIO CON ID 2
        ESTA SE DEBE USAR CUANDO QUIERAS SABER QUE ROLES TIENE EL PROVEEDOR
 
-GET  http://localhost:8000/api/usuario-roles?rol_id=1
+GET  http://localhost:8000/api/v1/usuario-roles?rol_id=1
      // TRAE TODOS LOS USUARIOS QUE TIENEN EL ROL CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS SABER QUIENES SON LOS ESTUDIANTES O ADMINISTRADORES
 
-POST http://localhost:8000/api/usuario-roles
+POST http://localhost:8000/api/v1/usuario-roles
      // ASIGNA UN ROL A UN USUARIO
        ESTA SE DEBE USAR CUANDO UN USUARIO DEBA TENER ACCESO A NUEVAS FUNCIONES
        REQUIERE BODY JSON: { usuario_id, rol_id }
 
-DELETE http://localhost:8000/api/usuario-roles/1
+DELETE http://localhost:8000/api/v1/usuario-roles/1
      // QUITA UN ROL A UN USUARIO (POR ID DEL REGISTRO DE LA ASIGNACION)
        ESTA SE DEBE USAR CUANDO UN USUARIO YA NO DEBA TENER CIERTO NIVEL DE ACCESO
 
 --PERFILES  (DATOS PERSONALES EXTENDIDOS DEL USUARIO)--
 
 
-GET  http://localhost:8000/api/usuario-perfiles
+GET  http://localhost:8000/api/v1/usuario-perfiles
      // TRAE LOS PERFILES DE TODOS LOS USUARIOS
        ESTA SE DEBE USAR CUANDO QUIERAS VER FECHA DE NACIMIENTO, GENERO Y DIRECCION DE TODOS
 
-GET  http://localhost:8000/api/usuario-perfiles/1
+GET  http://localhost:8000/api/v1/usuario-perfiles/1
      // TRAE EL PERFIL DEL USUARIO CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS MOSTRAR LA INFORMACION PERSONAL DE UN USUARIO ESPECIFICO
 
-GET  http://localhost:8000/api/usuario-perfiles/2
+GET  http://localhost:8000/api/v1/usuario-perfiles/2
      // TRAE EL PERFIL DEL USUARIO CON ID 2
 
-GET  http://localhost:8000/api/usuario-perfiles/3
+GET  http://localhost:8000/api/v1/usuario-perfiles/3
      // TRAE EL PERFIL DEL USUARIO CON ID 3
 
-PUT  http://localhost:8000/api/usuario-perfiles/1
+PUT  http://localhost:8000/api/v1/usuario-perfiles/1
      // ACTUALIZA LOS DATOS DEL PERFIL DEL USUARIO CON ID 1
        ESTA SE DEBE USAR CUANDO EL USUARIO EDITE SU FECHA DE NACIMIENTO, GENERO O DIRECCION
        REQUIERE BODY JSON: { fecha_nacimiento, genero, direccion }
@@ -200,219 +200,219 @@ PUT  http://localhost:8000/api/usuario-perfiles/1
 --SESIONES  (HISTORIAL DE SESIONES ABIERTAS)--
 
 
-GET  http://localhost:8000/api/sesiones
+GET  http://localhost:8000/api/v1/sesiones
      // TRAE TODAS LAS SESIONES REGISTRADAS EN EL SISTEMA PAGINADAS
        ESTA SE DEBE USAR CUANDO QUIERAS VER EL HISTORIAL COMPLETO DE CONEXIONES
 
-GET  http://localhost:8000/api/sesiones?activa=true
+GET  http://localhost:8000/api/v1/sesiones?activa=true
      // TRAE SOLO LAS SESIONES QUE ESTAN ACTUALMENTE ACTIVAS
        ESTA SE DEBE USAR CUANDO QUIERAS SABER QUIEN ESTA CONECTADO EN ESTE MOMENTO
 
-GET  http://localhost:8000/api/sesiones?activa=false
+GET  http://localhost:8000/api/v1/sesiones?activa=false
      // TRAE SOLO LAS SESIONES QUE YA TERMINARON
        ESTA SE DEBE USAR CUANDO QUIERAS REVISAR EL HISTORIAL DE SESIONES CERRADAS
 
-GET  http://localhost:8000/api/sesiones?usuario_id=1
+GET  http://localhost:8000/api/v1/sesiones?usuario_id=1
      // TRAE TODAS LAS SESIONES DEL USUARIO CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS AUDITAR DESDE DONDE Y CUANDO SE HA CONECTADO UN USUARIO
 
-GET  http://localhost:8000/api/sesiones?usuario_id=4
+GET  http://localhost:8000/api/v1/sesiones?usuario_id=4
      // TRAE TODAS LAS SESIONES DEL USUARIO CON ID 4
 
-GET  http://localhost:8000/api/sesiones?desde=2026-02-01&hasta=2026-02-28
+GET  http://localhost:8000/api/v1/sesiones?desde=2026-02-01&hasta=2026-02-28
      //TRAE LAS SESIONES ABIERTAS EN UN RANGO DE FECHAS
        ESTA SE DEBE USAR CUANDO QUIERAS GENERAR REPORTES DE ACTIVIDAD POR PERIODO
 
-GET  http://localhost:8000/api/sesiones?per_page=5
+GET  http://localhost:8000/api/v1/sesiones?per_page=5
      // TRAE 5 SESIONES POR PAGINA
        ESTA SE DEBE USAR CUANDO QUIERAS CONTROLAR EL TAMANO DE LA RESPUESTA
 
-GET  http://localhost:8000/api/sesiones/1
+GET  http://localhost:8000/api/v1/sesiones/1
      // TRAE EL DETALLE COMPLETO DE LA SESION CON ID 1
        INCLUYE IP, NAVEGADOR, HORA DE INICIO Y EXPIRACION
 
-GET  http://localhost:8000/api/sesiones/2
+GET  http://localhost:8000/api/v1/sesiones/2
      // TRAE EL DETALLE COMPLETO DE LA SESION CON ID 2
 
 
 --BITACORA — ACCESOS  (REGISTRO DE LOGINS, LOGOUTS Y FALLOS)--
 
 
-GET  http://localhost:8000/api/bitacora/accesos
+GET  http://localhost:8000/api/v1/bitacora/accesos
      // TRAE TODOS LOS EVENTOS DE ACCESO REGISTRADOS (PAGINADOS)
        ESTA SE DEBE USAR CUANDO QUIERAS VER EL HISTORIAL COMPLETO DE ENTRADAS Y SALIDAS DEL SISTEMA
 
-GET  http://localhost:8000/api/bitacora/accesos?evento=login_success
+GET  http://localhost:8000/api/v1/bitacora/accesos?evento=login_success
      // TRAE SOLO LOS INICIOS DE SESION EXITOSOS
        ESTA SE DEBE USAR CUANDO QUIERAS VER CUANDO Y QUIEN ENTRO CORRECTAMENTE AL SISTEMA
 
-GET  http://localhost:8000/api/bitacora/accesos?evento=login_failed
+GET  http://localhost:8000/api/v1/bitacora/accesos?evento=login_failed
      // TRAE SOLO LOS INTENTOS DE LOGIN FALLIDOS
        ESTA SE DEBE USAR CUANDO QUIERAS DETECTAR ATAQUES DE FUERZA BRUTA O INTENTOS SOSPECHOSOS
 
-GET  http://localhost:8000/api/bitacora/accesos?evento=logout
+GET  http://localhost:8000/api/v1/bitacora/accesos?evento=logout
      // TRAE SOLO LOS CIERRES DE SESION
        ESTA SE DEBE USAR CUANDO QUIERAS VER CUANDO SALIERON LOS USUARIOS
 
-GET  http://localhost:8000/api/bitacora/accesos?evento=registro
+GET  http://localhost:8000/api/v1/bitacora/accesos?evento=registro
      // TRAE SOLO LOS EVENTOS DE REGISTRO DE NUEVOS USUARIOS
        ESTA SE DEBE USAR CUANDO QUIERAS VER CUANDO SE CREARON CUENTAS NUEVAS
 
-GET  http://localhost:8000/api/bitacora/accesos?exito=true
+GET  http://localhost:8000/api/v1/bitacora/accesos?exito=true
      // TRAE SOLO LOS EVENTOS DE ACCESO QUE FUERON EXITOSOS
        ESTA SE DEBE USAR CUANDO QUIERAS FILTRAR SOLO LAS ACCIONES QUE SI FUNCIONARON
 
-GET  http://localhost:8000/api/bitacora/accesos?exito=false
+GET  http://localhost:8000/api/v1/bitacora/accesos?exito=false
      // TRAE SOLO LOS EVENTOS DE ACCESO QUE FALLARON
        ESTA SE DEBE USAR CUANDO QUIERAS DETECTAR ACTIVIDAD SOSPECHOSA O ERRORES DE AUTENTICACION
 
-GET  http://localhost:8000/api/bitacora/accesos?usuario_id=1
+GET  http://localhost:8000/api/v1/bitacora/accesos?usuario_id=1
      // TRAE TODOS LOS EVENTOS DE ACCESO DEL USUARIO CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS AUDITAR LA ACTIVIDAD DE UN USUARIO ESPECIFICO
 
-GET  http://localhost:8000/api/bitacora/accesos?usuario_id=4
+GET  http://localhost:8000/api/v1/bitacora/accesos?usuario_id=4
      // TRAE TODOS LOS EVENTOS DE ACCESO DEL USUARIO CON ID 4
 
-GET  http://localhost:8000/api/bitacora/accesos?email=admin@campusdigital.com
+GET  http://localhost:8000/api/v1/bitacora/accesos?email=admin@campusdigital.com
      // TRAE LOS ACCESOS DONDE SE USO ESE EMAIL (INCLUSO SI FALLARON)
        ESTA SE DEBE USAR CUANDO QUIERAS RASTREAR INTENTOS CON UN CORREO ESPECIFICO
 
-GET  http://localhost:8000/api/bitacora/accesos?desde=2026-02-04&hasta=2026-02-04
+GET  http://localhost:8000/api/v1/bitacora/accesos?desde=2026-02-04&hasta=2026-02-04
      // TRAE LOS ACCESOS OCURRIDOS EN ESE RANGO DE FECHAS
        ESTA SE DEBE USAR CUANDO QUIERAS REPORTES DE ACTIVIDAD POR DIA O PERIODO
 
-GET  http://localhost:8000/api/bitacora/accesos?per_page=10
+GET  http://localhost:8000/api/v1/bitacora/accesos?per_page=10
      // TRAE 10 REGISTROS POR PAGINA
        ESTA SE DEBE USAR CUANDO QUIERAS CONTROLAR EL TAMANO DE LA RESPUESTA
 
-GET  http://localhost:8000/api/bitacora/accesos/1
+GET  http://localhost:8000/api/v1/bitacora/accesos/1
      // TRAE EL DETALLE DEL EVENTO DE ACCESO CON ID 1
        INCLUYE IP, NAVEGADOR, EMAIL INTENTADO Y RESULTADO
 
-GET  http://localhost:8000/api/bitacora/accesos/2
+GET  http://localhost:8000/api/v1/bitacora/accesos/2
      // TRAE EL DETALLE DEL EVENTO DE ACCESO CON ID 2
 
-GET  http://localhost:8000/api/bitacora/accesos/7
+GET  http://localhost:8000/api/v1/bitacora/accesos/7
      // TRAE EL DETALLE DEL EVENTO CON ID 7 (PRIMER LOGIN FALLIDO REGISTRADO)
 
 
 --BITACORA — ACTIVIDAD  (REGISTRO DE ACCIONES DENTRO DEL SISTEMA)--
 
 
-GET  http://localhost:8000/api/bitacora/actividad
+GET  http://localhost:8000/api/v1/bitacora/actividad
      // TRAE TODAS LAS ACCIONES REALIZADAS DENTRO DEL SISTEMA (PAGINADAS)
        ESTA SE DEBE USAR CUANDO QUIERAS VER QUE HIZO CADA USUARIO UNA VEZ DENTRO DEL SISTEMA
 
-GET  http://localhost:8000/api/bitacora/actividad?usuario_id=1
+GET  http://localhost:8000/api/v1/bitacora/actividad?usuario_id=1
      // TRAE TODAS LAS ACCIONES REALIZADAS POR EL USUARIO CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS AUDITAR QUE CAMBIOS HIZO UN ADMIN O USUARIO ESPECIFICO
 
-GET  http://localhost:8000/api/bitacora/actividad?modulo=seguridad
+GET  http://localhost:8000/api/v1/bitacora/actividad?modulo=seguridad
      // TRAE SOLO LAS ACCIONES DEL MODULO DE SEGURIDAD
        ESTA SE DEBE USAR CUANDO QUIERAS VER TODO LO QUE PASO EN LA GESTION DE USUARIOS Y ROLES
 
-GET  http://localhost:8000/api/bitacora/actividad?accion=eliminar_usuario
+GET  http://localhost:8000/api/v1/bitacora/actividad?accion=eliminar_usuario
      // TRAE SOLO LOS REGISTROS DONDE SE ELIMINO UN USUARIO
        ESTA SE DEBE USAR CUANDO QUIERAS AUDITAR QUIEN Y CUANDO ELIMINO CUENTAS
 
-GET  http://localhost:8000/api/bitacora/actividad?accion=actualizar_usuario
+GET  http://localhost:8000/api/v1/bitacora/actividad?accion=actualizar_usuario
      // TRAE SOLO LOS REGISTROS DONDE SE ACTUALIZO UN USUARIO
        ESTA SE DEBE USAR CUANDO QUIERAS VER QUE DATOS FUERON MODIFICADOS Y POR QUIEN
 
-GET  http://localhost:8000/api/bitacora/actividad?accion=cambiar_estado_usuario
+GET  http://localhost:8000/api/v1/bitacora/actividad?accion=cambiar_estado_usuario
      // TRAE SOLO LOS REGISTROS DE BLOQUEOS Y DESBLOQUEOS DE CUENTAS
        ESTA SE DEBE USAR CUANDO QUIERAS VER EL HISTORIAL DE SUSPENSIONES DE CUENTAS
 
-GET  http://localhost:8000/api/bitacora/actividad?target_tabla=usuario
+GET  http://localhost:8000/api/v1/bitacora/actividad?target_tabla=usuario
      //TRAE TODAS LAS ACCIONES QUE AFECTARON A LA TABLA USUARIO
        ESTA SE DEBE USAR CUANDO QUIERAS VER TODO LO QUE SE HIZO SOBRE LOS REGISTROS DE USUARIOS
 
-GET  http://localhost:8000/api/bitacora/actividad?exito=true
+GET  http://localhost:8000/api/v1/bitacora/actividad?exito=true
      // TRAE SOLO LAS ACCIONES QUE SE COMPLETARON CORRECTAMENTE
        ESTA SE DEBE USAR CUANDO QUIERAS VER EL HISTORIAL DE CAMBIOS QUE SI SE APLICARON
 
-GET  http://localhost:8000/api/bitacora/actividad?exito=false
+GET  http://localhost:8000/api/v1/bitacora/actividad?exito=false
      // TRAE SOLO LAS ACCIONES QUE FALLARON
        ESTA SE DEBE USAR CUANDO QUIERAS DETECTAR ERRORES O INTENTOS DE OPERACIONES NO PERMITIDAS
 
-GET  http://localhost:8000/api/bitacora/actividad?desde=2026-02-04&hasta=2026-02-04
+GET  http://localhost:8000/api/v1/bitacora/actividad?desde=2026-02-04&hasta=2026-02-04
      // TRAE LAS ACCIONES OCURRIDAS EN ESE RANGO DE FECHAS
        ESTA SE DEBE USAR CUANDO QUIERAS REPORTES DE ACTIVIDAD POR DIA O PERIODO
 
-GET  http://localhost:8000/api/bitacora/actividad?per_page=5
+GET  http://localhost:8000/api/v1/bitacora/actividad?per_page=5
      // TRAE 5 REGISTROS POR PAGINA
        ESTA SE DEBE USAR CUANDO QUIERAS CONTROLAR EL TAMANO DE LA RESPUESTA
 
-GET  http://localhost:8000/api/bitacora/actividad/1
+GET  http://localhost:8000/api/v1/bitacora/actividad/1
      // TRAE EL DETALLE DE LA ACCION CON ID 1
        INCLUYE QUE SE HIZO, SOBRE QUE REGISTRO, QUIEN LO HIZO Y DESDE QUE IP
 
-GET  http://localhost:8000/api/bitacora/actividad/5
+GET  http://localhost:8000/api/v1/bitacora/actividad/5
      // TRAE EL DETALLE DE LA ACCION CON ID 5 (ELIMINACION DE USUARIO)
 
-GET  http://localhost:8000/api/bitacora/actividad/10
+GET  http://localhost:8000/api/v1/bitacora/actividad/10
      // TRAE EL DETALLE DE LA ACCION CON ID 10
 
 
 --TARJETAS UNIVERSITARIAS  (MODULO 4.10 - RFID/NFC)--
 
 
-GET  http://localhost:8000/api/tarjetas
+GET  http://localhost:8000/api/v1/tarjetas
      // TRAE TODAS LAS TARJETAS UNIVERSITARIAS REGISTRADAS EN EL SISTEMA
        ESTA SE DEBE USAR CUANDO QUIERAS VER EL LISTADO COMPLETO DE TARJETAS DEL CAMPUS
 
-GET  http://localhost:8000/api/tarjetas?estado=activa
+GET  http://localhost:8000/api/v1/tarjetas?estado=activa
      // TRAE SOLO LAS TARJETAS ACTIVAS
        ESTA SE DEBE USAR CUANDO QUIERAS SABER QUE TARJETAS ESTAN EN USO NORMAL
 
-GET  http://localhost:8000/api/tarjetas?estado=bloqueada
+GET  http://localhost:8000/api/v1/tarjetas?estado=bloqueada
      // TRAE SOLO LAS TARJETAS BLOQUEADAS
        ESTA SE DEBE USAR PARA EL DASHBOARD DE TARJETAS SUSPENDIDAS
 
-GET  http://localhost:8000/api/tarjetas?estado=perdida
+GET  http://localhost:8000/api/v1/tarjetas?estado=perdida
      // TRAE SOLO LAS TARJETAS REPORTADAS COMO PERDIDAS
        ESTA SE DEBE USAR PARA REPORTES DE INCIDENTES Y AUDITORIA
 
-GET  http://localhost:8000/api/tarjetas?estado=cancelada
+GET  http://localhost:8000/api/v1/tarjetas?estado=cancelada
      // TRAE SOLO LAS TARJETAS CANCELADAS
        ESTA SE DEBE USAR PARA EL HISTORIAL DE TARJETAS DADAS DE BAJA
 
-GET  http://localhost:8000/api/tarjetas?usuario_id=1
+GET  http://localhost:8000/api/v1/tarjetas?usuario_id=1
      // TRAE LAS TARJETAS ASOCIADAS AL USUARIO CON ID 1
        ESTA SE DEBE USAR CUANDO QUIERAS SABER QUE TARJETA TIENE UN USUARIO ESPECIFICO
 
-GET  http://localhost:8000/api/tarjetas/uid/A1B2C3D4E5F6
+GET  http://localhost:8000/api/v1/tarjetas/uid/A1B2C3D4E5F6
      // BUSCA UNA TARJETA POR EL UID DEL CHIP RFID/NFC
        ESTA ES LA RUTA PRINCIPAL QUE LLAMA EL LECTOR AL DETECTAR UNA TARJETA
        DEVUELVE LA TARJETA CON EL USUARIO Y SU PERFIL ASOCIADO
        ESTA SE DEBE USAR DESDE EL HARDWARE O SIMULADOR CADA VEZ QUE SE LEE UN CHIP
 
-GET  http://localhost:8000/api/tarjetas/1
+GET  http://localhost:8000/api/v1/tarjetas/1
      // TRAE EL DETALLE COMPLETO DE LA TARJETA CON ID 1
        INCLUYE QUIEN LA REGISTRO, QUIEN LA BLOQUEO Y CUANDO
 
-GET  http://localhost:8000/api/tarjetas/2
+GET  http://localhost:8000/api/v1/tarjetas/2
      // TRAE EL DETALLE COMPLETO DE LA TARJETA CON ID 2
 
-POST http://localhost:8000/api/tarjetas
+POST http://localhost:8000/api/v1/tarjetas
      // REGISTRA UNA TARJETA NUEVA Y LA ASOCIA A UN USUARIO
        ESTA SE DEBE USAR CUANDO SE ENTREGUE UNA TARJETA NUEVA A UN ESTUDIANTE
        REQUIERE BODY JSON: { usuario_id, uid, estado, registrado_por_usuario_id }
 
-PUT  http://localhost:8000/api/tarjetas/1
+PUT  http://localhost:8000/api/v1/tarjetas/1
      // ACTUALIZA LOS DATOS DE LA TARJETA CON ID 1 (UID, ESTADO, NOTAS)
        ESTA SE DEBE USAR PARA CORRECCIONES O CAMBIOS ADMINISTRATIVOS
 
-DELETE http://localhost:8000/api/tarjetas/1
+DELETE http://localhost:8000/api/v1/tarjetas/1
      // ELIMINA (SOFT DELETE) LA TARJETA CON ID 1
        ESTA SE DEBE USAR SOLO PARA ELIMINAR REGISTROS INCORRECTOS, NO PARA BLOQUEAR
 
-POST http://localhost:8000/api/tarjetas/1/bloquear
+POST http://localhost:8000/api/v1/tarjetas/1/bloquear
      // BLOQUEA LA TARJETA CON ID 1 Y REGISTRA QUIEN Y POR QUE LA BLOQUEO
        ESTA SE DEBE USAR CUANDO EL USUARIO REPORTE ROBO, PERDIDA O HAYA UNA INCIDENCIA
        REQUIERE BODY JSON: { motivo_bloqueo, bloqueado_por_usuario_id }
 
-POST http://localhost:8000/api/tarjetas/1/desbloquear
+POST http://localhost:8000/api/v1/tarjetas/1/desbloquear
      // DESBLOQUEA LA TARJETA CON ID 1 Y LA REGRESA A ESTADO ACTIVA
        ESTA SE DEBE USAR CUANDO SE RESUELVA LA INCIDENCIA O SE ENTREGUE TARJETA NUEVA
 
@@ -420,68 +420,68 @@ POST http://localhost:8000/api/tarjetas/1/desbloquear
 --LECTURAS DE TARJETA  (LOG DE CADA USO DE LA TARJETA)--
 
 
-GET  http://localhost:8000/api/tarjeta-lecturas
+GET  http://localhost:8000/api/v1/tarjeta-lecturas
      // TRAE TODOS LOS REGISTROS DE LECTURAS REALIZADAS EN EL SISTEMA
        ESTA SE DEBE USAR PARA VER EL HISTORIAL COMPLETO DE USO DE LAS TARJETAS
 
-GET  http://localhost:8000/api/tarjeta-lecturas?tarjeta_id=1
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?tarjeta_id=1
      // TRAE LAS LECTURAS DE LA TARJETA CON ID 1
        ESTA SE DEBE USAR PARA AUDITAR TODOS LOS USOS DE UNA TARJETA CONCRETA
 
-GET  http://localhost:8000/api/tarjeta-lecturas?uid_leido=A1B2C3D4
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?uid_leido=A1B2C3D4
      // TRAE LAS LECTURAS DONDE SE LEYO ESE UID ESPECIFICO
        ESTA SE DEBE USAR PARA RASTREAR EL USO DE UN CHIP EN CONCRETO
 
-GET  http://localhost:8000/api/tarjeta-lecturas?modulo=cafeteria
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?modulo=cafeteria
      // TRAE LAS LECTURAS OCURRIDAS EN LA CAFETERIA
        ESTA SE DEBE USAR PARA VER CUANTAS VECES SE USO LA TARJETA EN CAFETERIA
        VALORES POSIBLES: cafeteria, copias, souvenirs, biblioteca, acceso, otro
 
-GET  http://localhost:8000/api/tarjeta-lecturas?modulo=copias
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?modulo=copias
      // TRAE LAS LECTURAS EN EL MODULO DE COPIAS/IMPRESIONES
 
-GET  http://localhost:8000/api/tarjeta-lecturas?modulo=biblioteca
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?modulo=biblioteca
      // TRAE LAS LECTURAS EN EL MODULO DE BIBLIOTECA
 
-GET  http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=consumo
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?tipo_lectura=consumo
      // TRAE SOLO LAS LECTURAS DE TIPO CONSUMO (CUANDO SE COBRO ALGO)
        VALORES POSIBLES: acceso, consumo, consulta_saldo, confirmacion_entrega
 
-GET  http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=confirmacion_entrega
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?tipo_lectura=confirmacion_entrega
      // TRAE LAS LECTURAS USADAS PARA CONFIRMAR ENTREGA DE UN PEDIDO
        ESTA SE DEBE USAR DESDE EL MODULO 4.5 PARA LIGAR LECTURA CON ENTREGA
 
-GET  http://localhost:8000/api/tarjeta-lecturas?tipo_lectura=consulta_saldo
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?tipo_lectura=consulta_saldo
      // TRAE LAS LECTURAS DONDE EL USUARIO CONSULTO SU SALDO CON LA TARJETA
 
-GET  http://localhost:8000/api/tarjeta-lecturas?exito=true
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?exito=true
      // TRAE SOLO LAS LECTURAS EXITOSAS
        ESTA SE DEBE USAR PARA VER ACCESOS Y CONSUMOS QUE SI PROCEDIERON
 
-GET  http://localhost:8000/api/tarjeta-lecturas?exito=false
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?exito=false
      // TRAE SOLO LAS LECTURAS FALLIDAS (TARJETA BLOQUEADA, UID NO RECONOCIDO, ETC.)
        ESTA SE DEBE USAR PARA DETECTAR INTENTOS CON TARJETAS INVALIDAS O BLOQUEADAS
 
-GET  http://localhost:8000/api/tarjeta-lecturas?pedido_id=5
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?pedido_id=5
      // TRAE LAS LECTURAS ASOCIADAS AL PEDIDO CON ID 5
        ESTA SE DEBE USAR DESDE EL MODULO 4.5 PARA VER LA CONFIRMACION DE ENTREGA DE UN PEDIDO
 
-GET  http://localhost:8000/api/tarjeta-lecturas?operador_id=2
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?operador_id=2
      // TRAE LAS LECTURAS REGISTRADAS POR EL OPERADOR CON ID 2
        ESTA SE DEBE USAR PARA EL MODULO 4.9 DE PROVEEDORES
 
-GET  http://localhost:8000/api/tarjeta-lecturas?desde=2026-02-01&hasta=2026-02-28
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?desde=2026-02-01&hasta=2026-02-28
      // TRAE LAS LECTURAS EN UN RANGO DE FECHAS
        ESTA SE DEBE USAR PARA REPORTES DE ACTIVIDAD POR PERIODO
 
-GET  http://localhost:8000/api/tarjeta-lecturas?per_page=10
+GET  http://localhost:8000/api/v1/tarjeta-lecturas?per_page=10
      // TRAE 10 LECTURAS POR PAGINA
        ESTA SE DEBE USAR CUANDO QUIERAS CONTROLAR EL TAMANO DE LA RESPUESTA
 
-GET  http://localhost:8000/api/tarjeta-lecturas/1
+GET  http://localhost:8000/api/v1/tarjeta-lecturas/1
      // TRAE EL DETALLE DE LA LECTURA CON ID 1 CON TODO SU CONTEXTO
 
-POST http://localhost:8000/api/tarjeta-lecturas
+POST http://localhost:8000/api/v1/tarjeta-lecturas
      // REGISTRA UNA NUEVA LECTURA (LO LLAMA EL LECTOR FISICO O LA SIMULACION)
        AUTOMATICAMENTE BUSCA LA TARJETA POR UID Y DETERMINA SI FUE EXITOSA
        ESTA SE DEBE USAR CADA VEZ QUE EL HARDWARE O SIMULADOR DETECTE UNA TARJETA
@@ -491,27 +491,27 @@ POST http://localhost:8000/api/tarjeta-lecturas
 --SALDO MONEDERO  (MODULO 4.2 - SALDO DIGITAL)--
 
 
-GET  http://localhost:8000/api/saldo-monederos
+GET  http://localhost:8000/api/v1/saldo-monederos
      // TRAE TODOS LOS MONEDEROS REGISTRADOS EN EL SISTEMA
        ESTA SE DEBE USAR PARA EL DASHBOARD GENERAL DE SALDOS
 
-GET  http://localhost:8000/api/saldo-monederos?usuario_id=1
+GET  http://localhost:8000/api/v1/saldo-monederos?usuario_id=1
      // TRAE EL MONEDERO DEL USUARIO CON ID 1
        ESTA SE DEBE USAR PARA FILTRAR EL MONEDERO DE UN USUARIO ESPECIFICO
 
-GET  http://localhost:8000/api/saldo-monederos/usuario/1
+GET  http://localhost:8000/api/v1/saldo-monederos/usuario/1
      // CONSULTA DIRECTA DEL SALDO DEL USUARIO CON ID 1
        ESTA ES LA RUTA PRINCIPAL PARA SABER EL SALDO DE UN USUARIO
        ESTA SE DEBE USAR DESDE CUALQUIER MODULO QUE NECESITE VERIFICAR SALDO ANTES DE COBRAR
 
-GET  http://localhost:8000/api/saldo-monederos/usuario/4
+GET  http://localhost:8000/api/v1/saldo-monederos/usuario/4
      // CONSULTA DIRECTA DEL SALDO DEL USUARIO CON ID 4
 
-GET  http://localhost:8000/api/saldo-monederos/1
+GET  http://localhost:8000/api/v1/saldo-monederos/1
      // TRAE EL DETALLE DEL MONEDERO CON ID INTERNO 1
        INCLUYE SALDO DISPONIBLE Y SALDO RETENIDO
 
-POST http://localhost:8000/api/saldo-monederos
+POST http://localhost:8000/api/v1/saldo-monederos
      // CREA UN MONEDERO NUEVO PARA UN USUARIO
        ESTA SE DEBE USAR CUANDO SE REGISTRE UN USUARIO NUEVO QUE AUN NO TIENE MONEDERO
        REQUIERE BODY JSON: { usuario_id }
@@ -520,53 +520,53 @@ POST http://localhost:8000/api/saldo-monederos
 --SALDO MOVIMIENTOS  (ABONOS Y CARGOS AL MONEDERO)--
 
 
-GET  http://localhost:8000/api/saldo-movimientos
+GET  http://localhost:8000/api/v1/saldo-movimientos
      // TRAE TODOS LOS MOVIMIENTOS DE SALDO DEL SISTEMA
        ESTA SE DEBE USAR PARA VER EL HISTORIAL COMPLETO DE ABONOS Y CARGOS
 
-GET  http://localhost:8000/api/saldo-movimientos?usuario_id=1
+GET  http://localhost:8000/api/v1/saldo-movimientos?usuario_id=1
      // TRAE TODOS LOS MOVIMIENTOS DEL USUARIO CON ID 1 (ESTADO DE CUENTA)
        ESTA SE DEBE USAR PARA MOSTRAR EL ESTADO DE CUENTA DE UN USUARIO
 
-GET  http://localhost:8000/api/saldo-movimientos?usuario_id=4
+GET  http://localhost:8000/api/v1/saldo-movimientos?usuario_id=4
      // TRAE TODOS LOS MOVIMIENTOS DEL USUARIO CON ID 4
 
-GET  http://localhost:8000/api/saldo-movimientos?tipo=abono
+GET  http://localhost:8000/api/v1/saldo-movimientos?tipo=abono
      // TRAE SOLO LOS ABONOS (RECARGAS DE SALDO)
        ESTA SE DEBE USAR PARA EL MODULO 4.8 DE RECARGAS
 
-GET  http://localhost:8000/api/saldo-movimientos?tipo=cargo
+GET  http://localhost:8000/api/v1/saldo-movimientos?tipo=cargo
      // TRAE SOLO LOS CARGOS (CONSUMOS DESCONTADOS DEL SALDO)
        ESTA SE DEBE USAR PARA VER TODOS LOS CONSUMOS REALIZADOS
 
-GET  http://localhost:8000/api/saldo-movimientos?modulo=cafeteria
+GET  http://localhost:8000/api/v1/saldo-movimientos?modulo=cafeteria
      // TRAE LOS MOVIMIENTOS ORIGINADOS EN LA CAFETERIA
        ESTA SE DEBE USAR PARA REPORTES DE CONSUMO POR AREA
        VALORES POSIBLES: cafeteria, copias, souvenirs, biblioteca, recarga, rfid, otro
 
-GET  http://localhost:8000/api/saldo-movimientos?modulo=copias
+GET  http://localhost:8000/api/v1/saldo-movimientos?modulo=copias
      // TRAE LOS MOVIMIENTOS DEL MODULO DE COPIAS/IMPRESIONES
 
-GET  http://localhost:8000/api/saldo-movimientos?modulo=recarga
+GET  http://localhost:8000/api/v1/saldo-movimientos?modulo=recarga
      // TRAE SOLO LOS MOVIMIENTOS DE TIPO RECARGA DE SALDO
 
-GET  http://localhost:8000/api/saldo-movimientos?saldo_monedero_id=1
+GET  http://localhost:8000/api/v1/saldo-movimientos?saldo_monedero_id=1
      // TRAE LOS MOVIMIENTOS DEL MONEDERO CON ID 1
        ESTA SE DEBE USAR CUANDO TENGAS EL ID DEL MONEDERO Y QUIERAS SU HISTORIAL
 
-GET  http://localhost:8000/api/saldo-movimientos?desde=2026-02-01&hasta=2026-02-28
+GET  http://localhost:8000/api/v1/saldo-movimientos?desde=2026-02-01&hasta=2026-02-28
      // TRAE LOS MOVIMIENTOS EN UN RANGO DE FECHAS
        ESTA SE DEBE USAR PARA REPORTES DE CONSUMO POR PERIODO
 
-GET  http://localhost:8000/api/saldo-movimientos?per_page=10
+GET  http://localhost:8000/api/v1/saldo-movimientos?per_page=10
      // TRAE 10 MOVIMIENTOS POR PAGINA
        ESTA SE DEBE USAR CUANDO QUIERAS CONTROLAR EL TAMANO DE LA RESPUESTA
 
-GET  http://localhost:8000/api/saldo-movimientos/1
+GET  http://localhost:8000/api/v1/saldo-movimientos/1
      // TRAE EL DETALLE DEL MOVIMIENTO CON ID 1
        INCLUYE MONTO, SALDO ANTES Y DESPUES, CONCEPTO Y MODULO
 
-POST http://localhost:8000/api/saldo-movimientos
+POST http://localhost:8000/api/v1/saldo-movimientos
      // REGISTRA UN ABONO O CARGO AL MONEDERO DEL USUARIO
        ACTUALIZA AUTOMATICAMENTE EL SALDO DISPONIBLE EN saldo_monedero
        SI ES CARGO Y NO HAY SALDO SUFICIENTE, DEVUELVE ERROR 422
@@ -577,89 +577,89 @@ POST http://localhost:8000/api/saldo-movimientos
 --PEDIDOS  (MODULO 4.5 - PEDIDOS Y SEGUIMIENTO)--
 
 
-GET  http://localhost:8000/api/pedidos
+GET  http://localhost:8000/api/v1/pedidos
      // TRAE TODOS LOS PEDIDOS DEL SISTEMA
        ESTA SE DEBE USAR PARA EL DASHBOARD GENERAL DE PEDIDOS
 
-GET  http://localhost:8000/api/pedidos?usuario_id=1
+GET  http://localhost:8000/api/v1/pedidos?usuario_id=1
      // TRAE TODOS LOS PEDIDOS DEL USUARIO CON ID 1
        ESTA SE DEBE USAR CUANDO EL USUARIO CONSULTE SU HISTORIAL DE PEDIDOS
 
-GET  http://localhost:8000/api/pedidos?usuario_id=4
+GET  http://localhost:8000/api/v1/pedidos?usuario_id=4
      // TRAE TODOS LOS PEDIDOS DEL USUARIO CON ID 4
 
-GET  http://localhost:8000/api/pedidos?estado=creado
+GET  http://localhost:8000/api/v1/pedidos?estado=creado
      // TRAE SOLO LOS PEDIDOS RECIEN CREADOS (ESPERANDO SER ACEPTADOS)
        ESTA SE DEBE USAR EN EL PANEL DEL PROVEEDOR PARA VER PEDIDOS NUEVOS ENTRANTES
        ESTADOS POSIBLES: creado, aceptado, en_proceso, listo, entregado, cancelado
 
-GET  http://localhost:8000/api/pedidos?estado=aceptado
+GET  http://localhost:8000/api/v1/pedidos?estado=aceptado
      // TRAE LOS PEDIDOS QUE EL PROVEEDOR YA ACEPTO
 
-GET  http://localhost:8000/api/pedidos?estado=en_proceso
+GET  http://localhost:8000/api/v1/pedidos?estado=en_proceso
      // TRAE LOS PEDIDOS QUE ESTAN SIENDO PREPARADOS
 
-GET  http://localhost:8000/api/pedidos?estado=listo
+GET  http://localhost:8000/api/v1/pedidos?estado=listo
      // TRAE LOS PEDIDOS LISTOS PARA ENTREGAR
        ESTA SE DEBE USAR PARA NOTIFICAR AL USUARIO QUE SU PEDIDO ESTA LISTO
 
-GET  http://localhost:8000/api/pedidos?estado=entregado
+GET  http://localhost:8000/api/v1/pedidos?estado=entregado
      // TRAE LOS PEDIDOS YA ENTREGADOS
        ESTA SE DEBE USAR PARA REPORTES DE PEDIDOS COMPLETADOS
 
-GET  http://localhost:8000/api/pedidos?estado=cancelado
+GET  http://localhost:8000/api/v1/pedidos?estado=cancelado
      // TRAE LOS PEDIDOS CANCELADOS
        ESTA SE DEBE USAR PARA REPORTES Y ANALISIS DE CANCELACIONES
 
-GET  http://localhost:8000/api/pedidos?modulo=cafeteria
+GET  http://localhost:8000/api/v1/pedidos?modulo=cafeteria
      // TRAE SOLO LOS PEDIDOS DE LA CAFETERIA
        ESTA SE DEBE USAR EN EL PANEL DEL MODULO 4.9 PARA FILTRAR POR AREA
        VALORES POSIBLES: cafeteria, copias, souvenirs, biblioteca, otro
 
-GET  http://localhost:8000/api/pedidos?modulo=copias
+GET  http://localhost:8000/api/v1/pedidos?modulo=copias
      // TRAE SOLO LOS PEDIDOS DEL MODULO DE COPIAS/IMPRESIONES
 
-GET  http://localhost:8000/api/pedidos?operador_id=2
+GET  http://localhost:8000/api/v1/pedidos?operador_id=2
      // TRAE LOS PEDIDOS ATENDIDOS POR EL OPERADOR CON ID 2
        ESTA SE DEBE USAR PARA REPORTES DE RENDIMIENTO POR OPERADOR EN EL MODULO 4.9
 
-GET  http://localhost:8000/api/pedidos?folio=F-ABC
+GET  http://localhost:8000/api/v1/pedidos?folio=F-ABC
      // BUSCA UN PEDIDO POR SU NUMERO DE FOLIO (BUSQUEDA PARCIAL)
        ESTA SE DEBE USAR CUANDO EL USUARIO O PROVEEDOR BUSQUE UN PEDIDO POR FOLIO
 
-GET  http://localhost:8000/api/pedidos?desde=2026-02-01&hasta=2026-02-28
+GET  http://localhost:8000/api/v1/pedidos?desde=2026-02-01&hasta=2026-02-28
      // TRAE LOS PEDIDOS EN UN RANGO DE FECHAS
        ESTA SE DEBE USAR PARA REPORTES DE PEDIDOS POR PERIODO
 
-GET  http://localhost:8000/api/pedidos?per_page=5
+GET  http://localhost:8000/api/v1/pedidos?per_page=5
      // TRAE 5 PEDIDOS POR PAGINA
        ESTA SE DEBE USAR CUANDO QUIERAS CONTROLAR EL TAMANO DE LA RESPUESTA
 
-GET  http://localhost:8000/api/pedidos/1
+GET  http://localhost:8000/api/v1/pedidos/1
      // TRAE EL DETALLE COMPLETO DEL PEDIDO CON ID 1
        INCLUYE USUARIO, OPERADOR, LECTURA DE TARJETA Y MOVIMIENTO DE SALDO ASOCIADO
 
-POST http://localhost:8000/api/pedidos
+POST http://localhost:8000/api/v1/pedidos
      // CREA UN PEDIDO NUEVO EN ESTADO "creado"
        GENERA AUTOMATICAMENTE EL NUMERO DE FOLIO UNICO
        ESTA SE DEBE USAR DESDE EL MODULO 4.4 (CHECKOUT) CUANDO EL USUARIO CONFIRME SU COMPRA
        REQUIERE BODY JSON: { usuario_id, modulo, total, descripcion, notas }
 
-PUT  http://localhost:8000/api/pedidos/1
+PUT  http://localhost:8000/api/v1/pedidos/1
      // ACTUALIZA NOTAS, DESCRIPCION O TOTAL DEL PEDIDO CON ID 1
        ESTA SE DEBE USAR PARA CORRECCIONES ANTES DE QUE SEA ACEPTADO
 
-DELETE http://localhost:8000/api/pedidos/1
+DELETE http://localhost:8000/api/v1/pedidos/1
      // ELIMINA (SOFT DELETE) EL PEDIDO CON ID 1
        ESTA SE DEBE USAR SOLO PARA ELIMINAR PEDIDOS CREADOS POR ERROR
 
-POST http://localhost:8000/api/pedidos/1/estado
+POST http://localhost:8000/api/v1/pedidos/1/estado
      // CAMBIA EL ESTADO DEL PEDIDO CON ID 1
        ESTA SE DEBE USAR EN EL PANEL DEL PROVEEDOR (MODULO 4.9) PARA AVANZAR EL PEDIDO
        FLUJO NORMAL: creado → aceptado → en_proceso → listo → entregado
        REQUIERE BODY JSON: { estado, operador_usuario_id }
 
-POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
+POST http://localhost:8000/api/v1/pedidos/1/confirmar-tarjeta
      // CONFIRMA LA ENTREGA DEL PEDIDO CON ID 1 USANDO LA TARJETA RFID/NFC DEL USUARIO
        CAMBIA EL ESTADO A "entregado" Y REGISTRA LA LECTURA DE TARJETA
        ESTA SE DEBE USAR DESDE EL MODULO 4.10 CUANDO EL LECTOR CONFIRME LA ENTREGA
@@ -669,7 +669,7 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
 --BODIES JSON PARA POST / PUT (COMO PODER UTILIZAR LOS DIFERENTES URL)--
 
 
-── POST /api/usuarios 
+── POST /api/v1/usuarios 
 {
     "nombre": "Carlos",
     "apellido": "Lopez",
@@ -678,58 +678,58 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "telefono": "5551234567"
 }
 
-── PUT /api/usuarios/{id} 
+── PUT /api/v1/usuarios/{id} 
 {
     "nombre": "Carlos Alberto",
     "telefono": "5559999999"
 }
 
-── POST /api/roles 
+── POST /api/v1/roles 
 {
     "nombre": "moderador",
     "descripcion": "Rol de moderacion",
     "activo": true
 }
 
-── PUT /api/roles/{id}
+── PUT /api/v1/roles/{id}
 {
     "descripcion": "Descripcion actualizada",
     "activo": false
 }
 
-── POST /api/permisos
+── POST /api/v1/permisos
 {
     "clave": "reporte.read",
     "descripcion": "Ver reportes",
     "activo": true
 }
 
-── PUT /api/permisos/{id}
+── PUT /api/v1/permisos/{id}
 {
     "descripcion": "Permiso actualizado",
     "activo": true
 }
 
-── POST /api/rol-permisos
+── POST /api/v1/rol-permisos
 {
     "rol_id": 1,
     "permiso_id": 2
 }
 
-── POST /api/usuario-roles
+── POST /api/v1/usuario-roles
 {
     "usuario_id": 4,
     "rol_id": 2
 }
 
-── PUT /api/usuario-perfiles/{id} 
+── PUT /api/v1/usuario-perfiles/{id} 
 {
     "fecha_nacimiento": "1995-06-15",
     "genero": "masculino",
     "direccion": "Calle Falsa 123"
 }
 
-── POST /api/tarjetas 
+── POST /api/v1/tarjetas 
 {
     "usuario_id": 4,
     "uid": "A1B2C3D4E5F6",
@@ -737,19 +737,19 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "registrado_por_usuario_id": 1
 }
 
-── PUT /api/tarjetas/{id}
+── PUT /api/v1/tarjetas/{id}
 {
     "estado": "perdida",
     "motivo_bloqueo": "El usuario reporto que no encuentra su tarjeta"
 }
 
-── POST /api/tarjetas/{id}/bloquear 
+── POST /api/v1/tarjetas/{id}/bloquear 
 {
     "motivo_bloqueo": "Tarjeta reportada como robada",
     "bloqueado_por_usuario_id": 1
 }
 
-── POST /api/tarjeta-lecturas 
+── POST /api/v1/tarjeta-lecturas 
 {
     "uid_leido": "A1B2C3D4E5F6",
     "modulo": "cafeteria",
@@ -759,12 +759,12 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "operador_usuario_id": 2
 }
 
-── POST /api/saldo-monederos 
+── POST /api/v1/saldo-monederos 
 {
     "usuario_id": 4
 }
 
-── POST /api/saldo-movimientos — ABONO (recarga de saldo) 
+── POST /api/v1/saldo-movimientos — ABONO (recarga de saldo) 
 {
     "usuario_id": 4,
     "tipo": "abono",
@@ -774,7 +774,7 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "operador_usuario_id": 1
 }
 
-── POST /api/saldo-movimientos — CARGO (consumo)
+── POST /api/v1/saldo-movimientos — CARGO (consumo)
 {
     "usuario_id": 4,
     "tipo": "cargo",
@@ -787,7 +787,7 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "referencia_id": 5
 }
 
-── POST /api/pedidos 
+── POST /api/v1/pedidos 
 {
     "usuario_id": 4,
     "modulo": "cafeteria",
@@ -796,19 +796,139 @@ POST http://localhost:8000/api/pedidos/1/confirmar-tarjeta
     "notas": "Sin chile"
 }
 
-── PUT /api/pedidos/{id}
+── PUT /api/v1/pedidos/{id}
 {
     "notas": "Sin chile y sin sal",
     "descripcion": "Comida del dia actualizada"
 }
 
-── POST /api/pedidos/{id}/estado 
+── POST /api/v1/pedidos/{id}/estado 
 {
     "estado": "aceptado",
     "operador_usuario_id": 2
 }
 
-── POST /api/pedidos/{id}/confirmar-tarjeta 
+── POST /api/v1/pedidos/{id}/confirmar-tarjeta 
 {
     "tarjeta_lectura_id": 5
+}
+
+
+
+--RFID — AUTENTICACIÓN Y CONSULTA POR TARJETA--
+
+
+POST http://localhost:8000/api/v1/rfid/auth
+     // AUTENTICA UN USUARIO CON UID + PIN Y DEVUELVE SUS DATOS COMPLETOS
+       NO REQUIERE API/v1 KEY — ES PUBLICA COMO EL LOGIN NORMAL
+       ESTA SE DEBE USAR DESDE APPS EXTERNAS, O SISTEMAS DE TERCEROS
+       QUE NECESITEN VERIFICAR LA IDENTIDAD DE UN USUARIO POR TARJETA
+       DEVUELVE: datos del usuario, roles, estado de tarjeta y saldo actual
+       REQUIERE BODY JSON: { uid, pin }
+
+POST http://localhost:8000/api/v1/rfid/verificar
+     // VERIFICA SI EL UID + PIN SON VALIDOS SIN EXPONER DATOS SENSIBLES
+       REQUIERE API/v1 KEY
+       ESTA SE DEBE USAR ANTES DE EJECUTAR UNA ACCION CRITICA (COBRO, ACCESO ESPECIAL)
+       CUANDO SOLO NECESITAS SABER SI LA TARJETA Y PIN SON CORRECTOS SIN MAS INFORMACION
+       DEVUELVE: { ok, valido, uid, estado }
+       REQUIERE BODY JSON: { uid, pin }
+
+GET  http://localhost:8000/api/v1/rfid/usuario/{uid}
+     // TRAE EL PERFIL COMPLETO DEL USUARIO DUENO DE ESA TARJETA
+       REQUIERE API/v1 KEY
+       ESTA SE DEBE USAR EN  PANTALLAS QUE MUESTRAN DATOS DEL USUARIO AL PASAR TARJETA
+       NO REQUIERE PIN — SOLO EL UID ES SUFICIENTE PARA VER EL PERFIL
+       DEVUELVE: nombre, email, telefono, foto, roles, perfil, fecha de registro y datos de tarjeta
+
+GET  http://localhost:8000/api/v1/rfid/saldo/{uid}
+     // CONSULTA RAPI/v1DA DEL SALDO DEL MONEDERO POR UID DE TARJETA
+       REQUIERE API/v1 KEY
+       ESTA SE DEBE USAR EN PANTALLAS DEL LECTOR PARA MOSTRAR SALDO AL MOMENTO DEL ESCANEO
+       NO REQUIERE PIN — SOLO EL UID
+       DEVUELVE: nombre del usuario, saldo_disponible, saldo_retenido y monedero_id
+
+GET  http://localhost:8000/api/v1/rfid/saldo/{uid}
+     // EJEMPLO CON UID REAL:
+GET  http://localhost:8000/api/v1/rfid/saldo/A1B2C3D4
+     // DEVUELVE EL SALDO DEL DUENO DE LA TARJETA CON UID A1B2C3D4
+
+GET  http://localhost:8000/api/v1/rfid/historial/{uid}
+     // HISTORIAL DE MOVIMIENTOS DEL MONEDERO POR UID DE TARJETA
+       REQUIERE API/v1 KEY
+       ESTA SE DEBE USAR EN PANTALLAS APPS QUE MUESTRAN EL ESTADO DE CUENTA AL PASAR TARJETA
+       SOPORTA FILTROS: tipo (abono/cargo), modulo (cafeteria, copias, etc.), per_page
+       DEVUELVE: lista paginada de movimientos con monto, saldo antes/despues, modulo y fecha
+
+GET  http://localhost:8000/api/v1/rfid/historial/{uid}?tipo=cargo
+     // TRAE SOLO LOS CARGOS (CONSUMOS) DEL DUENO DE ESA TARJETA
+       ESTA SE DEBE USAR PARA MOSTRAR SOLO LOS GASTOS EN EL ESTADO DE CUENTA
+
+GET  http://localhost:8000/api/v1/rfid/historial/{uid}?tipo=abono
+     // TRAE SOLO LOS ABONOS (RECARGAS) DEL DUENO DE ESA TARJETA
+
+GET  http://localhost:8000/api/v1/rfid/historial/{uid}?modulo=cafeteria
+     // TRAE SOLO LOS MOVIMIENTOS EN CAFETERIA DEL DUENO DE ESA TARJETA
+       ESTA SE DEBE USAR PARA REPORTES DE CONSUMO POR AREA DESDE EL MODULO 4.9
+
+GET  http://localhost:8000/api/v1/rfid/historial/{uid}?per_page=5
+     // TRAE SOLO 5 MOVIMIENTOS POR PAGINA
+
+GET  http://localhost:8000/api/v1/rfid/pedidos/{uid}
+     // PEDIDOS ACTIVOS DEL USUARIO DUENO DE ESA TARJETA
+       REQUIERE API/v1 KEY
+       ESTA SE DEBE USAR EN EL LECTOR CUANDO EL USUARIO PASA LA TARJETA PARA RECOGER UN PEDIDO
+       POR DEFECTO DEVUELVE: creado, aceptado, en_proceso Y listo (los no entregados ni cancelados)
+       DEVUELVE: lista de pedidos con folio, estado, modulo, total, descripcion y fecha
+
+GET  http://localhost:8000/api/v1/rfid/pedidos/{uid}?estado=listo
+     // TRAE SOLO LOS PEDIDOS LISTOS PARA RECOGER DEL DUENO DE ESA TARJETA
+       ESTA ES LA CONSULTA MAS UTIL EN EL LECTOR: MUESTRA LO QUE PUEDE RECOGER AHORA
+
+GET  http://localhost:8000/api/v1/rfid/pedidos/{uid}?estado=entregado
+     // TRAE EL HISTORIAL DE PEDIDOS YA ENTREGADOS AL DUENO DE ESA TARJETA
+
+GET  http://localhost:8000/api/v1/rfid/pedidos/{uid}?modulo=cafeteria
+     // TRAE SOLO LOS PEDIDOS DE CAFETERIA DEL DUENO DE ESA TARJETA
+       ESTA SE DEBE USAR EN EL LECTOR DE CAFETERIA PARA FILTRAR SOLO SUS PEDIDOS
+
+GET  http://localhost:8000/api/v1/rfid/pedidos/{uid}?estado=listo&modulo=cafeteria
+     // COMBINACION: PEDIDOS LISTOS EN CAFETERIA PARA ESA TARJETA
+       ESTE ES EL FILTRO IDEAL PARA EL LECTOR EN EL PUNTO DE ENTREGA DE CAFETERIA
+
+GET  http://localhost:8000/api/v1/rfid/lecturas/{uid}
+     // HISTORIAL DE LECTURAS (ACCESOS Y USOS) DE ESA TARJETA
+       REQUIERE API/v1 KEY
+       ESTA SE DEBE USAR PARA AUDITORIA DE UNA TARJETA ESPECIFICA
+       SOPORTA FILTROS: desde, hasta, modulo, tipo_lectura, per_page
+       DEVUELVE: lista paginada de lecturas con modulo, tipo, exito, detalle y fecha
+
+GET  http://localhost:8000/api/v1/rfid/lecturas/{uid}?modulo=cafeteria
+     // TRAE SOLO LAS LECTURAS DE ESA TARJETA EN CAFETERIA
+       ESTA SE DEBE USAR PARA VER CUANTAS VECES USO LA TARJETA EN CAFETERIA
+
+GET  http://localhost:8000/api/v1/rfid/lecturas/{uid}?tipo_lectura=acceso
+     // TRAE SOLO LAS LECTURAS DE TIPO ACCESO (ENTRADAS/SALIDAS) DE ESA TARJETA
+
+GET  http://localhost:8000/api/v1/rfid/lecturas/{uid}?desde=2026-01-01&hasta=2026-12-31
+     // TRAE LAS LECTURAS DE ESA TARJETA EN UN RANGO DE FECHAS
+       ESTA SE DEBE USAR PARA REPORTES DE AUDITORIA POR PERIODO
+
+GET  http://localhost:8000/api/v1/rfid/lecturas/{uid}?per_page=10
+     // TRAE 10 LECTURAS POR PAGINA
+
+
+--BODIES JSON PARA RFID--
+
+
+── POST /api/v1/rfid/auth
+{
+    "uid": "8FE785CD",
+    "pin": "1234"
+}
+
+── POST /api/v1/rfid/verificar
+{
+    "uid": "A1B2C3D4",
+    "pin": "1234"
 }

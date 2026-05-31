@@ -133,18 +133,24 @@
                     <div v-show="activeTab === 'rfid'">
                         <form @submit.prevent="submitRfid" class="login-form">
 
-                            <div class="rfid-illustration">
-                                <div class="rfid-ring rfid-ring-1"></div>
-                                <div class="rfid-ring rfid-ring-2"></div>
-                                <div class="rfid-ring rfid-ring-3"></div>
-                                <div class="rfid-icon">
-                                    <i class="fas fa-id-card"></i>
+                            <div class="qr-login-box">
+                                <p class="qr-login-label">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    Escanea con la app móvil para entrar
+                                </p>
+                                <canvas ref="canvasQrLogin" class="qr-login-canvas"></canvas>
+                                <div class="qr-login-code-row">
+                                    <span class="qr-login-code-hint">Código:</span>
+                                    <input
+                                        v-model="codigoQrLogin"
+                                        type="text"
+                                        maxlength="32"
+                                        class="qr-login-code-input"
+                                        @input="codigoQrLogin = codigoQrLogin.toUpperCase(); regenerarQr()"
+                                    />
                                 </div>
+                                <p class="qr-login-hint">O ingresa el UID y PIN manualmente abajo</p>
                             </div>
-
-                            <p class="rfid-hint">
-                                Acerca tu tarjeta al lector o escribe el UID manualmente
-                            </p>
 
                             <div v-if="rfidErrors.uid" class="alert-error">
                                 <i class="fas fa-exclamation-circle"></i>
@@ -274,19 +280,19 @@
 
 <script setup>
 import { useForm, Link, router } from '@inertiajs/vue3';
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, onUnmounted, watch, nextTick } from 'vue';
+import QRCode from 'qrcode';
 
-const loginBg = '/images/Campus.webp'; 
+const loginBg = '/images/Campus.webp';
 
-const activeTab = ref('password');
+const activeTab    = ref('password');
+const showPassword = ref(false);
 
 const form = useForm({
-    email: '',
+    email:    '',
     password: '',
     remember: false,
 });
-
-const showPassword = ref(false);
 
 const submit = () => {
     form.post(route('login'), {
@@ -299,11 +305,6 @@ const rfidErrors     = reactive({ uid: '', pin: '' });
 const rfidProcessing = ref(false);
 const rfidSuccess    = ref('');
 const uidInputRef    = ref(null);
-
-function onTabRfid() {
-    activeTab.value = 'rfid';
-    setTimeout(() => uidInputRef.value?.focus(), 50);
-}
 
 function submitRfid() {
     if (!rfidForm.uid || !rfidForm.pin) return;
@@ -320,6 +321,7 @@ function submitRfid() {
         preserveState: true,
         onSuccess: () => {
             rfidSuccess.value = '¡Tarjeta válida! Redirigiendo...';
+            clearInterval(loginPollingInterval);
         },
         onError: (errors) => {
             rfidErrors.uid = errors.uid ?? '';
@@ -334,7 +336,67 @@ function submitRfid() {
     });
 }
 
+const canvasQrLogin = ref(null);
+const codigoQrLogin = ref(
+    localStorage.getItem('login_qr_codigo') ?? 'LOGIN-QR-01'
+);
+
+watch(codigoQrLogin, (v) => {
+    localStorage.setItem('login_qr_codigo', v);
+});
+
+async function regenerarQr() {
+    await nextTick();
+    if (canvasQrLogin.value && codigoQrLogin.value.trim()) {
+        await QRCode.toCanvas(canvasQrLogin.value, codigoQrLogin.value, {
+            width:  130,
+            margin: 2,
+            color:  { dark: '#7c3aed', light: '#ffffff' },
+        });
+    }
+}
+
+let loginPollingInterval = null;
+let ultimoLoginTimestamp = null;
+
+async function verificarLoginPendiente() {
+    try {
+        const res  = await fetch('/simulador/login-pendiente');
+        const data = await res.json();
+
+        if (data.uid && data.pin && data.timestamp && data.timestamp !== ultimoLoginTimestamp) {
+            ultimoLoginTimestamp = data.timestamp;
+            rfidForm.uid = data.uid;
+            rfidForm.pin = data.pin;
+            submitRfid();
+        }
+    } catch (_) {}
+}
+
+function onTabRfid() {
+    activeTab.value = 'rfid';
+    setTimeout(async () => {
+        await regenerarQr();
+        uidInputRef.value?.focus();
+    }, 50);
+}
+
+watch(activeTab, (tab) => {
+    if (tab === 'rfid') {
+        ultimoLoginTimestamp = null;
+        loginPollingInterval = setInterval(verificarLoginPendiente, 1500);
+        setTimeout(() => regenerarQr(), 50);
+    } else {
+        clearInterval(loginPollingInterval);
+        loginPollingInterval = null;
+    }
+});
+
 onMounted(() => {});
+
+onUnmounted(() => {
+    clearInterval(loginPollingInterval);
+});
 </script>
 
 <style scoped>
@@ -783,6 +845,36 @@ onMounted(() => {});
 .stat-pill-icon i { font-size: 0.78rem; color: #e9d5ff; }
 .stat-pill-label  { font-size: 0.8rem; color: rgba(255,255,255,0.85); font-weight: 600; letter-spacing: 0.3px; }
 
+
+.qr-login-box {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 10px 10px 8px;
+    background: #faf5ff; border: 1px solid #e9d5ff;
+    border-radius: 12px; margin-bottom: 0.75rem;
+}
+.qr-login-label {
+    font-size: 0.68rem; font-weight: 700; color: #7c3aed;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    display: flex; align-items: center; gap: 0.3rem;
+}
+.qr-login-canvas { border-radius: 6px; display: block; }
+.qr-login-code-row {
+    display: flex; align-items: center; gap: 0.4rem; margin-top: 2px;
+}
+.qr-login-code-hint { font-size: 0.65rem; color: #94a3b8; }
+.qr-login-code-input {
+    width: 110px; padding: 0.2rem 0.5rem;
+    background: #fff; border: 1px solid #d8b4fe;
+    border-radius: 999px; font-size: 0.65rem;
+    font-family: monospace; color: #7c3aed;
+    text-transform: uppercase; text-align: center;
+    letter-spacing: 1px; outline: none;
+    transition: border-color 0.2s;
+}
+.qr-login-code-input:focus { border-color: #a855f7; }
+.qr-login-hint {
+    font-size: 0.63rem; color: #a78bfa; text-align: center;
+}
 
 @media (max-height: 700px) and (min-width: 769px) {
     .brand               { margin-bottom: 0.5rem; }

@@ -142,4 +142,15 @@ public function tarjeta()
     return $this->hasOne(TarjetaUniversitaria::class, 'usuario_id');
 }
 
+
+public function archivos()
+{
+    return $this->hasMany(\App\Models\Archivo::class, 'usuario_id');
+}
+
+public function carpetas()
+{
+    return $this->hasMany(\App\Models\ArchivosCarpeta::class, 'usuario_id');
+}
+
 }
