@@ -322,6 +322,7 @@ const isAdmin = computed(() => {
     return userRoles.value.includes('administrador');
 });
 
+
 const isEstudiante = computed(() => {
     return userRoles.value.includes('estudiante');
 });

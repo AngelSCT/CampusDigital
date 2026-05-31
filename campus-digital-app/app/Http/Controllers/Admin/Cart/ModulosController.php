@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Cart;
 use App\Http\Controllers\Controller;
 use App\Models\Cart\Bitacora;
 use App\Models\Cart\ModuloCliente;
+use App\Models\Cart\SolicitudModulo;
 use App\Models\Cart\TokenModulo;
 use App\Modules\Cart\Services\ModuleTokenService;
 use Illuminate\Http\RedirectResponse;
@@ -25,8 +26,16 @@ class ModulosController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $stats = [
+            'total'                  => ModuloCliente::count(),
+            'activos'                => ModuloCliente::where('activo', true)->count(),
+            'tokens_activos'         => TokenModulo::where('tipo', TokenModulo::TIPO_ACCESS)->where('estado', TokenModulo::ESTADO_ACTIVO)->count(),
+            'solicitudes_pendientes' => SolicitudModulo::where('estado', SolicitudModulo::ESTADO_PENDIENTE)->count(),
+        ];
+
         return Inertia::render('Admin/Cart/ModulosIndex', [
             'modulos' => $modulos,
+            'stats'   => $stats,
         ]);
     }
 
