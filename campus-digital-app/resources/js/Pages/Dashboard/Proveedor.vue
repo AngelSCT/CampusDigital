@@ -1,14 +1,17 @@
 <script setup>
 import AuthLayout from '@/Layouts/AuthLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { computed, ref, onMounted } from 'vue';
 import axios from 'axios';
 
 const props = defineProps({
     stats: Object,
     tienda: Object,
+    tiendas: Array,
     tipos: Object
 });
+
+const selectedTiendaId = ref(props.tienda?.id);
 
 const apiStats = ref({
     pedidos_pendientes: 0,
@@ -21,27 +24,57 @@ const apiStats = ref({
 
 const loadingApi = ref(true);
 
-onMounted(async () => {
+const fetchStats = async () => {
+    if (!selectedTiendaId.value) return;
+    loadingApi.value = true;
     try {
-        const response = await axios.get('/api/proveedor/metrics');
+        const response = await axios.get('/api/proveedor/metrics', {
+            params: { tienda_id: selectedTiendaId.value }
+        });
         apiStats.value = response.data;
     } catch (error) {
         console.error('Error cargando métricas API:', error);
     } finally {
         loadingApi.value = false;
     }
-});
+};
+
+const changeTienda = () => {
+    router.get('/dashboard', { tienda_id: selectedTiendaId.value }, {
+        preserveState: false,
+        preserveScroll: true,
+        onSuccess: () => {
+            fetchStats();
+        }
+    });
+};
+
+onMounted(fetchStats);
 </script>
 
 <template>
     <Head title="Panel de Proveedor" />
     <AuthLayout>
         <div class="space-y-6">
-            <div class="flex justify-between items-end">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-                        Panel de {{ tienda?.nombre || 'Mi Tienda' }}
-                    </h1>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                            Panel de {{ tienda?.nombre || 'Mi Tienda' }}
+                        </h1>
+                        <!-- Selector de Tiendas si tiene múltiples -->
+                        <div v-if="tiendas && tiendas.length > 1">
+                            <select 
+                                v-model="selectedTiendaId" 
+                                @change="changeTienda" 
+                                class="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded-xl px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 font-bold transition-all cursor-pointer outline-none"
+                            >
+                                <option v-for="t in tiendas" :key="t.id" :value="t.id">
+                                    🏪 {{ t.nombre }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                     <p class="mt-1 text-sm text-slate-400">Gestión de inventario y personal para {{ (tipos && tienda) ? tipos[tienda.tipo] : 'tu negocio' }}</p>
                 </div>
                 <div class="text-right">

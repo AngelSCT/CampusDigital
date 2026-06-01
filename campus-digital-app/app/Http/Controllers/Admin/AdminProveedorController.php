@@ -39,7 +39,7 @@ class AdminProveedorController extends Controller
         $proveedores = Usuario::whereHas('roles', function($q) {
                 $q->where('nombre', 'proveedor_area');
             })
-            ->with(['roles', 'tienda'])
+            ->with(['roles', 'tienda', 'tiendas'])
             ->get();
 
         $tiendas = Tienda::all();
@@ -61,12 +61,18 @@ class AdminProveedorController extends Controller
     public function asignarTienda(Request $request, Usuario $usuario)
     {
         $request->validate([
-            'tienda_id' => 'required|exists:tienda,id'
+            'tienda_ids' => 'required|array',
+            'tienda_ids.*' => 'exists:tienda,id'
         ]);
 
-        $usuario->update(['tienda_id' => $request->tienda_id]);
+        $tiendaIds = $request->tienda_ids;
+        $usuario->tiendas()->sync($tiendaIds);
 
-        return redirect()->back()->with('success', 'Tienda asignada correctamente.');
+        // Compatibilidad: Guardar la primera tienda en el campo tienda_id tradicional
+        $mainTiendaId = count($tiendaIds) > 0 ? $tiendaIds[0] : null;
+        $usuario->update(['tienda_id' => $mainTiendaId]);
+
+        return redirect()->back()->with('success', 'Tiendas asignadas correctamente.');
     }
 
     public function buscarUsuarios(Request $request)
@@ -81,5 +87,33 @@ class AdminProveedorController extends Controller
             ->get(['id', 'nombre', 'apellido', 'email']);
 
         return response()->json($usuarios);
+    }
+
+    public function asignarRolProveedor(Request $request)
+    {
+        $request->validate([
+            'usuario_id' => 'required|exists:usuario,id'
+        ]);
+
+        $usuario = Usuario::findOrFail($request->usuario_id);
+        $rolProveedor = Rol::where('nombre', 'proveedor_area')->first();
+
+        if (!$usuario->hasRole('proveedor_area')) {
+            $usuario->roles()->attach($rolProveedor->id);
+        }
+
+        return redirect()->back()->with('success', 'Usuario dado de alta como proveedor.');
+    }
+
+    public function quitarRolProveedor(Usuario $usuario)
+    {
+        $rolProveedor = Rol::where('nombre', 'proveedor_area')->first();
+        $usuario->roles()->detach($rolProveedor->id);
+        
+        // Desvincular tiendas
+        $usuario->tiendas()->sync([]);
+        $usuario->update(['tienda_id' => null]);
+
+        return redirect()->back()->with('success', 'Usuario removido de los proveedores.');
     }
 }

@@ -74,7 +74,7 @@ const setPeriodo = (p) => {
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
             </div>
 
-            <template v-else-if="reports">
+            <div v-else-if="reports">
                 <!-- Summary Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-2xl border border-blue-500/20 shadow-xl">
@@ -91,7 +91,7 @@ const setPeriodo = (p) => {
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                     <!-- Ventas por Producto -->
                     <div class="bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-800 bg-slate-900/80">
@@ -140,7 +140,7 @@ const setPeriodo = (p) => {
                     </div>
 
                     <!-- Ventas por Día -->
-                    <div class="bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden">
+                    <div class="bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden lg:col-span-2">
                         <div class="px-6 py-4 border-b border-slate-800 bg-slate-900/80">
                             <h3 class="text-lg font-bold text-white">Ventas por Día</h3>
                         </div>
@@ -165,9 +165,8 @@ const setPeriodo = (p) => {
                         </div>
                     </div>
                 </div>
-                </div>
 
-                <!-- NEW: Historial de Atención -->
+                <!-- Historial de Atención -->
                 <div class="mt-6 bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden">
                     <div class="px-6 py-4 border-b border-slate-800 bg-slate-900/80">
                         <h3 class="text-lg font-bold text-white">Historial de Atención (Últimos {{ periodo }})</h3>
@@ -212,7 +211,7 @@ const setPeriodo = (p) => {
                         </div>
                     </div>
                 </div>
-            </template>
+            </div>
         </div>
     </AuthLayout>
 </template>

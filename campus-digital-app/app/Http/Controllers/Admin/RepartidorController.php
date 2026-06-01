@@ -41,4 +41,28 @@ class RepartidorController extends Controller
 
         return redirect()->back()->with('success', $msg);
     }
+
+    public function asignar(Request $request)
+    {
+        $request->validate([
+            'usuario_id' => 'required|exists:usuario,id'
+        ]);
+
+        $usuario = Usuario::findOrFail($request->usuario_id);
+        $rolRepartidor = Rol::where('nombre', 'repartidor')->first();
+
+        if (!$usuario->hasRole('repartidor')) {
+            $usuario->roles()->attach($rolRepartidor->id);
+        }
+
+        return redirect()->back()->with('success', 'Usuario dado de alta como repartidor.');
+    }
+
+    public function desvincular(Usuario $usuario)
+    {
+        $rolRepartidor = Rol::where('nombre', 'repartidor')->first();
+        $usuario->roles()->detach($rolRepartidor->id);
+
+        return redirect()->back()->with('success', 'Usuario removido de los repartidores.');
+    }
 }

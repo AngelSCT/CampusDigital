@@ -213,10 +213,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/proveedores/gestion', [AdminProveedorController::class, 'index'])->name('proveedores.manage');
         Route::get('/api/usuarios/buscar', [AdminProveedorController::class, 'buscarUsuarios'])->name('proveedores.search');
         Route::post('/proveedores/{usuario}/asignar', [AdminProveedorController::class, 'asignarTienda'])->name('proveedores.asignar');
+        Route::post('/proveedores/asignar-rol', [AdminProveedorController::class, 'asignarRolProveedor'])->name('proveedores.asignar-rol');
+        Route::delete('/proveedores/{usuario}/quitar-rol', [AdminProveedorController::class, 'quitarRolProveedor'])->name('proveedores.quitar-rol');
 
         // Rutas de Repartidores
         Route::get('/repartidores', [RepartidorController::class, 'index'])->name('repartidores.index');
         Route::post('/repartidores/{usuario}/toggle', [RepartidorController::class, 'toggle'])->name('repartidores.toggle');
+        Route::post('/repartidores/asignar', [RepartidorController::class, 'asignar'])->name('repartidores.asignar');
+        Route::delete('/repartidores/{usuario}', [RepartidorController::class, 'desvincular'])->name('repartidores.destroy');
 
 
         Route::prefix('tarjetas')->name('tarjetas.')->group(function () {

@@ -44,6 +44,9 @@ use App\Http\Controllers\Api\RecargaApiController;
 // RUTAS EXTRA CON UID Y EL PIN
 use App\Http\Controllers\Api\RfidApiController;
 
+// ── INTEGRACIÓN MÓDULO 4.3 → 4.9 ─────────────────────────────────────────
+use App\Http\Controllers\Api\CatalogoIntegracionApiController;
+
 Route::middleware('api.key')->group(function () {
     Route::apiResource('areas', AreaApiController::class);
     Route::apiResource('categorias-ticket', CategoriaTicketApiController::class);
@@ -121,6 +124,12 @@ Route::middleware('api.key')->group(function () {
     // NUEVAS RUTAS PROVEEDOR (MODULO 4.9)
     Route::get('proveedor/metrics', [ProviderApiController::class, 'getMetrics']);
     Route::get('proveedor/reports', [ProviderApiController::class, 'getReports']);
+
+    // ── INTEGRACIÓN MÓDULO 4.3 → 4.9 ─────────────────────────────────────────
+    // Catálogo por vendedor: precio + disponibilidad + regla ya resueltos.
+    // Consumido por el panel operativo del módulo 4.9 (ProductoController).
+    Route::get('catalogo-integracion/vendedores',             [CatalogoIntegracionApiController::class, 'vendedores']);
+    Route::get('catalogo-integracion/vendedor/{id_vendedor}', [CatalogoIntegracionApiController::class, 'porVendedor']);
 });
 
 

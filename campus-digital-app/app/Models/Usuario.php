@@ -164,4 +164,9 @@ public function carpetas()
     {
         return $this->belongsTo(Tienda::class, 'tienda_id');
     }
+
+    public function tiendas()
+    {
+        return $this->belongsToMany(Tienda::class, 'usuario_tienda', 'usuario_id', 'tienda_id')->withTimestamps();
+    }
 }

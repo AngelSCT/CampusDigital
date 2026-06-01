@@ -29,11 +29,27 @@ class Tienda extends Model
         'ubicacion',
         'imagen_url',
         'activo',
+        'vendedor_catalogo_id',  // ← AGREGADO — integración 4.3 → 4.9
     ];
 
     protected $casts = [
-        'activo' => 'boolean',
+        'activo'               => 'boolean',
+        'vendedor_catalogo_id' => 'integer',
     ];
+
+    protected $appends = [
+        'imagen_url',
+    ];
+
+    public function getImagenUrlAttribute()
+    {
+        return $this->logo_url;
+    }
+
+    public function setImagenUrlAttribute($value)
+    {
+        $this->attributes['logo_url'] = $value;
+    }
 
     public function productos()
     {
@@ -48,5 +64,10 @@ class Tienda extends Model
     public function usuarios()
     {
         return $this->hasMany(Usuario::class, 'tienda_id');
+    }
+
+    public function usuariosNn()
+    {
+        return $this->belongsToMany(Usuario::class, 'usuario_tienda', 'tienda_id', 'usuario_id')->withTimestamps();
     }
 }
