@@ -77,6 +77,12 @@
                                                 </svg>
                                                 Tickets
                                             </a>
+                                            <a href="/admin/areas" class="flex items-center px-4 py-2.5 text-sm text-white hover:bg-blue-500/10 hover:text-blue-400 transition-all duration-200">
+                                                <svg class="w-4 h-4 mr-3 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                </svg>
+                                                Áreas
+                                            </a>
                                             <a href="/admin/categorias-ticket" class="flex items-center px-4 py-2.5 text-sm text-white hover:bg-blue-500/10 hover:text-blue-400 transition-all duration-200">
                                                 <svg class="w-4 h-4 mr-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
@@ -243,6 +249,7 @@
                             <div class="pl-3 pr-4 py-1">
                                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider py-1">Soporte</p>
                                 <a href="/admin/tickets" class="text-white hover:text-blue-400 block py-1.5 text-sm transition-all duration-200">Tickets</a>
+                                <a href="/admin/areas" class="text-white hover:text-blue-400 block py-1.5 text-sm transition-all duration-200">Áreas</a>
                                 <a href="/admin/categorias-ticket" class="text-white hover:text-blue-400 block py-1.5 text-sm transition-all duration-200">Categorías</a>
                                 <a href="/admin/ubicaciones" class="text-white hover:text-blue-400 block py-1.5 text-sm transition-all duration-200">Ubicaciones</a>
                                 <a href="/admin/equipos-activos" class="text-white hover:text-blue-400 block py-1.5 text-sm transition-all duration-200">Equipos Activos</a>
