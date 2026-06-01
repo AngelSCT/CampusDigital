@@ -28,11 +28,24 @@ use App\Http\Controllers\Admin\AsignacionTecnicaController;
 use App\Http\Controllers\Admin\InsumoController;
 use App\Http\Controllers\Admin\GastoTicketController;
 use App\Http\Controllers\Admin\HistorialTicketController;
+use App\Http\Controllers\Proveedor\PedidoOperativoController;
+use App\Http\Controllers\Proveedor\ProductoController;
+use App\Http\Controllers\Api\PedidoApiController;
+use App\Http\Controllers\Api\ProviderApiController;
+use App\Http\Controllers\Admin\TiendaController;
+use App\Http\Controllers\Admin\AdminProveedorController;
+use App\Http\Controllers\Admin\RepartidorController;
+use App\Http\Controllers\Admin\RepartidorRoleController;
+use App\Http\Controllers\StoreManager\ManagerOperativoController;
 
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+Route::get('/login', function () {
+    return inertia('Auth/Login');
+})->name('login');
 
 
 Route::post('/auth/rfid-login', [RfidLoginController::class, 'login'])
@@ -160,7 +173,55 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{archivo}/nota',                     [ArchivoController::class, 'agregarNota'])->middleware('permission:file.admin')->name('nota');
     });
 
+    // ── REPARTIDOR (INDIVIDUAL) ──────────────────────────────────
+    Route::middleware(['role:repartidor'])->prefix('repartidor')->name('repartidor.')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Repartidor\RepartidorDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/pedidos/{pedido}/estado', [\App\Http\Controllers\Repartidor\RepartidorDashboardController::class, 'actualizarEstado'])->name('pedido.estado');
+    });
+
+    Route::middleware(['role:proveedor_area'])->prefix('proveedor')->name('proveedor.')->group(function () {
+        Route::get('/operativo', [App\Http\Controllers\DashboardController::class, 'dashboardProveedor'])->name('operativo.index');
+        
+        // Inventario
+        Route::get('/inventario', [App\Http\Controllers\Proveedor\ProductoController::class, 'index'])->name('inventario.index');
+        Route::post('/inventario', [App\Http\Controllers\Proveedor\ProductoController::class, 'store'])->name('inventario.store');
+        Route::put('/inventario/{producto}', [App\Http\Controllers\Proveedor\ProductoController::class, 'update'])->name('inventario.update');
+        Route::delete('/inventario/{producto}', [App\Http\Controllers\Proveedor\ProductoController::class, 'destroy'])->name('inventario.destroy');
+
+        // Repartidores (Nuevo)
+        Route::get('/repartidores', [App\Http\Controllers\Proveedor\RepartidorProveedorController::class, 'index'])->name('repartidores.index');
+        Route::get('/api/usuarios/buscar', [App\Http\Controllers\Proveedor\RepartidorProveedorController::class, 'search'])->name('repartidores.search');
+        Route::post('/repartidores/asignar', [App\Http\Controllers\Proveedor\RepartidorProveedorController::class, 'asignar'])->name('repartidores.asignar');
+        Route::delete('/repartidores/{usuario}', [App\Http\Controllers\Proveedor\RepartidorProveedorController::class, 'desvincular'])->name('repartidores.destroy');
+
+        Route::get('/reportes', function() {
+            return Inertia::render('Proveedor/Reportes');
+        })->name('reportes.index');
+    });
+
+
     Route::middleware(['role:administrador'])->prefix('admin')->name('admin.')->group(function () {
+        // Rutas de Tiendas
+        Route::get('/tiendas',           [TiendaController::class, 'dashboard'])->name('tiendas.index');
+        Route::get('/tiendas/gestion',   [TiendaController::class, 'index'])->name('tiendas.manage');
+        Route::post('/tiendas',          [TiendaController::class, 'store'])->name('tiendas.store');
+        Route::put('/tiendas/{tienda}',  [TiendaController::class, 'update'])->name('tiendas.update');
+        Route::delete('/tiendas/{tienda}', [TiendaController::class, 'destroy'])->name('tiendas.destroy');
+
+        // Rutas de Proveedores
+        Route::get('/proveedores',         [AdminProveedorController::class, 'dashboard'])->name('proveedores.index');
+        Route::get('/proveedores/gestion', [AdminProveedorController::class, 'index'])->name('proveedores.manage');
+        Route::get('/api/usuarios/buscar', [AdminProveedorController::class, 'buscarUsuarios'])->name('proveedores.search');
+        Route::post('/proveedores/{usuario}/asignar', [AdminProveedorController::class, 'asignarTienda'])->name('proveedores.asignar');
+        Route::post('/proveedores/asignar-rol', [AdminProveedorController::class, 'asignarRolProveedor'])->name('proveedores.asignar-rol');
+        Route::delete('/proveedores/{usuario}/quitar-rol', [AdminProveedorController::class, 'quitarRolProveedor'])->name('proveedores.quitar-rol');
+
+        // Rutas de Repartidores
+        Route::get('/repartidores', [RepartidorController::class, 'index'])->name('repartidores.index');
+        Route::post('/repartidores/{usuario}/toggle', [RepartidorController::class, 'toggle'])->name('repartidores.toggle');
+        Route::post('/repartidores/asignar', [RepartidorController::class, 'asignar'])->name('repartidores.asignar');
+        Route::delete('/repartidores/{usuario}', [RepartidorController::class, 'desvincular'])->name('repartidores.destroy');
+
 
         Route::prefix('tarjetas')->name('tarjetas.')->group(function () {
 

@@ -26,6 +26,8 @@ class Usuario extends Authenticatable implements MustVerifyEmail
         'bloqueado',
         'bloqueado_hasta',
         'seguridad_json',
+        'modulo',
+        'tienda_id',
     ];
 
     protected $hidden = [
@@ -153,4 +155,18 @@ public function carpetas()
     return $this->hasMany(\App\Models\ArchivosCarpeta::class, 'usuario_id');
 }
 
+    public function pedidosRepartidor()
+    {
+        return $this->hasMany(Pedido::class, 'repartidor_id');
+    }
+
+    public function tienda()
+    {
+        return $this->belongsTo(Tienda::class, 'tienda_id');
+    }
+
+    public function tiendas()
+    {
+        return $this->belongsToMany(Tienda::class, 'usuario_tienda', 'usuario_id', 'tienda_id')->withTimestamps();
+    }
 }

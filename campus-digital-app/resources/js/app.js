@@ -58,28 +58,36 @@ window.route = (name, params) => {
         "admin.usuarios.export": "/admin/usuarios/export",
         "admin.usuarios.export-by-role": "/admin/usuarios/export-by-role",
         "admin.usuarios.export-pdf": "/admin/usuarios/export-pdf",
-        "admin.usuarios.export-by-role-pdf":
-            "/admin/usuarios/export-by-role-pdf",
+        "admin.usuarios.export-by-role-pdf": "/admin/usuarios/export-by-role-pdf",
         "admin.reportes.usuarios": "/admin/reportes/usuarios",
         "admin.reportes.accesos": "/admin/reportes/accesos",
         "admin.reportes.actividad": "/admin/reportes/actividad",
+
+        // Tiendas
+        "admin.tiendas.index": "/admin/tiendas",
+        "admin.tiendas.manage": "/admin/tiendas/gestion",
+        "admin.tiendas.store": "/admin/tiendas",
+        "admin.tiendas.update": "/admin/tiendas/:id",
+        "admin.tiendas.destroy": "/admin/tiendas/:id",
+
+        // Proveedores
+        "admin.proveedores.index": "/admin/proveedores",
+        "admin.proveedores.manage": "/admin/proveedores/gestion",
+        "admin.proveedores.asignar": "/admin/proveedores/:id/asignar",
+
+        // Repartidores
+        "admin.repartidores.index": "/admin/repartidores",
+        "admin.repartidores.toggle": "/admin/repartidores/:id/toggle",
+
         "admin.roles.index": "/admin/roles",
-        "admin.bitacora.export-accesos-pdf":
-            "/admin/bitacora/export-accesos-pdf",
-        "admin.bitacora.export-accesos-periodo":
-            "/admin/bitacora/export-accesos-periodo",
-        "admin.bitacora.export-accesos-periodo-pdf":
-            "/admin/bitacora/export-accesos-periodo-pdf",
-        "admin.bitacora.export-actividad-pdf":
-            "/admin/bitacora/export-actividad-pdf",
-        "admin.bitacora.export-actividad-periodo":
-            "/admin/bitacora/export-actividad-periodo",
-        "admin.bitacora.export-actividad-periodo-pdf":
-            "/admin/bitacora/export-actividad-periodo-pdf",
-        "admin.bitacora.export-actividad-modulo":
-            "/admin/bitacora/export-actividad-modulo",
-        "admin.bitacora.export-actividad-modulo-pdf":
-            "/admin/bitacora/export-actividad-modulo-pdf",
+        "admin.bitacora.export-accesos-pdf": "/admin/bitacora/export-accesos-pdf",
+        "admin.bitacora.export-accesos-periodo": "/admin/bitacora/export-accesos-periodo",
+        "admin.bitacora.export-accesos-periodo-pdf": "/admin/bitacora/export-accesos-periodo-pdf",
+        "admin.bitacora.export-actividad-pdf": "/admin/bitacora/export-actividad-pdf",
+        "admin.bitacora.export-actividad-periodo": "/admin/bitacora/export-actividad-periodo",
+        "admin.bitacora.export-actividad-periodo-pdf": "/admin/bitacora/export-actividad-periodo-pdf",
+        "admin.bitacora.export-actividad-modulo": "/admin/bitacora/export-actividad-modulo",
+        "admin.bitacora.export-actividad-modulo-pdf": "/admin/bitacora/export-actividad-modulo-pdf",
         "admin.roles.create": "/admin/roles/create",
         "admin.roles.store": "/admin/roles",
         "admin.roles.show": "/admin/roles/:id",
@@ -209,10 +217,16 @@ window.route = (name, params) => {
         "archivos.marcar-visto": "/archivos/:id/marcar-visto",
         "archivos.desmarcar-visto": "/archivos/:id/desmarcar-visto",
         "archivos.nota": "/archivos/:id/nota",
+
+        "proveedor.operativo.index": "/proveedor/operativo",
+        "proveedor.inventario.index": "/proveedor/inventario",
+        "proveedor.productos.store": "/proveedor/productos",
+        "proveedor.productos.update": "/proveedor/productos/:id",
+        "proveedor.productos.destroy": "/proveedor/productos/:id",
+        "proveedor.reportes.index":  "/proveedor/reportes",
     };
 
     let url = routes[name] || "/";
-
     if (params) {
         if (typeof params === "object") {
             Object.keys(params).forEach((key) => {

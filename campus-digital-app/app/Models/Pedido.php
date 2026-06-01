@@ -17,6 +17,9 @@ class Pedido extends Model
         'numero_folio',
         'estado',
         'modulo',
+        'tienda_id',
+        'tipo_entrega',
+        'repartidor_id',
         'total',
         'descripcion',
         'notas',
@@ -51,6 +54,17 @@ class Pedido extends Model
     public function operador()
     {
         return $this->belongsTo(Usuario::class, 'operador_usuario_id');
+    }
+
+
+    public function tienda()
+    {
+        return $this->belongsTo(Tienda::class, 'tienda_id');
+    }
+
+    public function repartidor()
+    {
+        return $this->belongsTo(Usuario::class, 'repartidor_id');
     }
 
     public function tarjetaLectura()

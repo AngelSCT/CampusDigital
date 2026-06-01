@@ -14,6 +14,35 @@
                 </div>
             </div>
 
+            <!-- Dashboard Hub Navigation Tabs -->
+            <div class="flex border-b border-slate-800 mb-6 gap-2 flex-wrap">
+                <button 
+                    @click="activeAdminTab = 'seguridad'" 
+                    :class="['px-5 py-3 text-xs font-bold uppercase tracking-widest border-b-2 transition-all outline-none', activeAdminTab === 'seguridad' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-300']"
+                >
+                    🛡️ Seguridad y Accesos
+                </button>
+                <button 
+                    @click="activeAdminTab = 'tiendas'" 
+                    :class="['px-5 py-3 text-xs font-bold uppercase tracking-widest border-b-2 transition-all outline-none', activeAdminTab === 'tiendas' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-300']"
+                >
+                    🏪 Red de Tiendas
+                </button>
+                <button 
+                    @click="activeAdminTab = 'proveedores'" 
+                    :class="['px-5 py-3 text-xs font-bold uppercase tracking-widest border-b-2 transition-all outline-none', activeAdminTab === 'proveedores' ? 'border-amber-500 text-amber-400' : 'border-transparent text-slate-500 hover:text-slate-300']"
+                >
+                    👨‍🍳 Proveedores y Menús
+                </button>
+                <button 
+                    @click="activeAdminTab = 'repartidores'" 
+                    :class="['px-5 py-3 text-xs font-bold uppercase tracking-widest border-b-2 transition-all outline-none', activeAdminTab === 'repartidores' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-300']"
+                >
+                    🚴‍♂️ Logística y Repartidores
+                </button>
+            </div>
+
+            <template v-if="activeAdminTab === 'seguridad'">
             <div class="resumen-24h">
                 <div class="resumen-title">Últimas 24 horas</div>
                 <div class="resumen-items">
@@ -425,6 +454,439 @@
                     </div>
                 </div>
             </div>
+            </template>
+            <!-- /seguridad -->
+
+            <!-- ╔═══════════════════════════════════════╗ -->
+            <!-- ║        TAB: RED DE TIENDAS            ║ -->
+            <!-- ╚═══════════════════════════════════════╝ -->
+            <div v-if="activeAdminTab === 'tiendas'" class="space-y-6">
+
+                <!-- KPIs Tiendas -->
+                <div class="kpi-grid">
+                    <div class="kpi-card blue">
+                        <div class="kpi-top">
+                            <div class="kpi-icon blue">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            </div>
+                            <span class="kpi-label">Total Tiendas</span>
+                        </div>
+                        <div class="kpi-number">{{ stats.tiendas_admin?.length ?? 0 }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge green-soft">{{ tiendasActivas }} activas</span>
+                            <span class="kpi-badge red-soft">{{ (stats.tiendas_admin?.length ?? 0) - tiendasActivas }} inactivas</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card green">
+                        <div class="kpi-top">
+                            <div class="kpi-icon green">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <span class="kpi-label">Ingresos Totales</span>
+                        </div>
+                        <div class="kpi-number">${{ formatMonto(totalVentasTiendas) }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge green-soft">pedidos entregados</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card purple">
+                        <div class="kpi-top">
+                            <div class="kpi-icon purple">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            </div>
+                            <span class="kpi-label">Total Productos</span>
+                        </div>
+                        <div class="kpi-number">{{ totalProductosTiendas }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge purple-soft">en catálogos activos</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card amber-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon amber">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            </div>
+                            <span class="kpi-label">Total Pedidos</span>
+                        </div>
+                        <div class="kpi-number">{{ totalPedidosTiendas }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge yellow-soft">entregados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de tiendas -->
+                <div class="content-card wide-card">
+                    <div class="content-header">
+                        <h3 class="content-title">Rendimiento por Tienda</h3>
+                        <span class="header-badge indigo">{{ stats.tiendas_admin?.length ?? 0 }} tiendas</span>
+                    </div>
+                    <div class="content-body">
+                        <div class="activity-table-wrapper">
+                            <table class="activity-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Estado</th>
+                                        <th>Productos</th>
+                                        <th>Pedidos</th>
+                                        <th>Ingresos</th>
+                                        <th>Participación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(t, i) in tiendasOrdenadas" :key="t.id">
+                                        <td><span class="ip-rank" :class="i === 0 ? 'rank-1' : 'rank-n'">#{{ i + 1 }}</span></td>
+                                        <td class="user-col">{{ t.nombre }}</td>
+                                        <td><span class="tipo-pill">{{ t.tipo }}</span></td>
+                                        <td>
+                                            <span class="badge" :class="t.activo ? 'badge-success' : 'badge-error'">{{ t.activo ? 'Activa' : 'Inactiva' }}</span>
+                                        </td>
+                                        <td class="text-center font-bold text-white">{{ t.productos_count }}</td>
+                                        <td class="text-center font-bold text-white">{{ t.total_pedidos_entregados }}</td>
+                                        <td class="text-green font-bold">${{ formatMonto(t.total_ventas) }}</td>
+                                        <td style="min-width:120px">
+                                            <div class="mini-bar-wrap">
+                                                <div class="mini-bar" :style="{ width: totalVentasTiendas > 0 ? (t.total_ventas / totalVentasTiendas * 100).toFixed(1) + '%' : '0%' }"></div>
+                                            </div>
+                                            <span class="mini-pct">{{ totalVentasTiendas > 0 ? (t.total_ventas / totalVentasTiendas * 100).toFixed(1) : 0 }}%</span>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="!stats.tiendas_admin?.length">
+                                        <td colspan="8" class="empty-msg">No hay tiendas registradas</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barras de ventas por tienda -->
+                <div class="content-card">
+                    <div class="content-header"><h3 class="content-title">Ranking de Ingresos por Tienda</h3></div>
+                    <div class="content-body">
+                        <div class="mod-list">
+                            <div v-for="t in tiendasOrdenadas" :key="t.id" class="mod-row">
+                                <span class="mod-name">{{ t.nombre }}</span>
+                                <div class="mod-bar-wrap">
+                                    <div class="mod-bar" :style="{ width: totalVentasTiendas > 0 ? (t.total_ventas / totalVentasTiendas * 100) + '%' : '0%' }"></div>
+                                </div>
+                                <div class="mod-info">
+                                    <span class="mod-val">${{ formatMonto(t.total_ventas) }}</span>
+                                    <span class="mod-count">{{ t.total_pedidos_entregados }} ped.</span>
+                                </div>
+                            </div>
+                            <p v-if="!stats.tiendas_admin?.length" class="empty-msg">Sin datos de ventas</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /tiendas -->
+
+            <!-- ╔══════════════════════════════════════════╗ -->
+            <!-- ║      TAB: PROVEEDORES Y MENÚS            ║ -->
+            <!-- ╚══════════════════════════════════════════╝ -->
+            <div v-if="activeAdminTab === 'proveedores'" class="space-y-6">
+
+                <!-- KPIs Proveedores -->
+                <div class="kpi-grid">
+                    <div class="kpi-card amber-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon amber">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            </div>
+                            <span class="kpi-label">Total Proveedores</span>
+                        </div>
+                        <div class="kpi-number">{{ stats.proveedores_admin?.length ?? 0 }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge yellow-soft">registrados en sistema</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card blue">
+                        <div class="kpi-top">
+                            <div class="kpi-icon blue">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            </div>
+                            <span class="kpi-label">Con Tiendas Asignadas</span>
+                        </div>
+                        <div class="kpi-number">{{ proveedoresConTienda }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge blue-soft">{{ proveedoresSinTienda }} sin tienda</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card green">
+                        <div class="kpi-top">
+                            <div class="kpi-icon green">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                            </div>
+                            <span class="kpi-label">Promedio Tiendas / Prov.</span>
+                        </div>
+                        <div class="kpi-number">{{ promedioTiendasPorProveedor }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge green-soft">tiendas por proveedor</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card purple">
+                        <div class="kpi-top">
+                            <div class="kpi-icon purple">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <span class="kpi-label">Con Acceso Reciente</span>
+                        </div>
+                        <div class="kpi-number">{{ proveedoresActivos }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge purple-soft">en últimos 30 días</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de proveedores -->
+                <div class="content-card wide-card">
+                    <div class="content-header">
+                        <h3 class="content-title">Directorio de Proveedores</h3>
+                        <span class="header-badge amber">{{ stats.proveedores_admin?.length ?? 0 }} proveedores</span>
+                    </div>
+                    <div class="content-body">
+                        <div class="activity-table-wrapper">
+                            <table class="activity-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Tiendas Asignadas</th>
+                                        <th>Nº Tiendas</th>
+                                        <th>Último Acceso</th>
+                                        <th>Cobertura</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(p, i) in stats.proveedores_admin" :key="p.id">
+                                        <td><span class="ip-rank" :class="i === 0 ? 'rank-1' : 'rank-n'">#{{ i + 1 }}</span></td>
+                                        <td>
+                                            <div class="top-user-row" style="gap:0.5rem">
+                                                <div class="top-user-avatar" :class="`avatar-${i % 5}`">{{ provInitials(p.nombre) }}</div>
+                                                <span class="user-col">{{ p.nombre }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="ip-col">{{ p.email }}</td>
+                                        <td style="max-width:200px;white-space:normal;font-size:0.78rem;color:#cbd5e1">
+                                            <span v-if="p.tiendas_nombres">{{ p.tiendas_nombres }}</span>
+                                            <span v-else class="empty-msg" style="padding:0">Sin tienda asignada</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge" :class="p.tiendas_count > 0 ? 'badge-success' : 'badge-error'">{{ p.tiendas_count }}</span>
+                                        </td>
+                                        <td class="date-col">{{ p.ultimo_login ? formatDate(p.ultimo_login) : 'Nunca' }}</td>
+                                        <td style="min-width:120px">
+                                            <div class="mini-bar-wrap">
+                                                <div class="mini-bar amber-bar" :style="{ width: maxTiendasPorProveedor > 0 ? (p.tiendas_count / maxTiendasPorProveedor * 100) + '%' : '0%' }"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="!stats.proveedores_admin?.length">
+                                        <td colspan="7" class="empty-msg">No hay proveedores registrados</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Distribución de cobertura -->
+                <div class="content-grid" style="grid-template-columns: 1fr 1fr">
+                    <div class="content-card">
+                        <div class="content-header"><h3 class="content-title">Cobertura de Tiendas</h3></div>
+                        <div class="content-body">
+                            <div class="mod-list">
+                                <div v-for="p in proveedoresOrdenadosPorTiendas" :key="p.id" class="mod-row">
+                                    <span class="mod-name">{{ p.nombre }}</span>
+                                    <div class="mod-bar-wrap">
+                                        <div class="mod-bar amber" :style="{ width: maxTiendasPorProveedor > 0 ? (p.tiendas_count / maxTiendasPorProveedor * 100) + '%' : '0%' }"></div>
+                                    </div>
+                                    <span class="mod-val">{{ p.tiendas_count }} tiendas</span>
+                                </div>
+                                <p v-if="!stats.proveedores_admin?.length" class="empty-msg">Sin datos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="content-header"><h3 class="content-title">Proveedores sin Tienda Asignada</h3></div>
+                        <div class="content-body">
+                            <div v-if="proveedoresSinTiendaLista.length" class="top-users">
+                                <div v-for="(p, i) in proveedoresSinTiendaLista" :key="p.id" class="top-user-row">
+                                    <div class="top-user-avatar" :class="`avatar-${i % 5}`">{{ provInitials(p.nombre) }}</div>
+                                    <div class="top-user-info">
+                                        <span class="top-user-name">{{ p.nombre }}</span>
+                                        <span class="top-user-email">{{ p.email }}</span>
+                                    </div>
+                                    <span class="badge badge-error">Sin tienda</span>
+                                </div>
+                            </div>
+                            <p v-else class="empty-msg">✓ Todos los proveedores tienen tienda asignada</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /proveedores -->
+
+            <!-- ╔══════════════════════════════════════════╗ -->
+            <!-- ║    TAB: LOGÍSTICA Y REPARTIDORES         ║ -->
+            <!-- ╚══════════════════════════════════════════╝ -->
+            <div v-if="activeAdminTab === 'repartidores'" class="space-y-6">
+
+                <!-- KPIs Repartidores -->
+                <div class="kpi-grid">
+                    <div class="kpi-card green">
+                        <div class="kpi-top">
+                            <div class="kpi-icon green">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <span class="kpi-label">Total Repartidores</span>
+                        </div>
+                        <div class="kpi-number">{{ stats.repartidores_admin?.length ?? 0 }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge green-soft">{{ repartidoresActivos }} con pedidos activos</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card blue">
+                        <div class="kpi-top">
+                            <div class="kpi-icon blue">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <span class="kpi-label">Total Entregas</span>
+                        </div>
+                        <div class="kpi-number">{{ totalEntregas }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge blue-soft">pedidos entregados</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card purple">
+                        <div class="kpi-top">
+                            <div class="kpi-icon purple">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            </div>
+                            <span class="kpi-label">Pedidos Activos</span>
+                        </div>
+                        <div class="kpi-number">{{ totalPedidosActivosRep }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge purple-soft">en proceso ahora</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card amber-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon amber">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            </div>
+                            <span class="kpi-label">Promedio Entregas</span>
+                        </div>
+                        <div class="kpi-number">{{ promedioEntregas }}</div>
+                        <div class="kpi-sub">
+                            <span class="kpi-badge yellow-soft">por repartidor</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de repartidores -->
+                <div class="content-card wide-card">
+                    <div class="content-header">
+                        <h3 class="content-title">Rendimiento de Repartidores</h3>
+                        <span class="header-badge emerald">{{ stats.repartidores_admin?.length ?? 0 }} repartidores</span>
+                    </div>
+                    <div class="content-body">
+                        <div class="activity-table-wrapper">
+                            <table class="activity-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ranking</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Tienda Base</th>
+                                        <th>Entregas</th>
+                                        <th>En Proceso</th>
+                                        <th>Rendimiento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(r, i) in repartidoresOrdenados" :key="r.id">
+                                        <td>
+                                            <span class="rank-badge" :class="i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank-bronze' : 'rank-normal'">{{ i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}` }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="top-user-row" style="gap:0.5rem">
+                                                <div class="top-user-avatar" :class="`avatar-${i % 5}`">{{ provInitials(r.nombre) }}</div>
+                                                <span class="user-col">{{ r.nombre }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="ip-col">{{ r.email }}</td>
+                                        <td style="color:#94a3b8;font-size:0.82rem">{{ r.tienda_nombre }}</td>
+                                        <td class="text-center">
+                                            <span class="kpi-badge green-soft">{{ r.pedidos_entregados }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="kpi-badge" :class="r.pedidos_activos > 0 ? 'yellow-soft' : 'blue-soft'">{{ r.pedidos_activos }}</span>
+                                        </td>
+                                        <td style="min-width:140px">
+                                            <div class="mini-bar-wrap">
+                                                <div class="mini-bar emerald-bar" :style="{ width: totalEntregas > 0 ? (r.pedidos_entregados / Math.max(...(stats.repartidores_admin?.map(x => x.pedidos_entregados) ?? [1])) * 100) + '%' : '0%' }"></div>
+                                            </div>
+                                            <span class="mini-pct">{{ totalEntregas > 0 ? (r.pedidos_entregados / totalEntregas * 100).toFixed(1) : 0 }}%</span>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="!stats.repartidores_admin?.length">
+                                        <td colspan="7" class="empty-msg">No hay repartidores registrados</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ranking visual de repartidores -->
+                <div class="content-grid" style="grid-template-columns: 1fr 1fr">
+                    <div class="content-card">
+                        <div class="content-header"><h3 class="content-title">Ranking de Entregas</h3></div>
+                        <div class="content-body">
+                            <div class="top-users">
+                                <div v-for="(r, i) in repartidoresOrdenados.slice(0, 8)" :key="r.id" class="top-user-row">
+                                    <div class="top-user-avatar" :class="`avatar-${i % 5}`">{{ provInitials(r.nombre) }}</div>
+                                    <div class="top-user-info">
+                                        <span class="top-user-name">{{ r.nombre }}</span>
+                                        <span class="top-user-email">{{ r.tienda_nombre }}</span>
+                                    </div>
+                                    <div class="top-user-bar-wrap">
+                                        <div class="top-user-bar" style="background:linear-gradient(90deg,#059669,#10b981)" :style="{ width: totalEntregas > 0 ? (r.pedidos_entregados / Math.max(...(stats.repartidores_admin?.map(x => x.pedidos_entregados) ?? [1])) * 100) + '%' : '0%' }"></div>
+                                    </div>
+                                    <span class="top-user-count">{{ r.pedidos_entregados }}</span>
+                                </div>
+                                <p v-if="!stats.repartidores_admin?.length" class="empty-msg">Sin repartidores</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="content-header"><h3 class="content-title">Pedidos Activos Ahora</h3></div>
+                        <div class="content-body">
+                            <div v-if="repartidoresConActivos.length" class="top-users">
+                                <div v-for="(r, i) in repartidoresConActivos" :key="r.id" class="top-user-row">
+                                    <div class="top-user-avatar" :class="`avatar-${i % 5}`">{{ provInitials(r.nombre) }}</div>
+                                    <div class="top-user-info">
+                                        <span class="top-user-name">{{ r.nombre }}</span>
+                                        <span class="top-user-email">{{ r.tienda_nombre }}</span>
+                                    </div>
+                                    <span class="badge badge-success">{{ r.pedidos_activos }} activos</span>
+                                </div>
+                            </div>
+                            <p v-else class="empty-msg">🎉 Ningún pedido en proceso ahora</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /repartidores -->
 
         </div>
     </AuthLayout>
@@ -442,6 +904,46 @@ const chartInstances = ref([]);
 const resizeObserver = ref(null);
 
 const props = defineProps({ stats: Object });
+
+const activeAdminTab = ref('seguridad');
+
+// ── Computed: Tab Tiendas ──
+const tiendasActivas = computed(() => props.stats.tiendas_admin?.filter(t => t.activo).length ?? 0);
+const totalVentasTiendas = computed(() => props.stats.tiendas_admin?.reduce((s, t) => s + t.total_ventas, 0) ?? 0);
+const totalProductosTiendas = computed(() => props.stats.tiendas_admin?.reduce((s, t) => s + t.productos_count, 0) ?? 0);
+const totalPedidosTiendas = computed(() => props.stats.tiendas_admin?.reduce((s, t) => s + t.total_pedidos_entregados, 0) ?? 0);
+const tiendasOrdenadas = computed(() => [...(props.stats.tiendas_admin ?? [])].sort((a, b) => b.total_ventas - a.total_ventas));
+
+// ── Computed: Tab Proveedores ──
+const proveedoresConTienda = computed(() => props.stats.proveedores_admin?.filter(p => p.tiendas_count > 0).length ?? 0);
+const proveedoresSinTienda = computed(() => (props.stats.proveedores_admin?.length ?? 0) - proveedoresConTienda.value);
+const proveedoresSinTiendaLista = computed(() => props.stats.proveedores_admin?.filter(p => p.tiendas_count === 0) ?? []);
+const maxTiendasPorProveedor = computed(() => Math.max(...(props.stats.proveedores_admin?.map(p => p.tiendas_count) ?? [1]), 1));
+const promedioTiendasPorProveedor = computed(() => {
+    const arr = props.stats.proveedores_admin ?? [];
+    return arr.length ? (arr.reduce((s, p) => s + p.tiendas_count, 0) / arr.length).toFixed(1) : 0;
+});
+const proveedoresActivos = computed(() => props.stats.proveedores_admin?.filter(p => {
+    if (!p.ultimo_login) return false;
+    return (Date.now() - new Date(p.ultimo_login).getTime()) < 30 * 24 * 3600 * 1000;
+}).length ?? 0);
+const proveedoresOrdenadosPorTiendas = computed(() => [...(props.stats.proveedores_admin ?? [])].sort((a, b) => b.tiendas_count - a.tiendas_count));
+
+// ── Computed: Tab Repartidores ──
+const totalEntregas = computed(() => props.stats.repartidores_admin?.reduce((s, r) => s + r.pedidos_entregados, 0) ?? 0);
+const totalPedidosActivosRep = computed(() => props.stats.repartidores_admin?.reduce((s, r) => s + r.pedidos_activos, 0) ?? 0);
+const repartidoresActivos = computed(() => props.stats.repartidores_admin?.filter(r => r.pedidos_activos > 0).length ?? 0);
+const repartidoresConActivos = computed(() => (props.stats.repartidores_admin ?? []).filter(r => r.pedidos_activos > 0).sort((a, b) => b.pedidos_activos - a.pedidos_activos));
+const repartidoresOrdenados = computed(() => [...(props.stats.repartidores_admin ?? [])].sort((a, b) => b.pedidos_entregados - a.pedidos_entregados));
+const promedioEntregas = computed(() => {
+    const arr = props.stats.repartidores_admin ?? [];
+    return arr.length ? (totalEntregas.value / arr.length).toFixed(1) : 0;
+});
+
+function provInitials(nombre) {
+    const parts = (nombre ?? '').split(' ');
+    return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase();
+}
 
 const chartAccesos    = ref(null);
 const chartModulos    = ref(null);
@@ -664,6 +1166,33 @@ onUnmounted(() => {
 .kpi-link{font-size:0.8rem;font-weight:600;text-decoration:none;transition:opacity 0.2s}
 .kpi-link:hover{opacity:0.75}
 .kpi-link.blue{color:#60a5fa} .kpi-link.green{color:#4ade80} .kpi-link.red{color:#f87171} .kpi-link.purple{color:#c084fc}
+
+/* Extra KPI card colors */
+.kpi-card.amber-card{border-color:rgba(245,158,11,0.4)}
+.kpi-icon.amber{background:linear-gradient(135deg,#b45309,#f59e0b);box-shadow:0 6px 16px rgba(180,83,9,0.4)}
+
+/* Header badges */
+.header-badge{font-size:0.7rem;font-weight:700;padding:0.2rem 0.75rem;border-radius:999px;border:1px solid}
+.header-badge.red{background:rgba(239,68,68,0.15);color:#fca5a5;border-color:rgba(239,68,68,0.3)}
+.header-badge.indigo{background:rgba(99,102,241,0.15);color:#a5b4fc;border-color:rgba(99,102,241,0.3)}
+.header-badge.amber{background:rgba(245,158,11,0.15);color:#fde68a;border-color:rgba(245,158,11,0.3)}
+.header-badge.emerald{background:rgba(16,185,129,0.15);color:#6ee7b7;border-color:rgba(16,185,129,0.3)}
+
+/* Mini bar for table column */
+.mini-bar-wrap{height:6px;background:rgba(30,58,138,0.3);border-radius:999px;overflow:hidden;margin-bottom:2px}
+.mini-bar{height:100%;background:linear-gradient(90deg,#1e40af,#3b82f6);border-radius:999px;transition:width 0.6s}
+.mini-bar.amber-bar{background:linear-gradient(90deg,#b45309,#f59e0b)}
+.mini-bar.emerald-bar{background:linear-gradient(90deg,#059669,#10b981)}
+.mini-pct{font-size:0.65rem;color:#475569}
+
+/* Tipo pill */
+.tipo-pill{font-size:0.7rem;font-weight:600;padding:0.15rem 0.6rem;border-radius:999px;background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.25);text-transform:capitalize}
+
+/* Rank badge */
+.rank-badge{font-size:0.85rem;font-weight:700}
+.text-center{text-align:center}
+.text-green{color:#4ade80}
+.font-bold{font-weight:700}
 
 .meta-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.875rem; margin-bottom:2rem; background:#1e293b; border:1px solid rgba(30,58,138,0.4); border-radius:1rem; padding:1.25rem; }
 .meta-item{display:flex;align-items:center;gap:0.75rem}
