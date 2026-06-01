@@ -1,6 +1,6 @@
 <?php
 
-//RUTAS DE LA API REST DE LA APLICACION
+//RUTAS DE LA API REST DE LA APLICACION ANADIR EN EL ORDEN CORRESPONDIENTE PORFAVOR
 
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +32,9 @@ use App\Http\Controllers\Api\TarjetaLecturaApiController;
 use App\Http\Controllers\Api\SaldoMonederoApiController;
 use App\Http\Controllers\Api\SaldoMovimientoApiController;
 use App\Http\Controllers\Api\PedidoApiController;
+
+// MODULO RECARGAS (US2)
+use App\Http\Controllers\Api\RecargaApiController;
 
 // RUTAS EXTRA CON UID Y EL PIN
 use App\Http\Controllers\Api\RfidApiController;
@@ -104,6 +107,12 @@ Route::middleware('api.key')->group(function () {
     Route::delete('pedidos/{id}',                   [PedidoApiController::class, 'destroy']);
     Route::post  ('pedidos/{id}/estado',            [PedidoApiController::class, 'cambiarEstado']);
     Route::post  ('pedidos/{id}/confirmar-tarjeta', [PedidoApiController::class, 'confirmarConTarjeta']);
+
+    // ── RECARGAS (US2) ──────────────────────────────────────────────────────────
+    Route::get ('recargas',                      [RecargaApiController::class, 'index']);
+    Route::post('recargas',                      [RecargaApiController::class, 'store']);
+    Route::get ('recargas/{id}',                 [RecargaApiController::class, 'show']);
+    Route::get ('recargas/usuario/{usuario_id}', [RecargaApiController::class, 'porUsuario']);
 });
 
 

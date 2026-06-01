@@ -1,8 +1,31 @@
 import "./bootstrap";
+import * as api from "./services/api";
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import clickAway from "./directives/clickAway";
+
+//AXIOS ACTIVADO EXPLICITO PARA DEV - AXIOS YA ESTA CONFIGURADIO DESDE BOOTSTRAP.JS
+if (import.meta.env.DEV) {
+    const apiKey = import.meta.env.VITE_API_KEY;
+    const headers = { 'X-API-KEY': apiKey };
+
+    window.axios.get('/api/v1/usuarios', { params: { per_page: 5 }, headers })
+        .then(r => console.info('[Axios] GET /api/v1/usuarios →', r.data))
+        .catch(e => console.error('[Axios] GET /api/v1/usuarios ✗', e.response?.data));
+
+    window.axios.get('/api/v1/tarjetas', { params: { per_page: 5 }, headers })
+        .then(r => console.info('[Axios] GET /api/v1/tarjetas →', r.data))
+        .catch(e => console.error('[Axios] GET /api/v1/tarjetas ✗', e.response?.data));
+
+    window.axios.get('/api/v1/sesiones', { params: { per_page: 5 }, headers })
+        .then(r => console.info('[Axios] GET /api/v1/sesiones →', r.data))
+        .catch(e => console.error('[Axios] GET /api/v1/sesiones ✗', e.response?.data));
+
+    window.axios.get('/api/v1/roles', { headers })
+        .then(r => console.info('[Axios] GET /api/v1/roles →', r.data))
+        .catch(e => console.error('[Axios] GET /api/v1/roles ✗', e.response?.data));
+}
 
 const appName = import.meta.env.VITE_APP_NAME || "Campus Digital";
 
@@ -214,6 +237,7 @@ createInertiaApp({
         const app = createApp({ render: () => h(App, props) }).use(plugin);
 
         app.config.globalProperties.route = window.route;
+        app.config.globalProperties.$api = api;
         app.directive("click-away", clickAway);
 
         return app.mount(el);
