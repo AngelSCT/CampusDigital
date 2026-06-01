@@ -134,7 +134,7 @@ Route::prefix('rfid')->group(function () {
 });
 
 // ── MÓDULO 4.2: MONEDERO DIGITAL (ADMIN) ──────────────────────────────────────
-Route::prefix('admin/monedero')->middleware(['auth:sanctum', 'admin'])->group(function () {
+Route::prefix('admin/monedero')->middleware(['auth:sanctum', 'admin:administrador'])->group(function () {
     // Analytics
     Route::get('analytics/dashboard',       [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'dashboard']);
     Route::get('analytics/top-usuarios',    [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'topUsuarios']);
@@ -151,7 +151,7 @@ Route::prefix('admin/monedero')->middleware(['auth:sanctum', 'admin'])->group(fu
     Route::get('exportes/estado-cuenta/csv', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportEstadoCuentaCSV']);
     Route::get('exportes/movimientos/pdf',   [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportMovimientosPDF']);
     Route::get('exportes/movimientos/csv',   [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportMovimientosCSV']);
-    Route::get('exportes/uso-categoria/pdf', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportUsoCategoriaaPDF']);
+    Route::get('exportes/uso-categoria/pdf', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportUsoCategoriaPDF']);
     Route::get('exportes/uso-categoria/csv', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportUsoCategoriaCSV']);
 
     // Reglas (CRUD)

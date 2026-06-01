@@ -43,7 +43,7 @@ class MonederoExportService
     /**
      * Genera datos para exportar reporte de movimientos
      */
-    public function generarReporteMovimientos(?Carbon $desde = null, ?Carbon $hasta = null, ?string $modulo = null): array
+    public function generarReporteMovimientos(?int $usuarioId = null, ?Carbon $desde = null, ?Carbon $hasta = null, ?string $modulo = null): array
     {
         $desde = $desde ?? now()->subDays(30);
         $hasta = $hasta ?? now();
@@ -51,6 +51,10 @@ class MonederoExportService
         $query = SaldoMovimiento::with('usuario')
             ->whereBetween('created_at', [$desde, $hasta])
             ->orderByDesc('created_at');
+
+        if ($usuarioId) {
+            $query->where('usuario_id', $usuarioId);
+        }
 
         if ($modulo) {
             $query->where('modulo', $modulo);
@@ -63,6 +67,7 @@ class MonederoExportService
                 'desde' => $desde->format('Y-m-d'),
                 'hasta' => $hasta->format('Y-m-d'),
             ],
+            'usuario_id' => $usuarioId,
             'modulo' => $modulo,
             'movimientos' => $movimientos,
             'resumen' => [
@@ -77,7 +82,7 @@ class MonederoExportService
     /**
      * Genera datos para exportar reporte de uso por categoría
      */
-    public function generarReporteUsoPorCategoria(?Carbon $desde = null, ?Carbon $hasta = null): array
+    public function generarReporteUsoPorCategoria(?int $usuarioId = null, ?Carbon $desde = null, ?Carbon $hasta = null, ?string $modulo = null): array
     {
         $desde = $desde ?? now()->subDays(30);
         $hasta = $hasta ?? now();
@@ -90,8 +95,17 @@ class MonederoExportService
                 DB::raw('SUM(CASE WHEN tipo = \'abono\' THEN monto ELSE 0 END) as total_abono'),
                 DB::raw('COUNT(DISTINCT usuario_id) as usuarios_unicos')
             )
-            ->whereBetween('created_at', [$desde, $hasta])
-            ->groupBy('modulo')
+            ->whereBetween('created_at', [$desde, $hasta]);
+
+        if ($usuarioId) {
+            $categorias->where('usuario_id', $usuarioId);
+        }
+
+        if ($modulo) {
+            $categorias->where('modulo', $modulo);
+        }
+
+        $categorias = $categorias->groupBy('modulo')
             ->orderByDesc('total_cargo')
             ->get();
 
@@ -107,6 +121,8 @@ class MonederoExportService
                 'desde' => $desde->format('Y-m-d'),
                 'hasta' => $hasta->format('Y-m-d'),
             ],
+            'usuario_id' => $usuarioId,
+            'modulo' => $modulo,
             'categorias' => $categorias,
             'total_general' => $totalGeneral,
         ];

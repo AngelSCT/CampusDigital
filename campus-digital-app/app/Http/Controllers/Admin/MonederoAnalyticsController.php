@@ -6,6 +6,7 @@ use App\Services\MonederoAnalyticsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Http\Controllers\Controller;
 
 class MonederoAnalyticsController extends Controller
 {

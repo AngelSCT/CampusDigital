@@ -1,262 +1,144 @@
 <template>
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Gestión de Monedero Digital
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                Dashboard de Monedero Digital
             </h2>
         </template>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <!-- FILTROS -->
-                <div
-                    class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6"
-                >
-                    <div class="p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-1"
-                                    >Fecha Inicio</label
-                                >
-                                <input
-                                    type="date"
-                                    v-model="filters.desde"
-                                    @change="loadData"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-1"
-                                    >Fecha Fin</label
-                                >
-                                <input
-                                    type="date"
-                                    v-model="filters.hasta"
-                                    @change="loadData"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-1"
-                                    >Módulo</label
-                                >
-                                <select
-                                    v-model="filters.modulo"
-                                    @change="loadData"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
-                                >
-                                    <option value="">Todos</option>
-                                    <option value="cafeteria">Cafetería</option>
-                                    <option value="copias">
-                                        Copias/Impresiones
-                                    </option>
-                                    <option value="souvenirs">Souvenirs</option>
-                                    <option value="biblioteca">
-                                        Biblioteca
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="flex items-end">
-                                <button
-                                    @click="loadData"
-                                    class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                                >
-                                    Filtrar
-                                </button>
-                            </div>
+        <div class="space-y-6">
+            <!-- FILTROS -->
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700">
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-1">Fecha Inicio</label>
+                            <input
+                                type="date"
+                                v-model="filters.desde"
+                                @change="loadData"
+                                class="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-1">Fecha Fin</label>
+                            <input
+                                type="date"
+                                v-model="filters.hasta"
+                                @change="loadData"
+                                class="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-1">Módulo</label>
+                            <select
+                                v-model="filters.modulo"
+                                @change="loadData"
+                                class="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                            >
+                                <option value="">Todos</option>
+                                <option value="cafeteria">Cafetería</option>
+                                <option value="copias">Copias/Impresiones</option>
+                                <option value="souvenirs">Souvenirs</option>
+                                <option value="biblioteca">Biblioteca</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button
+                                @click="loadData"
+                                class="flex-1 px-4 py-2 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-lg text-sm font-medium text-white shadow-lg shadow-cyan-500/20 hover:shadow-xl hover:shadow-cyan-500/30 transition-all duration-200"
+                            >
+                                Filtrar
+                            </button>
+                            <button
+                                @click="limpiarFiltros"
+                                class="flex-1 px-4 py-2 bg-gradient-to-br from-red-600 to-rose-600 rounded-lg text-sm font-medium text-white shadow-lg shadow-red-500/20 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-200"
+                            >
+                                Limpiar
+                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
 
                 <!-- KPI CARDS -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div
-                        class="bg-blue-50 overflow-hidden shadow-sm sm:rounded-lg p-6"
-                    >
-                        <h3 class="text-sm font-medium text-gray-700">
-                            Saldo Total Administrado
-                        </h3>
-                        <p class="text-3xl font-bold text-blue-600 mt-2">
-                            ${{ formatCurrency(kpis.saldoTotal) }}
-                        </p>
-                        <p class="text-xs text-gray-600 mt-1">
-                            Saldo disponible
-                        </p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-800 border border-blue-500/30 rounded-xl p-6">
+                        <h3 class="text-sm font-medium text-slate-300">Saldo Total Administrado</h3>
+                        <p class="text-3xl font-bold text-blue-400 mt-2">{{ formatCurrency(kpis.saldoTotal) }}</p>
+                        <p class="text-xs text-slate-400 mt-1">Saldo disponible</p>
                     </div>
-                    <div
-                        class="bg-green-50 overflow-hidden shadow-sm sm:rounded-lg p-6"
-                    >
-                        <h3 class="text-sm font-medium text-gray-700">
-                            Total Cargado
-                        </h3>
-                        <p class="text-3xl font-bold text-green-600 mt-2">
-                            ${{ formatCurrency(kpis.totalAbonos) }}
-                        </p>
-                        <p class="text-xs text-gray-600 mt-1">
-                            Recargas exitosas
-                        </p>
+                    <div class="bg-slate-800 border border-green-500/30 rounded-xl p-6">
+                        <h3 class="text-sm font-medium text-slate-300">Total Cargado</h3>
+                        <p class="text-3xl font-bold text-green-400 mt-2">{{ formatCurrency(kpis.totalAbonos) }}</p>
+                        <p class="text-xs text-slate-400 mt-1">Recargas exitosas</p>
                     </div>
-                    <div
-                        class="bg-red-50 overflow-hidden shadow-sm sm:rounded-lg p-6"
-                    >
-                        <h3 class="text-sm font-medium text-gray-700">
-                            Total Gastado
-                        </h3>
-                        <p class="text-3xl font-bold text-red-600 mt-2">
-                            ${{ formatCurrency(kpis.totalCargos) }}
-                        </p>
-                        <p class="text-xs text-gray-600 mt-1">En el período</p>
+                    <div class="bg-slate-800 border border-red-500/30 rounded-xl p-6">
+                        <h3 class="text-sm font-medium text-slate-300">Total Gastado</h3>
+                        <p class="text-3xl font-bold text-red-400 mt-2">{{ formatCurrency(kpis.totalCargos) }}</p>
+                        <p class="text-xs text-slate-400 mt-1">En el período</p>
                     </div>
-                    <div
-                        class="bg-purple-50 overflow-hidden shadow-sm sm:rounded-lg p-6"
-                    >
-                        <h3 class="text-sm font-medium text-gray-700">
-                            Usuarios Activos
-                        </h3>
-                        <p class="text-3xl font-bold text-purple-600 mt-2">
-                            {{ kpis.usuariosActivos }}
-                        </p>
-                        <p class="text-xs text-gray-600 mt-1">
-                            Con movimientos
-                        </p>
+                    <div class="bg-slate-800 border border-purple-500/30 rounded-xl p-6">
+                        <h3 class="text-sm font-medium text-slate-300">Usuarios Activos</h3>
+                        <p class="text-3xl font-bold text-purple-400 mt-2">{{ kpis.usuariosActivos }}</p>
+                        <p class="text-xs text-slate-400 mt-1">Con movimientos</p>
                     </div>
                 </div>
 
                 <!-- GRÁFICOS -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <!-- Pie Chart -->
-                    <div
-                        class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6"
-                    >
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                            Distribución: Cargos vs Abonos
-                        </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-white mb-4">Distribución: Cargos vs Abonos</h3>
                         <canvas id="pieChart" class="max-w-sm mx-auto"></canvas>
                     </div>
-
-                    <!-- Line Chart -->
-                    <div
-                        class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6"
-                    >
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                            Evolución del Saldo Total
-                        </h3>
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-white mb-4">Evolución del Saldo Total</h3>
                         <canvas id="lineChart"></canvas>
                     </div>
                 </div>
 
-                <!-- TOP USUARIOS -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <div
-                        class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6"
-                    >
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                            Top 10 Usuarios por Consumo
-                        </h3>
+                <!-- TOP USUARIOS + CONSUMO POR MÓDULO -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-white mb-4">Top 10 Usuarios por Consumo</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
-                                <thead class="bg-gray-50 border-b">
+                                <thead class="bg-slate-700/50 border-b border-slate-600">
                                     <tr>
-                                        <th
-                                            class="px-4 py-2 text-left font-medium text-gray-700"
-                                        >
-                                            Usuario
-                                        </th>
-                                        <th
-                                            class="px-4 py-2 text-right font-medium text-gray-700"
-                                        >
-                                            Consumo
-                                        </th>
-                                        <th
-                                            class="px-4 py-2 text-right font-medium text-gray-700"
-                                        >
-                                            Transacciones
-                                        </th>
+                                        <th class="px-4 py-2 text-left font-medium text-slate-300 uppercase text-xs tracking-wider">Usuario</th>
+                                        <th class="px-4 py-2 text-right font-medium text-slate-300 uppercase text-xs tracking-wider">Consumo</th>
+                                        <th class="px-4 py-2 text-right font-medium text-slate-300 uppercase text-xs tracking-wider">Transacciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr
-                                        v-for="(user, idx) in topUsuarios"
-                                        :key="idx"
-                                        class="border-b hover:bg-gray-50"
-                                    >
-                                        <td class="px-4 py-3">
-                                            {{ user.nombre }}
-                                        </td>
-                                        <td
-                                            class="px-4 py-3 text-right font-semibold"
-                                        >
-                                            ${{
-                                                formatCurrency(
-                                                    user.total_consumo,
-                                                )
-                                            }}
-                                        </td>
-                                        <td class="px-4 py-3 text-right">
-                                            {{ user.cantidad_movimientos }}
-                                        </td>
+                                    <tr v-for="(user, idx) in topUsuarios" :key="idx" class="border-b border-slate-700 hover:bg-slate-700/30">
+                                        <td class="px-4 py-3 text-slate-200">{{ user.nombre }}</td>
+                                        <td class="px-4 py-3 text-right font-semibold text-slate-200">{{ formatCurrency(user.total_consumo) }}</td>
+                                        <td class="px-4 py-3 text-right text-slate-200">{{ user.cantidad_movimientos }}</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- CONSUMO POR MÓDULO -->
-                    <div
-                        class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6"
-                    >
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                            Consumo por Categoría
-                        </h3>
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-white mb-4">Consumo por Categoría</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
-                                <thead class="bg-gray-50 border-b">
+                                <thead class="bg-slate-700/50 border-b border-slate-600">
                                     <tr>
-                                        <th
-                                            class="px-4 py-2 text-left font-medium text-gray-700"
-                                        >
-                                            Categoría
-                                        </th>
-                                        <th
-                                            class="px-4 py-2 text-right font-medium text-gray-700"
-                                        >
-                                            Monto
-                                        </th>
-                                        <th
-                                            class="px-4 py-2 text-right font-medium text-gray-700"
-                                        >
-                                            Transacciones
-                                        </th>
-                                        <th
-                                            class="px-4 py-2 text-right font-medium text-gray-700"
-                                        >
-                                            %
-                                        </th>
+                                        <th class="px-4 py-2 text-left font-medium text-slate-300 uppercase text-xs tracking-wider">Categoría</th>
+                                        <th class="px-4 py-2 text-right font-medium text-slate-300 uppercase text-xs tracking-wider">Monto</th>
+                                        <th class="px-4 py-2 text-right font-medium text-slate-300 uppercase text-xs tracking-wider">Transacciones</th>
+                                        <th class="px-4 py-2 text-right font-medium text-slate-300 uppercase text-xs tracking-wider">%</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr
-                                        v-for="(modulo, idx) in consumoModulos"
-                                        :key="idx"
-                                        class="border-b hover:bg-gray-50"
-                                    >
-                                        <td class="px-4 py-3">
-                                            {{ modulo.modulo }}
-                                        </td>
-                                        <td
-                                            class="px-4 py-3 text-right font-semibold"
-                                        >
-                                            ${{ formatCurrency(modulo.monto) }}
-                                        </td>
-                                        <td class="px-4 py-3 text-right">
-                                            {{ modulo.cantidad }}
-                                        </td>
-                                        <td class="px-4 py-3 text-right">
-                                            {{ modulo.porcentaje }}%
-                                        </td>
+                                    <tr v-for="(modulo, idx) in consumoModulos" :key="idx" class="border-b border-slate-700 hover:bg-slate-700/30">
+                                        <td class="px-4 py-3 text-slate-200 font-medium">{{ modulo.modulo }}</td>
+                                        <td class="px-4 py-3 text-right font-semibold text-slate-200">{{ formatCurrency(modulo.monto) }}</td>
+                                        <td class="px-4 py-3 text-right text-slate-200">{{ modulo.cantidad }}</td>
+                                        <td class="px-4 py-3 text-right text-slate-200">{{ modulo.porcentaje }}%</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -265,96 +147,39 @@
                 </div>
 
                 <!-- ÚLTIMOS MOVIMIENTOS -->
-                <div
-                    class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6"
-                >
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                        Últimos 20 Movimientos
-                    </h3>
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">Últimos 20 Movimientos</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
-                            <thead class="bg-gray-50 border-b">
+                            <thead class="bg-slate-700/50 border-b border-slate-600">
                                 <tr>
-                                    <th
-                                        class="px-4 py-2 text-left font-medium text-gray-700"
-                                    >
-                                        Fecha
-                                    </th>
-                                    <th
-                                        class="px-4 py-2 text-left font-medium text-gray-700"
-                                    >
-                                        Usuario
-                                    </th>
-                                    <th
-                                        class="px-4 py-2 text-left font-medium text-gray-700"
-                                    >
-                                        Tipo
-                                    </th>
-                                    <th
-                                        class="px-4 py-2 text-left font-medium text-gray-700"
-                                    >
-                                        Módulo
-                                    </th>
-                                    <th
-                                        class="px-4 py-2 text-left font-medium text-gray-700"
-                                    >
-                                        Concepto
-                                    </th>
-                                    <th
-                                        class="px-4 py-2 text-right font-medium text-gray-700"
-                                    >
-                                        Monto
-                                    </th>
-                                    <th
-                                        class="px-4 py-2 text-right font-medium text-gray-700"
-                                    >
-                                        Saldo Nuevo
-                                    </th>
+                                    <th class="px-4 py-2 text-left font-medium text-slate-300 uppercase text-xs tracking-wider">Fecha</th>
+                                    <th class="px-4 py-2 text-left font-medium text-slate-300 uppercase text-xs tracking-wider">Usuario</th>
+                                    <th class="px-4 py-2 text-left font-medium text-slate-300 uppercase text-xs tracking-wider">Tipo</th>
+                                    <th class="px-4 py-2 text-left font-medium text-slate-300 uppercase text-xs tracking-wider">Módulo</th>
+                                    <th class="px-4 py-2 text-left font-medium text-slate-300 uppercase text-xs tracking-wider">Concepto</th>
+                                    <th class="px-4 py-2 text-right font-medium text-slate-300 uppercase text-xs tracking-wider">Monto</th>
+                                    <th class="px-4 py-2 text-right font-medium text-slate-300 uppercase text-xs tracking-wider">Saldo Nuevo</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr
-                                    v-for="mov in ultimosMovimientos"
-                                    :key="mov.id"
-                                    class="border-b hover:bg-gray-50"
-                                >
+                                <tr v-for="mov in ultimosMovimientos" :key="mov.id" class="border-b border-slate-700 hover:bg-slate-700/30">
+                                    <td class="px-4 py-3 text-slate-200">{{ formatDate(mov.created_at) }}</td>
+                                    <td class="px-4 py-3 text-slate-200">{{ mov.usuario.nombre }}</td>
                                     <td class="px-4 py-3">
-                                        {{ formatDate(mov.created_at) }}
+                                        <span v-if="mov.tipo === 'abono'" class="text-green-400 font-semibold">✓ Abono</span>
+                                        <span v-else class="text-red-400 font-semibold">✗ Cargo</span>
                                     </td>
-                                    <td class="px-4 py-3">
-                                        {{ mov.usuario.nombre }}
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <span
-                                            v-if="mov.tipo === 'abono'"
-                                            class="text-green-600 font-semibold"
-                                            >✓ Abono</span
-                                        >
-                                        <span
-                                            v-else
-                                            class="text-red-600 font-semibold"
-                                            >✗ Cargo</span
-                                        >
-                                    </td>
-                                    <td class="px-4 py-3">{{ mov.modulo }}</td>
-                                    <td class="px-4 py-3">
-                                        {{ mov.concepto }}
-                                    </td>
-                                    <td
-                                        class="px-4 py-3 text-right font-semibold"
-                                    >
-                                        ${{ formatCurrency(mov.monto) }}
-                                    </td>
-                                    <td class="px-4 py-3 text-right">
-                                        ${{ formatCurrency(mov.saldo_nuevo) }}
-                                    </td>
+                                    <td class="px-4 py-3 text-slate-200">{{ mov.modulo }}</td>
+                                    <td class="px-4 py-3 text-slate-200">{{ mov.concepto }}</td>
+                                    <td class="px-4 py-3 text-right font-semibold text-slate-200">{{ formatCurrency(mov.monto) }}</td>
+                                    <td class="px-4 py-3 text-right text-slate-200">{{ formatCurrency(mov.saldo_nuevo) }}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-        </div>
     </AuthenticatedLayout>
 </template>
 
@@ -402,7 +227,7 @@ function formatDate(date) {
 async function loadData() {
     try {
         const response = await axios.get(
-            "/api/admin/monedero/analytics/dashboard",
+            "/api/v1/admin/monedero/analytics/dashboard",
             {
                 params: filters.value,
             },
@@ -419,7 +244,19 @@ async function loadData() {
     }
 }
 
+function limpiarFiltros() {
+    filters.value = {
+        desde: getFecha30DiasAtras(),
+        hasta: new Date().toISOString().split("T")[0],
+        modulo: "",
+    };
+    loadData();
+}
+
 function renderCharts(data) {
+    const gc = 'rgba(30,58,138,0.18)';
+    const tc = '#94a3b8';
+
     // Pie Chart
     if (charts.value.pie) charts.value.pie.destroy();
     charts.value.pie = new Chart(document.getElementById("pieChart"), {
@@ -430,7 +267,7 @@ function renderCharts(data) {
                 {
                     data: [data.totalCargos, data.totalAbonos],
                     backgroundColor: ["#ef4444", "#22c55e"],
-                    borderColor: ["#ffffff", "#ffffff"],
+                    borderColor: ["#1e293b", "#1e293b"],
                     borderWidth: 2,
                 },
             ],
@@ -440,6 +277,7 @@ function renderCharts(data) {
             plugins: {
                 legend: {
                     position: "bottom",
+                    labels: { color: tc },
                 },
             },
         },
@@ -460,6 +298,8 @@ function renderCharts(data) {
                     fill: true,
                     tension: 0.4,
                     borderWidth: 2,
+                    pointBackgroundColor: "#3b82f6",
+                    pointRadius: 3,
                 },
             ],
         },
@@ -468,10 +308,17 @@ function renderCharts(data) {
             plugins: {
                 legend: {
                     position: "top",
+                    labels: { color: tc },
                 },
             },
             scales: {
+                x: {
+                    grid: { color: gc },
+                    ticks: { color: tc },
+                },
                 y: {
+                    grid: { color: gc },
+                    ticks: { color: tc },
                     beginAtZero: true,
                 },
             },
@@ -484,6 +331,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-/* Estilos adicionales si es necesario */
-</style>
+

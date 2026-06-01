@@ -212,12 +212,12 @@ async function guardarRegla() {
         if (props.regla) {
             // Actualizar
             await axios.put(
-                `/api/admin/monedero/reglas/${props.regla.id}`,
+                `/admin/monedero/reglas/${props.regla.id}`,
                 form.value,
             );
         } else {
             // Crear
-            await axios.post("/api/admin/monedero/reglas", form.value);
+            await axios.post("/admin/monedero/reglas", form.value);
         }
         window.location.href = "/admin/monedero/reglas";
     } catch (error) {

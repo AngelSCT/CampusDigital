@@ -112,6 +112,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // ── MONEDERO / RECARGAS ──────────────────────────────────────
     Route::prefix('monedero')->name('monedero.')->group(function () {
+        Route::get('/mi-saldo',  [RecargaController::class, 'miSaldo'])->name('mi-saldo');
         Route::get('/recargas',  [RecargaController::class, 'index'])->name('recargas');
         Route::post('/recargas', [RecargaController::class, 'store'])->name('recargas.store');
     });
@@ -384,6 +385,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{historialTicket}',   [HistorialTicketController::class, 'show'])->name('show');
             Route::put('/{historialTicket}',   [HistorialTicketController::class, 'update'])->name('update');
             Route::delete('/{historialTicket}',[HistorialTicketController::class, 'destroy'])->name('destroy');
+        });
 
         // ── MÓDULO 4.2: MONEDERO DIGITAL ──────────────────────────────────────
         Route::prefix('monedero')->name('monedero.')->group(function () {
@@ -402,7 +404,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('/estado-cuenta/csv', [App\Http\Controllers\Admin\MonederoReportesController::class, 'exportEstadoCuentaCSV'])->name('estado-cuenta-csv');
                 Route::get('/movimientos/pdf',   [App\Http\Controllers\Admin\MonederoReportesController::class, 'exportMovimientosPDF'])->name('movimientos-pdf');
                 Route::get('/movimientos/csv',   [App\Http\Controllers\Admin\MonederoReportesController::class, 'exportMovimientosCSV'])->name('movimientos-csv');
-                Route::get('/uso-categoria/pdf', [App\Http\Controllers\Admin\MonederoReportesController::class, 'exportUsoCategoriaaPDF'])->name('uso-categoria-pdf');
+                Route::get('/uso-categoria/pdf', [App\Http\Controllers\Admin\MonederoReportesController::class, 'exportUsoCategoriaPDF'])->name('uso-categoria-pdf');
                 Route::get('/uso-categoria/csv', [App\Http\Controllers\Admin\MonederoReportesController::class, 'exportUsoCategoriaCSV'])->name('uso-categoria-csv');
             });
 

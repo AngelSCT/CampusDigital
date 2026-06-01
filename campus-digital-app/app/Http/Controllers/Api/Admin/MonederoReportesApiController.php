@@ -42,6 +42,7 @@ class MonederoReportesApiController extends Controller
     public function movimientos(Request $request)
     {
         $request->validate([
+            'usuario_id' => 'integer|exists:usuario,id|nullable',
             'desde' => 'date',
             'hasta' => 'date|after_or_equal:desde',
             'modulo' => 'string|nullable',
@@ -51,6 +52,7 @@ class MonederoReportesApiController extends Controller
         $hasta = $request->hasta ? Carbon::parse($request->hasta) : now();
 
         $datos = $this->exportService->generarReporteMovimientos(
+            $request->usuario_id,
             $desde,
             $hasta,
             $request->modulo
@@ -65,14 +67,21 @@ class MonederoReportesApiController extends Controller
     public function usoCategoria(Request $request)
     {
         $request->validate([
+            'usuario_id' => 'integer|exists:usuario,id|nullable',
             'desde' => 'date',
             'hasta' => 'date|after_or_equal:desde',
+            'modulo' => 'string|nullable',
         ]);
 
         $desde = $request->desde ? Carbon::parse($request->desde) : now()->subDays(30);
         $hasta = $request->hasta ? Carbon::parse($request->hasta) : now();
 
-        $datos = $this->exportService->generarReporteUsoPorCategoria($desde, $hasta);
+        $datos = $this->exportService->generarReporteUsoPorCategoria(
+            $request->usuario_id,
+            $desde,
+            $hasta,
+            $request->modulo
+        );
 
         return response()->json($datos);
     }
@@ -91,14 +100,20 @@ class MonederoReportesApiController extends Controller
         $desde = $request->desde ? Carbon::parse($request->desde) : now()->subDays(30);
         $hasta = $request->hasta ? Carbon::parse($request->hasta) : now();
 
-        $datos = $this->exportService->generarEstadoCuenta(
+        $reporte = $this->exportService->generarEstadoCuenta(
             $request->usuario_id,
             $desde,
             $hasta
         );
 
-        // TODO: Implementar generación de PDF con DomPDF
-        return response()->json(['mensaje' => 'PDF generado', 'datos' => $datos]);
+        $pdf = \PDF::loadView('pdf.monedero.estado-cuenta', [
+            'reporte'      => $reporte,
+            'titulo'       => 'Estado de Cuenta - Monedero Digital',
+            'fecha'        => now()->format('d/m/Y H:i:s'),
+            'generadoPor'  => 'API',
+        ]);
+
+        return $pdf->download('estado-cuenta_' . now()->format('Y-m-d_His') . '.pdf');
     }
 
     /**
@@ -115,14 +130,24 @@ class MonederoReportesApiController extends Controller
         $desde = $request->desde ? Carbon::parse($request->desde) : now()->subDays(30);
         $hasta = $request->hasta ? Carbon::parse($request->hasta) : now();
 
-        $datos = $this->exportService->generarEstadoCuenta(
+        $reporte = $this->exportService->generarEstadoCuenta(
             $request->usuario_id,
             $desde,
             $hasta
         );
 
-        // TODO: Implementar generación de CSV
-        return response()->json(['mensaje' => 'CSV generado', 'datos' => $datos]);
+        $csvData = "Fecha,Tipo,Módulo,Concepto,Monto,Saldo Nuevo\n";
+        foreach ($reporte['movimientos'] as $mov) {
+            $tipo = $mov->tipo === 'abono' ? 'Abono' : 'Cargo';
+            $fecha = $mov->created_at instanceof \Carbon\Carbon
+                ? $mov->created_at->format('d/m/Y H:i')
+                : $mov->created_at;
+            $csvData .= "{$fecha},{$tipo},{$mov->modulo},\"{$mov->concepto}\",{$mov->monto},{$mov->saldo_nuevo}\n";
+        }
+
+        return response($csvData)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="estado-cuenta_' . now()->format('Y-m-d') . '.csv"');
     }
 
     /**
@@ -131,6 +156,7 @@ class MonederoReportesApiController extends Controller
     public function exportMovimientosPDF(Request $request)
     {
         $request->validate([
+            'usuario_id' => 'integer|exists:usuario,id|nullable',
             'desde' => 'date',
             'hasta' => 'date|after_or_equal:desde',
             'modulo' => 'string|nullable',
@@ -139,14 +165,21 @@ class MonederoReportesApiController extends Controller
         $desde = $request->desde ? Carbon::parse($request->desde) : now()->subDays(30);
         $hasta = $request->hasta ? Carbon::parse($request->hasta) : now();
 
-        $datos = $this->exportService->generarReporteMovimientos(
+        $reporte = $this->exportService->generarReporteMovimientos(
+            $request->usuario_id,
             $desde,
             $hasta,
             $request->modulo
         );
 
-        // TODO: Implementar generación de PDF
-        return response()->json(['mensaje' => 'PDF generado', 'datos' => $datos]);
+        $pdf = \PDF::loadView('pdf.monedero.movimientos', [
+            'reporte'      => $reporte,
+            'titulo'       => 'Reporte de Movimientos - Monedero Digital',
+            'fecha'        => now()->format('d/m/Y H:i:s'),
+            'generadoPor'  => 'API',
+        ]);
+
+        return $pdf->download('movimientos_' . now()->format('Y-m-d_His') . '.pdf');
     }
 
     /**
@@ -155,6 +188,7 @@ class MonederoReportesApiController extends Controller
     public function exportMovimientosCSV(Request $request)
     {
         $request->validate([
+            'usuario_id' => 'integer|exists:usuario,id|nullable',
             'desde' => 'date',
             'hasta' => 'date|after_or_equal:desde',
             'modulo' => 'string|nullable',
@@ -163,33 +197,58 @@ class MonederoReportesApiController extends Controller
         $desde = $request->desde ? Carbon::parse($request->desde) : now()->subDays(30);
         $hasta = $request->hasta ? Carbon::parse($request->hasta) : now();
 
-        $datos = $this->exportService->generarReporteMovimientos(
+        $reporte = $this->exportService->generarReporteMovimientos(
+            $request->usuario_id,
             $desde,
             $hasta,
             $request->modulo
         );
 
-        // TODO: Implementar generación de CSV
-        return response()->json(['mensaje' => 'CSV generado', 'datos' => $datos]);
+        $csvData = "Fecha,Usuario,Tipo,Módulo,Concepto,Monto\n";
+        foreach ($reporte['movimientos'] as $mov) {
+            $tipo = $mov->tipo === 'abono' ? 'Abono' : 'Cargo';
+            $usuario = $mov->usuario->nombre ?? 'N/A';
+            $fecha = $mov->created_at instanceof \Carbon\Carbon
+                ? $mov->created_at->format('d/m/Y H:i')
+                : $mov->created_at;
+            $csvData .= "{$fecha},{$usuario},{$tipo},{$mov->modulo},\"{$mov->concepto}\",{$mov->monto}\n";
+        }
+
+        return response($csvData)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="movimientos_' . now()->format('Y-m-d') . '.csv"');
     }
 
     /**
      * GET /api/admin/monedero/exportes/uso-categoria/pdf
      */
-    public function exportUsoCategoriaaPDF(Request $request)
+    public function exportUsoCategoriaPDF(Request $request)
     {
         $request->validate([
+            'usuario_id' => 'integer|exists:usuario,id|nullable',
             'desde' => 'date',
             'hasta' => 'date|after_or_equal:desde',
+            'modulo' => 'string|nullable',
         ]);
 
         $desde = $request->desde ? Carbon::parse($request->desde) : now()->subDays(30);
         $hasta = $request->hasta ? Carbon::parse($request->hasta) : now();
 
-        $datos = $this->exportService->generarReporteUsoPorCategoria($desde, $hasta);
+        $reporte = $this->exportService->generarReporteUsoPorCategoria(
+            $request->usuario_id,
+            $desde,
+            $hasta,
+            $request->modulo
+        );
 
-        // TODO: Implementar generación de PDF
-        return response()->json(['mensaje' => 'PDF generado', 'datos' => $datos]);
+        $pdf = \PDF::loadView('pdf.monedero.uso-categoria', [
+            'reporte'      => $reporte,
+            'titulo'       => 'Uso de Saldo por Categoría - Monedero Digital',
+            'fecha'        => now()->format('d/m/Y H:i:s'),
+            'generadoPor'  => 'API',
+        ]);
+
+        return $pdf->download('uso-categoria_' . now()->format('Y-m-d_His') . '.pdf');
     }
 
     /**
@@ -198,16 +257,29 @@ class MonederoReportesApiController extends Controller
     public function exportUsoCategoriaCSV(Request $request)
     {
         $request->validate([
+            'usuario_id' => 'integer|exists:usuario,id|nullable',
             'desde' => 'date',
             'hasta' => 'date|after_or_equal:desde',
+            'modulo' => 'string|nullable',
         ]);
 
         $desde = $request->desde ? Carbon::parse($request->desde) : now()->subDays(30);
         $hasta = $request->hasta ? Carbon::parse($request->hasta) : now();
 
-        $datos = $this->exportService->generarReporteUsoPorCategoria($desde, $hasta);
+        $reporte = $this->exportService->generarReporteUsoPorCategoria(
+            $request->usuario_id,
+            $desde,
+            $hasta,
+            $request->modulo
+        );
 
-        // TODO: Implementar generación de CSV
-        return response()->json(['mensaje' => 'CSV generado', 'datos' => $datos]);
+        $csvData = "Categoría,Total Cargo,Total Abono,Transacciones,Usuarios Únicos,Porcentaje\n";
+        foreach ($reporte['categorias'] as $cat) {
+            $csvData .= "{$cat->modulo},{$cat->total_cargo},{$cat->total_abono},{$cat->cantidad},{$cat->usuarios_unicos},{$cat->porcentaje}%\n";
+        }
+
+        return response($csvData)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="uso-categoria_' . now()->format('Y-m-d') . '.csv"');
     }
 }

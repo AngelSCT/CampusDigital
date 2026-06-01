@@ -22,7 +22,7 @@ class MonederoAnalyticsApiController extends Controller
         $request->validate([
             'desde' => 'date',
             'hasta' => 'date|after_or_equal:desde',
-            'modulo' => 'in:cafeteria,copias,souvenirs,biblioteca,recarga,otro',
+            'modulo' => 'nullable|in:cafeteria,copias,souvenirs,biblioteca,recarga,otro',
         ]);
 
         $dateRange = [

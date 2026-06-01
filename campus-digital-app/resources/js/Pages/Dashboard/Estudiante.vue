@@ -23,7 +23,7 @@
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-white truncate">Saldo Disponible</dt>
-                                    <dd class="text-3xl font-semibold text-white">$0.00</dd>
+                                    <dd class="text-3xl font-semibold text-white">${{ formatMonto(monedero?.saldo_disponible ?? 0) }}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -207,4 +207,12 @@
 
 <script setup>
 import AuthLayout from '@/Layouts/AuthLayout.vue';
+
+const props = defineProps({
+    monedero: { type: Object, default: null },
+});
+
+function formatMonto(v) {
+    return Number(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
 </script>

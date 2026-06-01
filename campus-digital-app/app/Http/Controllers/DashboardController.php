@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 use App\Models\AccesoBitacora;
+use App\Models\SaldoMonedero;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -228,6 +229,10 @@ class DashboardController extends Controller
 
     private function dashboardEstudiante($user)
     {
-        return Inertia::render('Dashboard/Estudiante', []);
+        $monedero = SaldoMonedero::where('usuario_id', $user->id)->first();
+
+        return Inertia::render('Dashboard/Estudiante', [
+            'monedero' => $monedero,
+        ]);
     }
 }
