@@ -1,0 +1,3376 @@
+openapi: 3.0.3
+info:
+  title: 'Campus Digital API Documentation'
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8000'
+tags:
+  -
+    name: Endpoints
+    description: ''
+paths:
+  /api/documentation:
+    get:
+      summary: 'Handles the API request and renders the Swagger documentation view.'
+      operationId: handlesTheAPIRequestAndRendersTheSwaggerDocumentationView
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+      security: []
+  /api/oauth2-callback:
+    get:
+      summary: 'Handles the OAuth2 callback and retrieves the required file for the redirect.'
+      operationId: handlesTheOAuth2CallbackAndRetrievesTheRequiredFileForTheRedirect
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "<!doctype html>\n<html lang=\"en-US\">\n<body>\n<script src=\"oauth2-redirect.js\"></script>\n</body>\n</html>\n"
+      tags:
+        - Endpoints
+      security: []
+  /api/v1/areas:
+    get:
+      summary: ''
+      operationId: getApiV1Areas
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1Areas
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name_area:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: b
+              required:
+                - name_area
+      security: []
+  '/api/v1/areas/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1AreasId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1AreasId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name_area:
+                  type: string
+                  description: ''
+                  example: null
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1AreasId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the area.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/categorias-ticket:
+    get:
+      summary: ''
+      operationId: getApiV1CategoriasTicket
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1CategoriasTicket
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_area:
+                  type: integer
+                  description: 'The <code>id_area</code> of an existing record in the area table.'
+                  example: 16
+                nombre_categoria:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: 'n'
+                tiempo_sla_horas:
+                  type: integer
+                  description: 'Must be at least 1.'
+                  example: 67
+              required:
+                - id_area
+                - nombre_categoria
+                - tiempo_sla_horas
+      security: []
+  '/api/v1/categorias-ticket/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1CategoriasTicketId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1CategoriasTicketId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_area:
+                  type: integer
+                  description: 'The <code>id_area</code> of an existing record in the area table.'
+                  example: 16
+                nombre_categoria:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: 'n'
+                tiempo_sla_horas:
+                  type: integer
+                  description: 'Must be at least 1.'
+                  example: 67
+              required:
+                - id_area
+                - nombre_categoria
+                - tiempo_sla_horas
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1CategoriasTicketId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the categorias ticket.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/ubicaciones:
+    get:
+      summary: ''
+      operationId: getApiV1Ubicaciones
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1Ubicaciones
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                edificio:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: b
+                aula_departamento:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: 'n'
+              required:
+                - edificio
+                - aula_departamento
+      security: []
+  '/api/v1/ubicaciones/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1UbicacionesId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1UbicacionesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                edificio:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: b
+                aula_departamento:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: 'n'
+              required:
+                - edificio
+                - aula_departamento
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1UbicacionesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the ubicacione.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/equipos-activos:
+    get:
+      summary: ''
+      operationId: getApiV1EquiposActivos
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1EquiposActivos
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_categoria:
+                  type: integer
+                  description: 'The <code>id_categoria</code> of an existing record in the categorias_ticket table.'
+                  example: 16
+                id_ubicacion:
+                  type: integer
+                  description: 'The <code>id_ubicacion</code> of an existing record in the ubicaciones table.'
+                  example: 16
+                nombre_equipo:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: 'n'
+                estado_actual:
+                  type: string
+                  description: 'Must not be greater than 50 characters.'
+                  example: g
+              required:
+                - id_categoria
+                - id_ubicacion
+                - nombre_equipo
+                - estado_actual
+      security: []
+  '/api/v1/equipos-activos/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1EquiposActivosId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1EquiposActivosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_categoria:
+                  type: integer
+                  description: 'The <code>id_categoria</code> of an existing record in the categorias_ticket table.'
+                  example: 16
+                id_ubicacion:
+                  type: integer
+                  description: 'The <code>id_ubicacion</code> of an existing record in the ubicaciones table.'
+                  example: 16
+                nombre_equipo:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: 'n'
+                estado_actual:
+                  type: string
+                  description: 'Must not be greater than 50 characters.'
+                  example: g
+              required:
+                - id_categoria
+                - id_ubicacion
+                - nombre_equipo
+                - estado_actual
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1EquiposActivosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the equipos activo.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/mantenimientos-preventivos:
+    get:
+      summary: ''
+      operationId: getApiV1MantenimientosPreventivos
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1MantenimientosPreventivos
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_equipo:
+                  type: integer
+                  description: 'The <code>id_equipo</code> of an existing record in the equipos_activos table.'
+                  example: 16
+                proxima_fecha_programada:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-05-13T03:15:19'
+              required:
+                - id_equipo
+                - proxima_fecha_programada
+      security: []
+  '/api/v1/mantenimientos-preventivos/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1MantenimientosPreventivosId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1MantenimientosPreventivosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_equipo:
+                  type: integer
+                  description: 'The <code>id_equipo</code> of an existing record in the equipos_activos table.'
+                  example: 16
+                proxima_fecha_programada:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-05-13T03:15:19'
+              required:
+                - id_equipo
+                - proxima_fecha_programada
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1MantenimientosPreventivosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the mantenimientos preventivo.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/tickets:
+    get:
+      summary: ''
+      operationId: getApiV1Tickets
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1Tickets
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_usuario_solicitante:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: 16
+                id_categoria:
+                  type: integer
+                  description: 'The <code>id_categoria</code> of an existing record in the categorias_ticket table.'
+                  example: 16
+                id_equipo:
+                  type: integer
+                  description: 'The <code>id_equipo</code> of an existing record in the equipos_activos table.'
+                  example: 16
+                  nullable: true
+                estado:
+                  type: string
+                  description: 'Must not be greater than 50 characters.'
+                  example: 'n'
+                prioridad:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: g
+                fecha_creacion:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-05-13T03:15:19'
+                  nullable: true
+              required:
+                - id_usuario_solicitante
+                - id_categoria
+                - estado
+                - prioridad
+      security: []
+  '/api/v1/tickets/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1TicketsId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1TicketsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_usuario_solicitante:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: 16
+                id_categoria:
+                  type: integer
+                  description: 'The <code>id_categoria</code> of an existing record in the categorias_ticket table.'
+                  example: 16
+                id_equipo:
+                  type: integer
+                  description: 'The <code>id_equipo</code> of an existing record in the equipos_activos table.'
+                  example: 16
+                  nullable: true
+                estado:
+                  type: string
+                  description: 'Must not be greater than 50 characters.'
+                  example: 'n'
+                prioridad:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: g
+                fecha_creacion:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-05-13T03:15:19'
+                  nullable: true
+              required:
+                - id_usuario_solicitante
+                - id_categoria
+                - estado
+                - prioridad
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1TicketsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the ticket.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/asignaciones-tecnicas:
+    get:
+      summary: ''
+      operationId: getApiV1AsignacionesTecnicas
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1AsignacionesTecnicas
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_ticket:
+                  type: integer
+                  description: 'The <code>id_ticket</code> of an existing record in the tickets table.'
+                  example: 16
+                id_usuario_tecnico:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: 16
+              required:
+                - id_ticket
+                - id_usuario_tecnico
+      security: []
+  '/api/v1/asignaciones-tecnicas/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1AsignacionesTecnicasId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1AsignacionesTecnicasId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_ticket:
+                  type: integer
+                  description: 'The <code>id_ticket</code> of an existing record in the tickets table.'
+                  example: 16
+                id_usuario_tecnico:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: 16
+              required:
+                - id_ticket
+                - id_usuario_tecnico
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1AsignacionesTecnicasId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the asignaciones tecnica.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/insumos:
+    get:
+      summary: ''
+      operationId: getApiV1Insumos
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1Insumos
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre_insumo:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: b
+                stock_actual:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 39
+              required:
+                - nombre_insumo
+                - stock_actual
+      security: []
+  '/api/v1/insumos/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1InsumosId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1InsumosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre_insumo:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: b
+                stock_actual:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 39
+              required:
+                - nombre_insumo
+                - stock_actual
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1InsumosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the insumo.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/gastos-ticket:
+    get:
+      summary: ''
+      operationId: getApiV1GastosTicket
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1GastosTicket
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_ticket:
+                  type: integer
+                  description: 'The <code>id_ticket</code> of an existing record in the tickets table.'
+                  example: 16
+                id_insumo:
+                  type: integer
+                  description: 'The <code>id_insumo</code> of an existing record in the insumos table.'
+                  example: 16
+                cantidad:
+                  type: integer
+                  description: 'Must be at least 1.'
+                  example: 22
+              required:
+                - id_ticket
+                - id_insumo
+                - cantidad
+      security: []
+  '/api/v1/gastos-ticket/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1GastosTicketId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1GastosTicketId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_ticket:
+                  type: integer
+                  description: 'The <code>id_ticket</code> of an existing record in the tickets table.'
+                  example: 16
+                id_insumo:
+                  type: integer
+                  description: 'The <code>id_insumo</code> of an existing record in the insumos table.'
+                  example: 16
+                cantidad:
+                  type: integer
+                  description: 'Must be at least 1.'
+                  example: 22
+              required:
+                - id_ticket
+                - id_insumo
+                - cantidad
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1GastosTicketId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the gastos ticket.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/historial-tickets:
+    get:
+      summary: ''
+      operationId: getApiV1HistorialTickets
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1HistorialTickets
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_ticket:
+                  type: integer
+                  description: 'The <code>id_ticket</code> of an existing record in the tickets table.'
+                  example: 16
+                id_usuario:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: 16
+                estado_nuevo:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'n'
+              required:
+                - id_ticket
+                - id_usuario
+                - estado_nuevo
+      security: []
+  '/api/v1/historial-tickets/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1HistorialTicketsId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1HistorialTicketsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_ticket:
+                  type: integer
+                  description: 'The <code>id_ticket</code> of an existing record in the tickets table.'
+                  example: 16
+                id_usuario:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: 16
+                estado_nuevo:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'n'
+              required:
+                - id_ticket
+                - id_usuario
+                - estado_nuevo
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1HistorialTicketsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the historial ticket.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/usuarios:
+    get:
+      summary: ''
+      operationId: getApiV1Usuarios
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1Usuarios
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: b
+                apellido:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: 'n'
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: ashly64@example.com
+                password:
+                  type: string
+                  description: 'Must be at least 8 characters.'
+                  example: pBNvYg
+                telefono:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: h
+                  nullable: true
+              required:
+                - nombre
+                - apellido
+                - email
+                - password
+      security: []
+  '/api/v1/usuarios/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1UsuariosId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1UsuariosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: b
+                apellido:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: 'n'
+                email:
+                  type: string
+                  description: ''
+                  example: null
+                telefono:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: g
+                  nullable: true
+                password:
+                  type: string
+                  description: 'Must be at least 8 characters.'
+                  example: '{+-0pBNvYgx'
+                  nullable: true
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1UsuariosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the usuario.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/usuarios/{id}/toggle-block':
+    post:
+      summary: ''
+      operationId: postApiV1UsuariosIdToggleBlock
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the usuario.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/roles:
+    get:
+      summary: ''
+      operationId: getApiV1Roles
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1Roles
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  description: 'Must not be greater than 50 characters.'
+                  example: b
+                descripcion:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                activo:
+                  type: boolean
+                  description: ''
+                  example: true
+              required:
+                - nombre
+      security: []
+  '/api/v1/roles/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1RolesId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1RolesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  description: ''
+                  example: null
+                descripcion:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                activo:
+                  type: boolean
+                  description: ''
+                  example: true
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1RolesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the role.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/permisos:
+    get:
+      summary: ''
+      operationId: getApiV1Permisos
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1Permisos
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clave:
+                  type: string
+                  description: 'Must not be greater than 100 characters.'
+                  example: b
+                descripcion:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                activo:
+                  type: boolean
+                  description: ''
+                  example: true
+              required:
+                - clave
+      security: []
+  '/api/v1/permisos/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1PermisosId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1PermisosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clave:
+                  type: string
+                  description: ''
+                  example: null
+                descripcion:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                activo:
+                  type: boolean
+                  description: ''
+                  example: false
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1PermisosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the permiso.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/rol-permisos:
+    get:
+      summary: ''
+      operationId: getApiV1RolPermisos
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1RolPermisos
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rol_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the rol table.'
+                  example: architecto
+                permiso_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the permiso table.'
+                  example: architecto
+              required:
+                - rol_id
+                - permiso_id
+      security: []
+  '/api/v1/rol-permisos/{id}':
+    delete:
+      summary: ''
+      operationId: deleteApiV1RolPermisosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the rol permiso.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/usuario-roles:
+    get:
+      summary: ''
+      operationId: getApiV1UsuarioRoles
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1UsuarioRoles
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usuario_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: architecto
+                rol_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the rol table.'
+                  example: architecto
+              required:
+                - usuario_id
+                - rol_id
+      security: []
+  '/api/v1/usuario-roles/{id}':
+    delete:
+      summary: ''
+      operationId: deleteApiV1UsuarioRolesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the usuario role.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/usuario-perfiles:
+    get:
+      summary: ''
+      operationId: getApiV1UsuarioPerfiles
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+  '/api/v1/usuario-perfiles/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1UsuarioPerfilesId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1UsuarioPerfilesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fecha_nacimiento:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-05-13T03:15:19'
+                  nullable: true
+                genero:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                  nullable: true
+                direccion:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                preferencias_json:
+                  type: object
+                  description: ''
+                  example: null
+                  properties: {  }
+                  nullable: true
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the usuario perfile.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/sesiones:
+    get:
+      summary: ''
+      operationId: getApiV1Sesiones
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+  '/api/v1/sesiones/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1SesionesId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sesione.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/bitacora/accesos:
+    get:
+      summary: ''
+      operationId: getApiV1BitacoraAccesos
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+  '/api/v1/bitacora/accesos/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1BitacoraAccesosId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the acceso.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/bitacora/actividad:
+    get:
+      summary: ''
+      operationId: getApiV1BitacoraActividad
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+  '/api/v1/bitacora/actividad/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1BitacoraActividadId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the actividad.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/tarjetas:
+    get:
+      summary: ''
+      operationId: getApiV1Tarjetas
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1Tarjetas
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usuario_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: architecto
+                uid:
+                  type: string
+                  description: 'Must not be greater than 64 characters.'
+                  example: 'n'
+                estado:
+                  type: string
+                  description: ''
+                  example: perdida
+                  enum:
+                    - activa
+                    - bloqueada
+                    - perdida
+                    - cancelada
+              required:
+                - usuario_id
+                - uid
+      security: []
+  '/api/v1/tarjetas/uid/{uid}':
+    get:
+      summary: ''
+      operationId: getApiV1TarjetasUidUid
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: uid
+        description: 'The uid.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/tarjetas/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1TarjetasId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1TarjetasId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uid:
+                  type: string
+                  description: ''
+                  example: null
+                estado:
+                  type: string
+                  description: ''
+                  example: activa
+                  enum:
+                    - activa
+                    - bloqueada
+                    - perdida
+                    - cancelada
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1TarjetasId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the tarjeta.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/tarjetas/{id}/bloquear':
+    post:
+      summary: ''
+      operationId: postApiV1TarjetasIdBloquear
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motivo_bloqueo:
+                  type: string
+                  description: ''
+                  example: architecto
+              required:
+                - motivo_bloqueo
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the tarjeta.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/tarjetas/{id}/desbloquear':
+    post:
+      summary: ''
+      operationId: postApiV1TarjetasIdDesbloquear
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the tarjeta.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/tarjeta-lecturas:
+    get:
+      summary: ''
+      operationId: getApiV1TarjetaLecturas
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1TarjetaLecturas
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uid_leido:
+                  type: string
+                  description: 'Must not be greater than 64 characters.'
+                  example: b
+                modulo:
+                  type: string
+                  description: 'Must not be greater than 50 characters.'
+                  example: 'n'
+                tipo_lectura:
+                  type: string
+                  description: 'Must not be greater than 50 characters.'
+                  example: g
+                exito:
+                  type: boolean
+                  description: ''
+                  example: true
+              required:
+                - uid_leido
+                - modulo
+                - tipo_lectura
+      security: []
+  '/api/v1/tarjeta-lecturas/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1TarjetaLecturasId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the tarjeta lectura.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/saldo-monederos:
+    get:
+      summary: ''
+      operationId: getApiV1SaldoMonederos
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1SaldoMonederos
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usuario_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: architecto
+              required:
+                - usuario_id
+      security: []
+  '/api/v1/saldo-monederos/usuario/{usuario_id}':
+    get:
+      summary: ''
+      operationId: getApiV1SaldoMonederosUsuarioUsuario_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: usuario_id
+        description: 'The ID of the usuario.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/saldo-monederos/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1SaldoMonederosId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the saldo monedero.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/saldo-movimientos:
+    get:
+      summary: ''
+      operationId: getApiV1SaldoMovimientos
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1SaldoMovimientos
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usuario_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: architecto
+                tipo:
+                  type: string
+                  description: ''
+                  example: cargo
+                  enum:
+                    - abono
+                    - cargo
+                monto:
+                  type: number
+                  description: 'Must be at least 0.01.'
+                  example: 39
+                modulo:
+                  type: string
+                  description: 'Must not be greater than 50 characters.'
+                  example: g
+                concepto:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: z
+                operador_usuario_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: null
+                  nullable: true
+                tarjeta_lectura_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the tarjeta_lectura table.'
+                  example: null
+                  nullable: true
+              required:
+                - usuario_id
+                - tipo
+                - monto
+                - modulo
+                - concepto
+      security: []
+  '/api/v1/saldo-movimientos/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1SaldoMovimientosId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the saldo movimiento.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/pedidos:
+    get:
+      summary: ''
+      operationId: getApiV1Pedidos
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1Pedidos
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usuario_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: architecto
+                modulo:
+                  type: string
+                  description: 'Must not be greater than 50 characters.'
+                  example: 'n'
+                total:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 84
+                descripcion:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                notas:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+              required:
+                - usuario_id
+                - modulo
+                - total
+      security: []
+  '/api/v1/pedidos/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1PedidosId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiV1PedidosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notas:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                descripcion:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                total:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 39
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiV1PedidosId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the pedido.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/pedidos/{id}/estado':
+    post:
+      summary: ''
+      operationId: postApiV1PedidosIdEstado
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estado:
+                  type: string
+                  description: ''
+                  example: creado
+                  enum:
+                    - creado
+                    - aceptado
+                    - en_proceso
+                    - listo
+                    - entregado
+                    - cancelado
+              required:
+                - estado
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the pedido.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/pedidos/{id}/confirmar-tarjeta':
+    post:
+      summary: ''
+      operationId: postApiV1PedidosIdConfirmarTarjeta
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tarjeta_lectura_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the tarjeta_lectura table.'
+                  example: architecto
+              required:
+                - tarjeta_lectura_id
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the pedido.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/recargas:
+    get:
+      summary: ''
+      operationId: getApiV1Recargas
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiV1Recargas
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usuario_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the usuario table.'
+                  example: architecto
+                monto:
+                  type: number
+                  description: 'Must be at least 1.'
+                  example: 22
+                metodo_pago:
+                  type: string
+                  description: ''
+                  example: tarjeta
+                  enum:
+                    - tarjeta
+                    - transferencia
+                    - efectivo
+                referencia_pago:
+                  type: string
+                  description: 'Must not be greater than 100 characters.'
+                  example: g
+                  nullable: true
+                resultado_pago:
+                  type: string
+                  description: "resultado_pago: lo envía la pasarela de pago o el sistema externo\nvalores aceptados: \"exitoso\" o \"fallido\"."
+                  example: exitoso
+                  enum:
+                    - exitoso
+                    - fallido
+                razon_fallo:
+                  type: string
+                  description: 'Must not be greater than 500 characters.'
+                  example: z
+                  nullable: true
+                meta_json:
+                  type: object
+                  description: ''
+                  example: null
+                  properties: {  }
+                  nullable: true
+              required:
+                - usuario_id
+                - monto
+                - metodo_pago
+                - resultado_pago
+      security: []
+  '/api/v1/recargas/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1RecargasId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the recarga.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/recargas/usuario/{usuario_id}':
+    get:
+      summary: ''
+      operationId: getApiV1RecargasUsuarioUsuario_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: usuario_id
+        description: 'The ID of the usuario.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/rfid/auth:
+    post:
+      summary: ''
+      operationId: postApiV1RfidAuth
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uid:
+                  type: string
+                  description: 'Must not be greater than 64 characters.'
+                  example: b
+                pin:
+                  type: string
+                  description: 'Must be 4 digits.'
+                  example: '9775'
+              required:
+                - uid
+                - pin
+      security: []
+  /api/v1/rfid/verificar:
+    post:
+      summary: ''
+      operationId: postApiV1RfidVerificar
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uid:
+                  type: string
+                  description: 'Must not be greater than 64 characters.'
+                  example: b
+                pin:
+                  type: string
+                  description: 'Must be 4 digits.'
+                  example: '9775'
+              required:
+                - uid
+                - pin
+      security: []
+  '/api/v1/rfid/usuario/{uid}':
+    get:
+      summary: ''
+      operationId: getApiV1RfidUsuarioUid
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: uid
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/rfid/saldo/{uid}':
+    get:
+      summary: ''
+      operationId: getApiV1RfidSaldoUid
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: uid
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/rfid/historial/{uid}':
+    get:
+      summary: ''
+      operationId: getApiV1RfidHistorialUid
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: uid
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/rfid/pedidos/{uid}':
+    get:
+      summary: ''
+      operationId: getApiV1RfidPedidosUid
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: uid
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/rfid/lecturas/{uid}':
+    get:
+      summary: ''
+      operationId: getApiV1RfidLecturasUid
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: 'API key requerida.'
+                  hint: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+                properties:
+                  error:
+                    type: string
+                    example: 'API key requerida.'
+                  hint:
+                    type: string
+                    example: 'Agrega el header: X-API-KEY: TOKEN-DEL-ENV'
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: uid
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string

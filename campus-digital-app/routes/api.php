@@ -1,6 +1,6 @@
 <?php
 
-//RUTAS DE LA API REST DE LA APLICACION
+//RUTAS DE LA API REST DE LA APLICACION ANADIR EN EL ORDEN CORRESPONDIENTE PORFAVOR
 
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +41,9 @@ use App\Http\Controllers\Api\CartApiController;
 // MODULO RECARGAS (US2)
 use App\Http\Controllers\Api\RecargaApiController;
 
+// MODULO RECARGAS (US2)
+use App\Http\Controllers\Api\RecargaApiController;
+
 // RUTAS EXTRA CON UID Y EL PIN
 use App\Http\Controllers\Api\RfidApiController;
 
@@ -48,6 +51,17 @@ use App\Http\Controllers\Api\RfidApiController;
 use App\Http\Controllers\Api\CatalogoIntegracionApiController;
 
 Route::middleware('api.key')->group(function () {
+    Route::apiResource('areas', AreaApiController::class);
+    Route::apiResource('categorias-ticket', CategoriaTicketApiController::class);
+    Route::apiResource('ubicaciones', UbicacionApiController::class);
+    Route::apiResource('equipos-activos', EquipoActivoApiController::class);
+    Route::apiResource('mantenimientos-preventivos', MantenimientoPreventivoApiController::class);
+    Route::apiResource('tickets', TicketApiController::class);
+    Route::apiResource('asignaciones-tecnicas', AsignacionTecnicaApiController::class);
+    Route::apiResource('insumos', InsumoApiController::class);
+    Route::apiResource('gastos-ticket', GastoTicketApiController::class);
+    Route::apiResource('historial-tickets', HistorialTicketApiController::class);
+
     Route::apiResource('areas', AreaApiController::class);
     Route::apiResource('categorias-ticket', CategoriaTicketApiController::class);
     Route::apiResource('ubicaciones', UbicacionApiController::class);
@@ -120,7 +134,6 @@ Route::middleware('api.key')->group(function () {
     Route::post('recargas',                      [RecargaApiController::class, 'store']);
     Route::get ('recargas/{id}',                 [RecargaApiController::class, 'show']);
     Route::get ('recargas/usuario/{usuario_id}', [RecargaApiController::class, 'porUsuario']);
-
     // NUEVAS RUTAS PROVEEDOR (MODULO 4.9)
     Route::get('proveedor/metrics', [ProviderApiController::class, 'getMetrics']);
     Route::get('proveedor/reports', [ProviderApiController::class, 'getReports']);
