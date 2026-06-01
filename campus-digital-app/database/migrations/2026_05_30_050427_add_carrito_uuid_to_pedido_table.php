@@ -21,9 +21,14 @@ return new class extends Migration
     {
         Schema::table('pedido', function (Blueprint $table) {
             $table->string('carrito_uuid', 100)
-                  ->nullable()
-                  ->unique()
-                  ->after('meta_json');
+                ->nullable()
+                ->unique()
+                ->after('meta_json');
+        });
+
+        // Hacer usuario_id nullable para pedidos-regalo/escrow (acuerdo con M4.4)
+        Schema::table('pedido', function (Blueprint $table) {
+            $table->unsignedBigInteger('usuario_id')->nullable()->change();
         });
     }
 

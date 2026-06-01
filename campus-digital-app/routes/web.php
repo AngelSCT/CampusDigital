@@ -39,7 +39,6 @@ Route::get('/', function () {
 
 
 Route::post('/auth/rfid-login', [RfidLoginController::class, 'login'])
-    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])
     ->name('rfid.login');
 
 
@@ -51,9 +50,11 @@ Route::post('/simulador/uid', function (Request $request) {
     }
     Cache::put('simulador_uid_pendiente', $uid, 30);
     Cache::put('simulador_uid_timestamp', now()->toIso8601String(), 30);
-    return response()->json(['ok' => true, 'uid' => $uid])
-        ->header('Access-Control-Allow-Origin', '*');
-})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    return response()->json([
+        'ok'  => true,
+        'uid' => $uid
+    ])->header('Access-Control-Allow-Origin', '*');
+});
 
 Route::options('/simulador/uid', function () {
     return response('', 200)
@@ -72,19 +73,17 @@ Route::get('/simulador/uid-pendiente', function () {
 Route::post('/simulador/login-rfid', function (Request $request) {
     $uid = strtoupper(trim($request->input('uid', '')));
     $pin = $request->input('pin', '');
-
     if (!$uid || !$pin) {
         return response()->json(['error' => 'Datos incompletos'], 400)
             ->header('Access-Control-Allow-Origin', '*');
     }
-
     Cache::put('simulador_login_uid', $uid, 60);
     Cache::put('simulador_login_pin', $pin, 60);
     Cache::put('simulador_login_timestamp', now()->toIso8601String(), 60);
-
-    return response()->json(['ok' => true])
-        ->header('Access-Control-Allow-Origin', '*');
-})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    return response()->json([
+        'ok' => true
+    ])->header('Access-Control-Allow-Origin', '*');
+});
 
 Route::options('/simulador/login-rfid', function () {
     return response('', 200)
@@ -101,12 +100,15 @@ Route::get('/simulador/login-pendiente', function () {
     ]);
 })->name('simulador.login-pendiente');
 
+
 Route::post('/simulador/limpiar-login', function () {
     Cache::forget('simulador_login_uid');
     Cache::forget('simulador_login_pin');
     Cache::forget('simulador_login_timestamp');
-    return response()->json(['ok' => true]);
-})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    return response()->json([
+        'ok' => true
+    ]);
+});
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
