@@ -41,9 +41,6 @@ use App\Http\Controllers\Api\CartApiController;
 // MODULO RECARGAS (US2)
 use App\Http\Controllers\Api\RecargaApiController;
 
-// MODULO RECARGAS (US2)
-use App\Http\Controllers\Api\RecargaApiController;
-
 // RUTAS EXTRA CON UID Y EL PIN
 use App\Http\Controllers\Api\RfidApiController;
 
@@ -51,17 +48,6 @@ use App\Http\Controllers\Api\RfidApiController;
 use App\Http\Controllers\Api\CatalogoIntegracionApiController;
 
 Route::middleware('api.key')->group(function () {
-    Route::apiResource('areas', AreaApiController::class);
-    Route::apiResource('categorias-ticket', CategoriaTicketApiController::class);
-    Route::apiResource('ubicaciones', UbicacionApiController::class);
-    Route::apiResource('equipos-activos', EquipoActivoApiController::class);
-    Route::apiResource('mantenimientos-preventivos', MantenimientoPreventivoApiController::class);
-    Route::apiResource('tickets', TicketApiController::class);
-    Route::apiResource('asignaciones-tecnicas', AsignacionTecnicaApiController::class);
-    Route::apiResource('insumos', InsumoApiController::class);
-    Route::apiResource('gastos-ticket', GastoTicketApiController::class);
-    Route::apiResource('historial-tickets', HistorialTicketApiController::class);
-
     Route::apiResource('areas', AreaApiController::class);
     Route::apiResource('categorias-ticket', CategoriaTicketApiController::class);
     Route::apiResource('ubicaciones', UbicacionApiController::class);
