@@ -38,9 +38,28 @@ class CartController extends Controller
     {
         $userId = Auth::id();
 
-        $items = CarritoItem::where('usuario_id', $userId)
-            ->with('producto')
+        // ── Sistema nuevo: ítems via cart_carritos / cart_items_carrito ──────
+        $carritos = \App\Models\Cart\Carrito::where('usuario_ref', strval($userId))
+            ->whereIn('estado', ['abierto', 'procesando_checkout'])
+            ->with('itemsActivos.categoria')
             ->get();
+
+        $items = $carritos->flatMap(function ($carrito) {
+            return $carrito->itemsActivos->map(fn ($item) => [
+                'id'                    => $item->id,
+                'cantidad'              => $item->cantidad,
+                'es_regalo'             => $item->metadata['es_regalo'] ?? false,
+                'guardado_para_despues' => $item->metadata['guardado_para_despues'] ?? false,
+                'referencia_externa'    => $item->referencia_externa,
+                'carrito_uuid'          => $carrito->uuid,
+                'producto' => [
+                    'nombre'    => $item->nombre,
+                    'precio'    => $item->precio_unitario,
+                    'categoria' => $item->categoria?->slug ?? '',
+                    'imagen_url'=> null,
+                ],
+            ]);
+        })->values();
 
         try {
             $monedero        = SaldoMonedero::obtenerOCrear($userId);
@@ -51,11 +70,11 @@ class CartController extends Controller
             $saldoRetenido   = 0.00;
         }
 
-        $activos = $items->filter(fn($i) => !$i->guardado_para_despues && !$i->en_wishlist);
-        $total   = $activos->sum(fn($i) => $i->cantidad * (float) ($i->producto->precio ?? 0));
+        $activos = $items->filter(fn($i) => !$i['guardado_para_despues']);
+        $total   = $activos->sum(fn($i) => $i['cantidad'] * (float) ($i['producto']['precio'] ?? 0));
 
         return Inertia::render('Carrito/Index', [
-            'carrito'  => $items->values(),
+            'carrito'  => $items,
             'total'    => $total,
             'monedero' => [
                 'saldo_disponible' => $saldoDisponible,
@@ -160,57 +179,17 @@ class CartController extends Controller
     // Marca/desmarca un ítem de carrito como regalo.
     // Al marcar: valida límite global, calcula expiración dinámica y genera hash.
     // -------------------------------------------------------------------------
-    public function marcarRegalo(Request $request, CarritoItem $item): JsonResponse
+    public function marcarRegalo(Request $request, int $itemId): JsonResponse
     {
-        abort_if($item->usuario_id !== $request->user()->id, 403);
-
-        $data = $request->validate([
-            'es_regalo'           => ['required', 'boolean'],
-            'mensaje_dedicatorio' => ['nullable', 'string', 'max:200'],
-            'destinatario_id'     => ['nullable', 'integer', 'exists:usuario,id'],
-        ]);
-
-        if ($data['es_regalo']) {
-            // ── Validación de límite global ─────────────────────────────────
-            $producto = $item->producto;
-            if (! $this->validarLimiteGlobal($request->user()->id, $producto)) {
-                $limite = $producto->limite_por_usuario ?? 3;
-                return response()->json([
-                    'mensaje' => "Has alcanzado el límite de {$limite} unidad(es) para este producto "
-                               . "(suma de compras propias + regalos enviados pendientes).",
-                ], 422);
-            }
-
-            $hash       = hash('sha256', $item->id . $item->usuario_id . now()->timestamp . config('app.key'));
-            $expiracion = $this->calcularExpiracionRegalo($producto);
-
-            $item->update([
-                'es_regalo'               => true,
-                'mensaje_dedicatorio'     => $data['mensaje_dedicatorio'] ?? null,
-                'regalo_hash'             => $hash,
-                'estado_regalo'           => 'pendiente',
-                'fecha_expiracion_regalo' => $expiracion,
-                'destinatario_id'         => $data['destinatario_id'] ?? null,
-            ]);
-        } else {
-            $item->update([
-                'es_regalo'               => false,
-                'mensaje_dedicatorio'     => null,
-                'regalo_hash'             => null,
-                'estado_regalo'           => null,
-                'fecha_expiracion_regalo' => null,
-                'destinatario_id'         => null,
-            ]);
+        $item    = \App\Models\Cart\ItemCarrito::findOrFail($itemId);
+        $carrito = $item->carrito;
+        if ($carrito->usuario_ref !== strval(Auth::id())) {
+            abort(403);
         }
-
-        return response()->json([
-            'mensaje'                 => $data['es_regalo'] ? 'Marcado como regalo.' : 'Desmarcado como regalo.',
-            'es_regalo'               => $item->es_regalo,
-            'estado_regalo'           => $item->estado_regalo,
-            'mensaje_dedicatorio'     => $item->mensaje_dedicatorio,
-            'regalo_hash'             => $item->regalo_hash,
-            'fecha_expiracion_regalo' => $item->fecha_expiracion_regalo,
-        ]);
+        $metadata              = $item->metadata ?? [];
+        $metadata['es_regalo'] = !($metadata['es_regalo'] ?? false);
+        $item->update(['metadata' => $metadata]);
+        return response()->json(['es_regalo' => $metadata['es_regalo']]);
     }
 
     // -------------------------------------------------------------------------
@@ -687,21 +666,15 @@ class CartController extends Controller
     // PATCH /carrito/{item}/guardar  (web, auth)
     // Mueve un ítem del carrito activo a "Guardados para después" (manual).
     // -------------------------------------------------------------------------
-    public function guardarParaDespues(Request $request, CarritoItem $item): JsonResponse
+    public function guardarParaDespues(Request $request, int $itemId): JsonResponse
     {
-        abort_if($item->usuario_id !== $request->user()->id, 403);
-
-        $item->update([
-            'guardado_para_despues' => true,
-            'en_wishlist'           => false,
-            'motivo_movimiento'     => 'manual',
-            'ultima_actividad_at'   => now(),
-        ]);
-
-        return response()->json([
-            'mensaje' => 'Producto guardado para después.',
-            'item'    => $item->fresh('producto'),
-        ]);
+        $item    = \App\Models\Cart\ItemCarrito::findOrFail($itemId);
+        $carrito = $item->carrito;
+        if ($carrito->usuario_ref !== strval(Auth::id())) abort(403);
+        $metadata                          = $item->metadata ?? [];
+        $metadata['guardado_para_despues'] = !($metadata['guardado_para_despues'] ?? false);
+        $item->update(['metadata' => $metadata]);
+        return response()->json(['guardado' => $metadata['guardado_para_despues']]);
     }
 
     // -------------------------------------------------------------------------

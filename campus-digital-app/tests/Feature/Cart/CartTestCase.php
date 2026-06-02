@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Cart;
 
+use App\Modules\Cart\Contracts\PedidoCreatorInterface;
+use App\Modules\Cart\Services\NullPedidoCreator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -21,6 +23,10 @@ abstract class CartTestCase extends TestCase
         parent::setUp();
         $this->setUpSqliteInMemory();
         $this->runCartMigrations();
+
+        // Tests usan NullPedidoCreator: la tabla 'pedido' no existe en SQLite in-memory.
+        // AppServiceProvider liga EloquentPedidoCreator en producción; aquí usamos el stub.
+        $this->app->bind(PedidoCreatorInterface::class, NullPedidoCreator::class);
     }
 
     protected function tearDown(): void

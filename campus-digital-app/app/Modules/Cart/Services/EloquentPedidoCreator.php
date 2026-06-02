@@ -5,6 +5,7 @@ namespace App\Modules\Cart\Services;
 use App\Models\Cart\Carrito;
 use App\Models\Cart\ItemCarrito;
 use App\Models\Pedido;
+use App\Models\Usuario;
 use App\Modules\Cart\Contracts\PedidoCreatorInterface;
 
 /**
@@ -17,10 +18,11 @@ use App\Modules\Cart\Contracts\PedidoCreatorInterface;
  * Idempotencia: usa `carrito_uuid` (columna unique en `pedido`) para garantizar
  * que una segunda llamada con el mismo carrito retorne sin crear un segundo Pedido.
  *
- * Nota: `usuario_id` se deja en null porque el módulo Carrito identifica usuarios
- * por `usuario_ref` (string/matrícula), no por FK integer. El equipo de Pedidos
- * puede resolver el usuario_id desde usuario_ref usando meta_json['usuario_ref']
- * en un proceso asíncrono posterior si lo requiere.
+ * `usuario_id` se resuelve desde `carrito->usuario_ref`:
+ *   - Si es numérico → se usa directamente como FK integer.
+ *   - Si es matrícula string → se busca en `usuario.matricula`.
+ *   - Si no se puede resolver → se lanza RuntimeException (evita insertar null
+ *     en columnas NOT NULL y producir errores crípticos de BD).
  */
 final class EloquentPedidoCreator implements PedidoCreatorInterface
 {
@@ -29,6 +31,7 @@ final class EloquentPedidoCreator implements PedidoCreatorInterface
         'cafeteria'  => 'cafeteria',
         'copias'     => 'copias',
         'souvenirs'  => 'souvenirs',
+        'catalogo'   => 'otro',
     ];
 
     public function crearDesdeCarrito(Carrito $carrito): void
@@ -52,8 +55,29 @@ final class EloquentPedidoCreator implements PedidoCreatorInterface
 
         $descripcion = $items->map(fn($i) => "{$i->nombre} x{$i->cantidad}")->implode(', ');
 
+        // Resolver usuario_id desde usuario_ref.
+        // usuario_ref puede ser: un ID numérico (strval de auth()->id()) o una matrícula string.
+        $usuarioId = null;
+        $usuarioRef = $carrito->usuario_ref;
+
+        if (is_numeric($usuarioRef)) {
+            $usuarioId = (int) $usuarioRef;
+        } else {
+            $usuario = Usuario::where('id', $usuarioRef)
+                ->orWhere('matricula', $usuarioRef)
+                ->first();
+            $usuarioId = $usuario?->id;
+        }
+
+        if ($usuarioId === null) {
+            throw new \RuntimeException(
+                "EloquentPedidoCreator: no se pudo resolver usuario_id desde usuario_ref='{$usuarioRef}'. "
+                . "Verifica que el carrito almacene un ID numérico o matrícula válida."
+            );
+        }
+
         Pedido::create([
-            'usuario_id'       => null,
+            'usuario_id'       => $usuarioId,
             'numero_folio'     => $folio,
             'estado'           => 'creado',
             'modulo'           => $moduloPedido,

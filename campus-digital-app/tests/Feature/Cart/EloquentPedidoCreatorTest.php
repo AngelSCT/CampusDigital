@@ -138,7 +138,7 @@ class EloquentPedidoCreatorTest extends CartTestCase
         $meta   = $pedido->meta_json;
 
         $this->assertEquals((string) $carrito->uuid, $meta['carrito_uuid']);
-        $this->assertEquals('MAT-ELOQUENT-TEST', $meta['usuario_ref']);
+        $this->assertEquals('42', $meta['usuario_ref']);
         $this->assertNotEmpty($meta['items']);
         $this->assertEquals('LIBRO-ETEST', $meta['items'][0]['referencia_externa']);
     }
@@ -147,8 +147,10 @@ class EloquentPedidoCreatorTest extends CartTestCase
 
     private function crearCarritoConItem(): Carrito
     {
+        // Usa usuario_ref numérico para simular producción (strval(auth()->id())).
+        // EloquentPedidoCreator resuelve usuario_id = (int) usuario_ref sin consultar tabla usuario.
         $carrito = $this->carritoService->crear($this->modulo, [
-            'usuario_ref'    => 'MAT-ELOQUENT-TEST',
+            'usuario_ref'    => '42',
             'requiere_saldo' => false,
         ]);
 
