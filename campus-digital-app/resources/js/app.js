@@ -138,6 +138,12 @@ window.route = (name, params) => {
         "mi-tarjeta.escanear": "/mi-tarjeta/escanear",
         "mi-tarjeta.pin": "/mi-tarjeta/pin",
 
+        // Tienda estudiantil
+        "tienda.index": "/tienda",
+
+        // Catálogo detalle (producto)
+        "catalogo.show": "/catalogo/:id",
+
         //RUTA DE ERROR DE PERMISO POR MIDDLEWARE
         "sin-permiso": "/sin-permiso",
 

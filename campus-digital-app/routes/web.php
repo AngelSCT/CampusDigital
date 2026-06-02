@@ -204,6 +204,7 @@ Route::middleware(['auth'])->prefix('proveedor')->name('proveedor.')->group(func
 // ── CARRITO / TIENDA (solo auth, sin verified) ───────────────────────────────
 Route::middleware(['auth'])->group(function () {
     // Rutas sin parámetro — deben ir ANTES de las rutas con {item}/{pedido}
+    Route::get  ('/tienda',                               [\App\Http\Controllers\CatalogoEstudianteController::class, 'index'])->name('tienda.index');
     Route::get  ('/carrito',                              [CartController::class, 'indexWeb'])->name('carrito.index');
     Route::post ('/carrito/confirmar',                    [CartController::class, 'confirmarPedido'])->name('carrito.confirmar');
     Route::get  ('/carrito/exito',                        [CartController::class, 'exitoPedido'])->name('carrito.exito');
