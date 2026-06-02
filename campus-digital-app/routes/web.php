@@ -555,4 +555,8 @@ Route::prefix('catalogo/cart-proxy')
             [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'cancelar']);
         Route::get('/historico',
             [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'historico']);
+        Route::post('/validar-destinatario',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'validarDestinatario']);
+        Route::patch('/carritos/{uuid}/items/{item_id}/regalo',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'marcarRegalo']);
     });

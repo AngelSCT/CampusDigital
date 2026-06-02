@@ -1,0 +1,1 @@
+$u = App\Models\Usuario::where("email", "estudiante@campusdigital.com")->first(); if(!$u){ echo "NO EXISTE"; } else { echo "hash:" . strlen($u->password_hash ?? "") . " check:" . (Illuminate\Support\Facades\Hash::check("password", $u->getAuthPassword()) ? "PASS" : "FAIL"); }

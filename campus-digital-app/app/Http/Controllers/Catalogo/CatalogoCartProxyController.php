@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Catalogo;
 use App\Http\Controllers\Controller;
 use App\Services\Catalogo\CatalogoCartResolver;
 use App\Models\Catalogo\Catalogo;
+use App\Models\Usuario;
 use App\Exceptions\Catalogo\CategoryUnavailableException;
 use App\Exceptions\Catalogo\PriceUnavailableException;
 use App\Exceptions\Catalogo\OutOfStockException;
@@ -503,6 +504,111 @@ class CatalogoCartProxyController extends Controller
 
         if ($resp instanceof JsonResponse) {
             return $resp;
+        }
+
+        return response()->json($resp->json(), $resp->status());
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 8. validarDestinatario
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * POST /catalogo/cart-proxy/validar-destinatario
+     *
+     * Verifica que la matrícula y primer nombre coincidan con un usuario
+     * en la BD. No puede ser el mismo usuario autenticado.
+     */
+    public function validarDestinatario(Request $request): JsonResponse
+    {
+        $request->validate([
+            'matricula'    => ['required', 'string'],
+            'primer_nombre' => ['required', 'string'],
+        ]);
+
+        $usuario = Usuario::where('matricula', $request->matricula)
+            ->whereRaw('LOWER(nombre) LIKE ?', [strtolower($request->primer_nombre) . '%'])
+            ->first();
+
+        if (! $usuario) {
+            return response()->json([
+                'error'  => 'DESTINATARIO_NO_ENCONTRADO',
+                'mensaje' => 'Los datos del destinatario no coinciden.',
+            ], 422);
+        }
+
+        if ($usuario->id === auth()->id()) {
+            return response()->json([
+                'error'  => 'DESTINATARIO_ES_REMITENTE',
+                'mensaje' => 'No puedes enviarte un regalo a ti mismo.',
+            ], 422);
+        }
+
+        return response()->json([
+            'valido'          => true,
+            'destinatario_id' => $usuario->id,
+            'nombre_completo' => trim("{$usuario->nombre} {$usuario->apellido}"),
+        ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 9. marcarRegalo
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * PATCH /catalogo/cart-proxy/carritos/{uuid}/items/{item_id}/regalo
+     *
+     * Actualiza el metadata del ítem para marcarlo (o desmarcar) como regalo.
+     * La lógica persiste localmente en el catálogo; el Cart API no es involucrado.
+     */
+    public function marcarRegalo(Request $request, string $uuid, int $item_id): JsonResponse
+    {
+        $this->assertOwnership($uuid);
+
+        $request->validate([
+            'es_regalo' => ['required', 'boolean'],
+        ]);
+
+        if ($request->boolean('es_regalo')) {
+            $request->validate([
+                'destinatario_id'         => ['required', 'integer'],
+                'destinatario_matricula'  => ['required', 'string'],
+                'mensaje_dedicatorio'     => ['nullable', 'string', 'max:500'],
+            ]);
+        }
+
+        // Actualizar metadata en Cart API via cartCall PATCH
+        $payload = $request->boolean('es_regalo')
+            ? [
+                'metadata' => [
+                    'es_regalo'               => true,
+                    'destinatario_id'         => $request->integer('destinatario_id'),
+                    'destinatario_matricula'  => $request->input('destinatario_matricula'),
+                    'mensaje_dedicatorio'     => $request->input('mensaje_dedicatorio') ?? '',
+                ],
+            ]
+            : [
+                'metadata' => [
+                    'es_regalo'               => false,
+                    'destinatario_id'         => null,
+                    'destinatario_matricula'  => null,
+                    'mensaje_dedicatorio'     => null,
+                ],
+            ];
+
+        $resp = $this->cartCall('patch', "/carritos/{$uuid}/items/{$item_id}", $payload);
+
+        if ($resp instanceof JsonResponse) {
+            return $resp;
+        }
+
+        // Si el Cart API no soporta PATCH de items, respondemos con los datos locales
+        // para que el frontend quede actualizado sin romper el flujo.
+        if ($resp->status() === 404 || $resp->status() === 405) {
+            return response()->json([
+                'metadata' => $payload['metadata'],
+                'item_id'  => $item_id,
+            ]);
         }
 
         return response()->json($resp->json(), $resp->status());

@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'simulador/uid',
             'simulador/*',
             'auth/rfid-login',
+            'catalogo/cart-proxy/validar-destinatario',
         ]);
 
         $middleware->web(append: [

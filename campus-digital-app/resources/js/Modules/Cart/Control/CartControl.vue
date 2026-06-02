@@ -38,7 +38,11 @@
 
             <!-- Item list -->
             <template v-if="items.length > 0">
-                <CartItemList :items="items" @remove="cartStore.removeItem($event)">
+                <CartItemList
+                    :items="items"
+                    :api-base-url="props.apiBaseUrl"
+                    @remove="cartStore.removeItem($event)"
+                    @toggle-regalo="({ itemId, datosRegalo }) => cartStore.toggleRegalo(itemId, datosRegalo)">
                     <template #item-extra="{ item }">
                         <slot name="item-extra" :item="item" />
                     </template>

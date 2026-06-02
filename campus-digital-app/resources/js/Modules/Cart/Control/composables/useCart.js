@@ -106,6 +106,21 @@ export function useCart(userRef, config, apiBaseUrl, emit) {
         }
     }
 
+    async function toggleRegalo(itemId, datosRegalo) {
+        if (!uuid.value) return;
+        const cartUuid = uuid.value;
+        error.value = null;
+        try {
+            await api.marcarRegalo(cartUuid, itemId, datosRegalo);
+            const cartRes = await api.getCart(cartUuid);
+            cart.value = normalizeCart(cartRes.data);
+            emit('cart-updated', { items: items.value, total: total.value });
+        } catch (e) {
+            error.value = buildError(e);
+            emit('cart-error', error.value);
+        }
+    }
+
     async function doCheckout(metadataCheckout = {}) {
         if (!uuid.value || checkingOut.value) return;
         checkingOut.value = true;
@@ -146,6 +161,6 @@ export function useCart(userRef, config, apiBaseUrl, emit) {
     return {
         cart, items, total, uuid,
         loading, checkingOut, error, confirmed, pendingCharge,
-        init, addItem, removeItem, doCheckout,
+        init, addItem, removeItem, toggleRegalo, doCheckout,
     };
 }
