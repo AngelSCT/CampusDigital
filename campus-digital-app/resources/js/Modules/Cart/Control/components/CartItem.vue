@@ -3,12 +3,16 @@
         <div class="flex-1 min-w-0">
             <p class="truncate text-sm font-medium text-gray-800">{{ item.nombre }}</p>
             <p class="text-xs text-gray-400">{{ item.referencia_externa }}</p>
+            <p class="text-xs text-gray-400">Cantidad: {{ item.cantidad ?? 1 }}</p>
             <p v-if="item.duracion_dias" class="text-xs text-gray-400">{{ item.duracion_dias }} día(s)</p>
         </div>
         <div class="flex items-center gap-2">
-            <span class="text-sm font-semibold text-gray-700">
-                {{ formatMoney(item.precio_unitario) }}
-            </span>
+            <div class="text-right">
+                <p class="text-xs text-gray-400">{{ formatMoney(item.precio_unitario) }} / ud.</p>
+                <p class="text-sm font-semibold text-gray-700">
+                    {{ formatMoney((item.precio_unitario ?? 0) * (item.cantidad ?? 1)) }}
+                </p>
+            </div>
             <slot name="item-extra" :item="item" />
             <button @click="$emit('remove', item.id)"
                     class="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"

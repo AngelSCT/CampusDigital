@@ -4,9 +4,11 @@ namespace App\Models\Catalogo;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Inventario extends Model
 {
+    use HasFactory;
     protected $table = 'inventario';
 
     protected $primaryKey = 'id_inventario';
