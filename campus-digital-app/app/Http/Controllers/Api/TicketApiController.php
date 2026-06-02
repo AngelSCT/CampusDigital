@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TicketResource;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class TicketApiController extends Controller
     // GET /api/tickets
     public function index()
     {
-        return response()->json(
+        return TicketResource::collection(
             Ticket::with(['usuarioSolicitante', 'categoria.area', 'equipo'])
                 ->whereNull('deleted_at')
                 ->orderBy('fecha_creacion', 'desc')
@@ -22,11 +23,11 @@ class TicketApiController extends Controller
     // GET /api/tickets/{id}
     public function show($id)
     {
-        $ticket = Ticket::with(['usuarioSolicitante', 'categoria.area', 'equipo'])
-            ->whereNull('deleted_at')
-            ->findOrFail($id);
-
-        return response()->json($ticket);
+        return new TicketResource(
+            Ticket::with(['usuarioSolicitante', 'categoria.area', 'equipo'])
+                ->whereNull('deleted_at')
+                ->findOrFail($id)
+        );
     }
 
     // POST /api/tickets
@@ -45,7 +46,7 @@ class TicketApiController extends Controller
             $request->only(['id_usuario_solicitante', 'id_categoria', 'id_equipo', 'estado', 'prioridad', 'fecha_creacion'])
         );
 
-        return response()->json($ticket->load(['usuarioSolicitante', 'categoria.area', 'equipo']), 201);
+        return (new TicketResource($ticket->load(['usuarioSolicitante', 'categoria.area', 'equipo'])))->response()->setStatusCode(201);
     }
 
     // PUT /api/tickets/{id}
@@ -66,7 +67,7 @@ class TicketApiController extends Controller
             $request->only(['id_usuario_solicitante', 'id_categoria', 'id_equipo', 'estado', 'prioridad', 'fecha_creacion'])
         );
 
-        return response()->json($ticket->fresh()->load(['usuarioSolicitante', 'categoria.area', 'equipo']));
+        return new TicketResource($ticket->fresh()->load(['usuarioSolicitante', 'categoria.area', 'equipo']));
     }
 
     // DELETE /api/tickets/{id}

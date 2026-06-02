@@ -41,6 +41,7 @@ use App\Http\Controllers\CatalogoVendedorController;
 use App\Http\Controllers\PromocionController;
 use App\Http\Controllers\CatalogoUsuarioDemoController;
 use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\CartController;
 
 Route::get('/reglas', [ReglaController::class, 'index']);
 Route::get('/reglas/create', [ReglaController::class, 'create']);
@@ -92,6 +93,7 @@ Route::post('/catalogo', [CatalogoController::class, 'store'])->name('catalogo.s
 Route::post('/catalogo/bulk-update', [CatalogoController::class, 'bulkUpdate'])->name('catalogo.bulk-update');
 Route::patch('/catalogo/{id}/quick-update', [CatalogoController::class, 'quickUpdate'])->name('catalogo.quick-update');
 Route::get('/catalogo/{id}/edit', [CatalogoController::class, 'edit'])->name('catalogo.edit');
+Route::get('/catalogo/{id}', [CatalogoController::class, 'show'])->middleware(['auth'])->name('catalogo.show');
 Route::put('/catalogo/{id}', [CatalogoController::class, 'update'])->name('catalogo.update');
 Route::delete('/catalogo/{id}', [CatalogoController::class, 'destroy'])->name('catalogo.destroy');
 
@@ -192,6 +194,34 @@ Route::post('/simulador/limpiar-login', function () {
     return response()->json(['ok' => true]);
 })->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
+
+// ── PROVEEDOR (Módulo 4.9 – Preview) ─────────────────────────────────────────
+Route::middleware(['auth'])->prefix('proveedor')->name('proveedor.')->group(function () {
+    Route::get ('/pedidos',                        [\App\Http\Controllers\ProveedorController::class, 'index'])->name('pedidos');
+    Route::post('/pedidos/{pedido}/cancelar',       [\App\Http\Controllers\ProveedorController::class, 'cancelarPedido'])->name('cancelar');
+});
+
+// ── CARRITO / TIENDA (solo auth, sin verified) ───────────────────────────────
+Route::middleware(['auth'])->group(function () {
+    // Rutas sin parámetro — deben ir ANTES de las rutas con {item}/{pedido}
+    Route::get  ('/carrito',                              [CartController::class, 'indexWeb'])->name('carrito.index');
+    Route::post ('/carrito/confirmar',                    [CartController::class, 'confirmarPedido'])->name('carrito.confirmar');
+    Route::get  ('/carrito/exito',                        [CartController::class, 'exitoPedido'])->name('carrito.exito');
+    Route::get  ('/carrito/dashboard',                    [CartController::class, 'dashboardData'])->name('carrito.dashboard');
+    Route::get  ('/carrito/dashboard/exportar',           [CartController::class, 'exportarCSV'])->name('carrito.exportar');
+    Route::get  ('/carrito/mis-regalos-recibidos',        [CartController::class, 'misRegalosRecibidos'])->name('carrito.mis-regalos');
+    Route::post ('/carrito/regalos/{pedido}/aceptar',             [CartController::class, 'aceptarRegalo'])->name('carrito.regalos.aceptar');
+    Route::post ('/carrito/regalos/{pedido}/rechazar',            [CartController::class, 'rechazarRegaloEscrow'])->name('carrito.regalos.rechazar');
+    Route::post ('/carrito/regalos/{pedido}/cancelar-remitente',  [CartController::class, 'cancelarRegaloRemitente'])->name('carrito.regalos.cancelar-remitente');
+    Route::post ('/carrito/validar-destinatario',         [CartController::class, 'validarDestinatario'])->name('carrito.validar-destinatario');
+    // Rutas con parámetro
+    Route::patch('/carrito/{item}/guardar',               [CartController::class, 'guardarParaDespues'])->name('carrito.guardar');
+    Route::patch('/carrito/{item}/mover-al-carrito',      [CartController::class, 'moverAlCarrito'])->name('carrito.mover');
+    Route::patch('/carrito/{item}/regalo',                [CartController::class, 'marcarRegalo'])->name('carrito.regalo');
+    Route::post ('/carrito/{item}/rechazar-regalo',       [CartController::class, 'rechazarRegalo'])->name('carrito.rechazar-regalo');
+    Route::post ('/carrito/pedido/{pedido}/cancelar-gracia', [CartController::class, 'cancelarConGracia'])->name('carrito.cancelar-gracia');
+    Route::post ('/carrito/admin/pedidos-expirados',         [CartController::class, 'procesarPedidosExpirados'])->name('carrito.pedidos-expirados');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -474,3 +504,54 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 });
+
+// ── MÓDULO CARRITO — Panel de Administración (requiere auth + rol admin_carrito) ──
+Route::middleware(['auth', 'role.cart.admin'])
+    ->prefix('admin/cart')
+    ->name('admin.cart.')
+    ->group(function () {
+        Route::get('solicitudes',                              [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'index'])   ->name('solicitudes.index');
+        Route::get('solicitudes/{solicitud}',                  [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'show'])    ->name('solicitudes.show');
+        Route::post('solicitudes/{solicitud}/aprobar',         [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'aprobar']) ->name('solicitudes.aprobar');
+        Route::post('solicitudes/{solicitud}/rechazar',        [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'rechazar'])->name('solicitudes.rechazar');
+        Route::get('solicitudes/{folio}/token',                [\App\Http\Controllers\Admin\Cart\TokenEntregaController::class,'show'])    ->name('token.show');
+
+        Route::get('modulos',                                  [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'index'])              ->name('modulos.index');
+        Route::get('modulos/{modulo}',                         [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'show'])               ->name('modulos.show');
+        Route::post('modulos/{modulo}/revocar',                [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'revocarToken'])        ->name('modulos.revocar');
+        Route::post('modulos/{modulo}/forzar-refresh',         [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'forzarRefresh'])       ->name('modulos.forzar-refresh');
+        Route::get('bitacora',                                 [\App\Http\Controllers\Admin\Cart\BitacoraController::class,   'index'])              ->name('bitacora.index');
+    });
+
+// ── DEMO — Módulo Biblioteca (integración de referencia para equipos clientes) ──
+Route::prefix('demo/biblioteca')->name('demo.biblioteca.')->group(function () {
+    Route::get('prestamo',                              [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'index'])           ->name('prestamo');
+    Route::prefix('cart-proxy')->name('cart-proxy.')->group(function () {
+        Route::post('carritos',                         [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyCreateCart']) ->name('carritos.create');
+        Route::get('carritos/{uuid}',                   [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyGetCart'])    ->name('carritos.show');
+        Route::post('carritos/{uuid}/items',            [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyAddItem'])    ->name('carritos.items.add');
+        Route::delete('carritos/{uuid}/items/{itemId}', [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyRemoveItem']) ->name('carritos.items.remove');
+        Route::post('carritos/{uuid}/checkout',         [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyCheckout'])   ->name('carritos.checkout');
+        Route::post('carritos/{uuid}/cancelar',         [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyCancel'])     ->name('carritos.cancel');
+    });
+});
+
+// ── CATÁLOGO — Cart Proxy (Capa A3/A4) ──────────────────────────────────────
+Route::prefix('catalogo/cart-proxy')
+    ->middleware(['web', 'auth'])
+    ->group(function () {
+        Route::post('/carritos',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'crearCarrito']);
+        Route::get('/carritos/{uuid}',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'obtenerCarrito']);
+        Route::post('/carritos/{uuid}/items',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'agregarItem']);
+        Route::delete('/carritos/{uuid}/items/{item_id}',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'eliminarItem']);
+        Route::post('/carritos/{uuid}/checkout',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'checkout']);
+        Route::post('/carritos/{uuid}/cancelar',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'cancelar']);
+        Route::get('/historico',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'historico']);
+    });

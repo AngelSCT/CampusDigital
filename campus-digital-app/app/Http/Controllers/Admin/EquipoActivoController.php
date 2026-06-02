@@ -7,6 +7,7 @@ use App\Models\EquipoActivo;
 use App\Models\CategoriaTicket;
 use App\Models\Ubicacion;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class EquipoActivoController extends Controller
 {
@@ -32,8 +33,15 @@ class EquipoActivoController extends Controller
 
         $equipos = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
-        // TODO: return Inertia::render('Admin/EquiposActivos/Index', [...])
-        return response()->json($equipos);
+        $categorias = CategoriaTicket::orderBy('nombre_categoria')->get(['id_categoria', 'nombre_categoria']);
+        $ubicaciones = Ubicacion::orderBy('edificio')->get(['id_ubicacion', 'edificio', 'aula_departamento']);
+
+        return Inertia::render('Admin/EquiposActivos/Index', [
+            'equipos'     => $equipos,
+            'categorias'  => $categorias,
+            'ubicaciones' => $ubicaciones,
+            'filters'     => $request->only(['search', 'categoria', 'ubicacion', 'estado']),
+        ]);
     }
 
     public function store(Request $request)
@@ -45,16 +53,23 @@ class EquipoActivoController extends Controller
             'estado_actual' => ['required', 'string', 'max:50'],
         ]);
 
-        $equipo = EquipoActivo::create($validated);
+        EquipoActivo::create($validated);
 
-        // TODO: return redirect()->route('admin.equipos-activos.index')->with('success', ...)
-        return response()->json($equipo->load(['categoria', 'ubicacion']), 201);
+        return redirect()->route('admin.equipos-activos.index')->with('success', 'Equipo activo creado correctamente.');
     }
 
     public function show(EquipoActivo $equipoActivo)
     {
-        // TODO: return Inertia::render('Admin/EquiposActivos/Show', [...])
-        return response()->json($equipoActivo->load(['categoria', 'ubicacion']));
+        $equipoActivo->load(['categoria', 'ubicacion']);
+
+        $categorias  = CategoriaTicket::orderBy('nombre_categoria')->get(['id_categoria', 'nombre_categoria']);
+        $ubicaciones = Ubicacion::orderBy('edificio')->get(['id_ubicacion', 'edificio', 'aula_departamento']);
+
+        return Inertia::render('Admin/EquiposActivos/Show', [
+            'equipo'      => $equipoActivo,
+            'categorias'  => $categorias,
+            'ubicaciones' => $ubicaciones,
+        ]);
     }
 
     public function update(Request $request, EquipoActivo $equipoActivo)
@@ -68,15 +83,13 @@ class EquipoActivoController extends Controller
 
         $equipoActivo->update($validated);
 
-        // TODO: return redirect()->route('admin.equipos-activos.index')->with('success', ...)
-        return response()->json($equipoActivo->fresh()->load(['categoria', 'ubicacion']));
+        return redirect()->route('admin.equipos-activos.show', $equipoActivo->id_equipo)->with('success', 'Equipo activo actualizado correctamente.');
     }
 
     public function destroy(EquipoActivo $equipoActivo)
     {
         $equipoActivo->delete();
 
-        // TODO: return redirect()->route('admin.equipos-activos.index')->with('success', ...)
-        return response()->json(['message' => 'Equipo eliminado correctamente.']);
+        return redirect()->route('admin.equipos-activos.index')->with('success', 'Equipo activo eliminado correctamente.');
     }
 }

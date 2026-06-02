@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\RecargaResource;
 use App\Models\Recarga;
 use App\Models\SaldoMonedero;
 use App\Models\SaldoMovimiento;
@@ -26,7 +27,7 @@ class RecargaApiController extends Controller
         if ($request->filled('desde'))       $query->where('created_at', '>=', $request->desde);
         if ($request->filled('hasta'))       $query->where('created_at', '<=', $request->hasta);
 
-        return response()->json(
+        return RecargaResource::collection(
             $query->orderByDesc('created_at')->paginate($request->get('per_page', 15))
         );
     }
@@ -37,7 +38,7 @@ class RecargaApiController extends Controller
     // ─────────────────────────────────────────────────────────────
     public function show($id)
     {
-        return response()->json(
+        return new RecargaResource(
             Recarga::with(['usuario', 'saldoMovimiento'])
                 ->whereNull('deleted_at')
                 ->findOrFail($id)
@@ -102,8 +103,8 @@ class RecargaApiController extends Controller
                 ]);
 
                 return response()->json([
-                    'mensaje'  => 'El pago no fue autorizado. No se acreditó saldo.',
-                    'recarga'  => $recarga->fresh()->load('usuario'),
+                    'mensaje'    => 'El pago no fue autorizado. No se acreditó saldo.',
+                    'recarga'    => new RecargaResource($recarga->fresh()->load('usuario')),
                     'acreditado' => false,
                 ], 422);
             }
@@ -152,7 +153,7 @@ class RecargaApiController extends Controller
 
             return response()->json([
                 'mensaje'          => 'Recarga exitosa. Saldo acreditado correctamente.',
-                'recarga'          => $recarga->fresh()->load(['usuario', 'saldoMovimiento']),
+                'recarga'          => new RecargaResource($recarga->fresh()->load(['usuario', 'saldoMovimiento'])),
                 'saldo_disponible' => $monedero->saldo_disponible,
                 'acreditado'       => true,
             ], 201);
@@ -175,6 +176,6 @@ class RecargaApiController extends Controller
             return response()->json(['message' => 'El usuario no tiene recargas registradas.'], 404);
         }
 
-        return response()->json($recargas);
+        return RecargaResource::collection($recargas);
     }
 }

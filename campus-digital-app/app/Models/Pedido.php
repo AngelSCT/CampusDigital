@@ -26,6 +26,7 @@ class Pedido extends Model
         'tarjeta_lectura_id',
         'cobrado_de_saldo',
         'saldo_movimiento_id',
+        'carrito_uuid',
         'meta_json',
     ];
 

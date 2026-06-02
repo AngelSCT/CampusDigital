@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TarjetaUniversitariaResource;
 use App\Models\TarjetaUniversitaria;
 use Illuminate\Http\Request;
 
@@ -18,13 +19,13 @@ class TarjetaUniversitariaApiController extends Controller
         if ($request->filled('estado'))      $query->where('estado', $request->estado);
         if ($request->filled('uid'))         $query->where('uid', 'ilike', '%'.$request->uid.'%');
 
-        return response()->json($query->orderByDesc('created_at')->paginate($request->get('per_page', 15)));
+        return TarjetaUniversitariaResource::collection($query->orderByDesc('created_at')->paginate($request->get('per_page', 15)));
     }
 
     // GET /api/tarjetas/{id}
     public function show($id)
     {
-        return response()->json(
+        return new TarjetaUniversitariaResource(
             TarjetaUniversitaria::with(['usuario', 'registradoPor', 'bloqueadoPor'])
                 ->whereNull('deleted_at')
                 ->findOrFail($id)
@@ -43,7 +44,7 @@ class TarjetaUniversitariaApiController extends Controller
             return response()->json(['message' => 'Tarjeta no encontrada.'], 404);
         }
 
-        return response()->json($tarjeta);
+        return new TarjetaUniversitariaResource($tarjeta);
     }
 
     // POST /api/tarjetas
@@ -63,7 +64,7 @@ class TarjetaUniversitariaApiController extends Controller
             'meta_json'                 => $request->meta_json ?? [],
         ]);
 
-        return response()->json($tarjeta->load('usuario'), 201);
+        return (new TarjetaUniversitariaResource($tarjeta->load('usuario')))->response()->setStatusCode(201);
     }
 
     // PUT /api/tarjetas/{id}
@@ -78,7 +79,7 @@ class TarjetaUniversitariaApiController extends Controller
 
         $tarjeta->update($request->only(['uid', 'estado', 'motivo_bloqueo', 'meta_json']));
 
-        return response()->json($tarjeta->fresh());
+        return new TarjetaUniversitariaResource($tarjeta->fresh());
     }
 
     // DELETE /api/tarjetas/{id}
@@ -103,7 +104,7 @@ class TarjetaUniversitariaApiController extends Controller
             'bloqueado_at'              => now(),
         ]);
 
-        return response()->json(['message' => 'Tarjeta bloqueada.', 'tarjeta' => $tarjeta->fresh()]);
+        return response()->json(['message' => 'Tarjeta bloqueada.', 'tarjeta' => new TarjetaUniversitariaResource($tarjeta->fresh())]);
     }
 
     // POST /api/tarjetas/{id}/desbloquear
@@ -117,6 +118,6 @@ class TarjetaUniversitariaApiController extends Controller
             'bloqueado_at'             => null,
         ]);
 
-        return response()->json(['message' => 'Tarjeta desbloqueada.', 'tarjeta' => $tarjeta->fresh()]);
+        return response()->json(['message' => 'Tarjeta desbloqueada.', 'tarjeta' => new TarjetaUniversitariaResource($tarjeta->fresh())]);
     }
 }

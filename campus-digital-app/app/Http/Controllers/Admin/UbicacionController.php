@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Ubicacion;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class UbicacionController extends Controller
 {
@@ -14,15 +15,17 @@ class UbicacionController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('edificio',         'ilike', "%{$request->search}%")
+                $q->where('edificio',           'ilike', "%{$request->search}%")
                   ->orWhere('aula_departamento', 'ilike', "%{$request->search}%");
             });
         }
 
         $ubicaciones = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
-        // TODO: return Inertia::render('Admin/Ubicaciones/Index', [...])
-        return response()->json($ubicaciones);
+        return Inertia::render('Admin/Ubicaciones/Index', [
+            'ubicaciones' => $ubicaciones,
+            'filters'     => $request->only(['search']),
+        ]);
     }
 
     public function store(Request $request)
@@ -32,16 +35,16 @@ class UbicacionController extends Controller
             'aula_departamento' => ['required', 'string', 'max:120'],
         ]);
 
-        $ubicacion = Ubicacion::create($validated);
+        Ubicacion::create($validated);
 
-        // TODO: return redirect()->route('admin.ubicaciones.index')->with('success', ...)
-        return response()->json($ubicacion, 201);
+        return redirect()->route('admin.ubicaciones.index')->with('success', 'Ubicación creada correctamente.');
     }
 
     public function show(Ubicacion $ubicacion)
     {
-        // TODO: return Inertia::render('Admin/Ubicaciones/Show', ['ubicacion' => $ubicacion])
-        return response()->json($ubicacion);
+        return Inertia::render('Admin/Ubicaciones/Show', [
+            'ubicacion' => $ubicacion,
+        ]);
     }
 
     public function update(Request $request, Ubicacion $ubicacion)
@@ -53,15 +56,13 @@ class UbicacionController extends Controller
 
         $ubicacion->update($validated);
 
-        // TODO: return redirect()->route('admin.ubicaciones.index')->with('success', ...)
-        return response()->json($ubicacion->fresh());
+        return redirect()->route('admin.ubicaciones.index')->with('success', 'Ubicación actualizada correctamente.');
     }
 
     public function destroy(Ubicacion $ubicacion)
     {
         $ubicacion->delete();
 
-        // TODO: return redirect()->route('admin.ubicaciones.index')->with('success', ...)
-        return response()->json(['message' => 'Ubicación eliminada correctamente.']);
+        return redirect()->route('admin.ubicaciones.index')->with('success', 'Ubicación eliminada correctamente.');
     }
 }

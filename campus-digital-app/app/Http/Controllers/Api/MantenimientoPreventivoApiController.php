@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MantenimientoPreventivoResource;
 use App\Models\MantenimientoPreventivo;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class MantenimientoPreventivoApiController extends Controller
     // GET /api/mantenimientos-preventivos
     public function index()
     {
-        return response()->json(
+        return MantenimientoPreventivoResource::collection(
             MantenimientoPreventivo::with(['equipo.categoria', 'equipo.ubicacion'])
                 ->whereNull('deleted_at')
                 ->orderBy('proxima_fecha_programada', 'asc')
@@ -22,11 +23,11 @@ class MantenimientoPreventivoApiController extends Controller
     // GET /api/mantenimientos-preventivos/{id}
     public function show($id)
     {
-        $preventivo = MantenimientoPreventivo::with(['equipo.categoria', 'equipo.ubicacion'])
-            ->whereNull('deleted_at')
-            ->findOrFail($id);
-
-        return response()->json($preventivo);
+        return new MantenimientoPreventivoResource(
+            MantenimientoPreventivo::with(['equipo.categoria', 'equipo.ubicacion'])
+                ->whereNull('deleted_at')
+                ->findOrFail($id)
+        );
     }
 
     // POST /api/mantenimientos-preventivos
@@ -41,7 +42,7 @@ class MantenimientoPreventivoApiController extends Controller
             $request->only(['id_equipo', 'proxima_fecha_programada'])
         );
 
-        return response()->json($preventivo->load(['equipo.categoria', 'equipo.ubicacion']), 201);
+        return (new MantenimientoPreventivoResource($preventivo->load(['equipo.categoria', 'equipo.ubicacion'])))->response()->setStatusCode(201);
     }
 
     // PUT /api/mantenimientos-preventivos/{id}
@@ -58,7 +59,7 @@ class MantenimientoPreventivoApiController extends Controller
             $request->only(['id_equipo', 'proxima_fecha_programada'])
         );
 
-        return response()->json($preventivo->fresh()->load(['equipo.categoria', 'equipo.ubicacion']));
+        return new MantenimientoPreventivoResource($preventivo->fresh()->load(['equipo.categoria', 'equipo.ubicacion']));
     }
 
     // DELETE /api/mantenimientos-preventivos/{id}

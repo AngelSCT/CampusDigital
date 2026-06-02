@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\RolResource;
 use App\Models\Rol;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class RolApiController extends Controller
     // GET /api/roles
     public function index()
     {
-        return response()->json(
+        return RolResource::collection(
             Rol::with(['permisos' => fn($q) => $q->whereNull('rol_permiso.deleted_at')])
                 ->whereNull('deleted_at')
                 ->get()
@@ -21,11 +22,11 @@ class RolApiController extends Controller
     // GET /api/roles/{id}
     public function show($id)
     {
-        $rol = Rol::with(['permisos' => fn($q) => $q->whereNull('rol_permiso.deleted_at')])
-            ->whereNull('deleted_at')
-            ->findOrFail($id);
-
-        return response()->json($rol);
+        return new RolResource(
+            Rol::with(['permisos' => fn($q) => $q->whereNull('rol_permiso.deleted_at')])
+                ->whereNull('deleted_at')
+                ->findOrFail($id)
+        );
     }
 
     // POST /api/roles
@@ -39,7 +40,7 @@ class RolApiController extends Controller
 
         $rol = Rol::create($request->only(['nombre', 'descripcion', 'activo']));
 
-        return response()->json($rol, 201);
+        return (new RolResource($rol))->response()->setStatusCode(201);
     }
 
     // PUT /api/roles/{id}
@@ -55,7 +56,7 @@ class RolApiController extends Controller
 
         $rol->update($request->only(['nombre', 'descripcion', 'activo']));
 
-        return response()->json($rol->fresh());
+        return new RolResource($rol->fresh());
     }
 
     // DELETE /api/roles/{id}

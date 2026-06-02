@@ -1,6 +1,6 @@
 <?php
 
-//RUTAS DE LA API REST DE LA APLICACION
+//RUTAS DE LA API REST DE LA APLICACION ANADIR EN EL ORDEN CORRESPONDIENTE PORFAVOR
 
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +32,10 @@ use App\Http\Controllers\Api\TarjetaLecturaApiController;
 use App\Http\Controllers\Api\SaldoMonederoApiController;
 use App\Http\Controllers\Api\SaldoMovimientoApiController;
 use App\Http\Controllers\Api\PedidoApiController;
+
+// MODULO CARRITO / TIENDA
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\Api\CartApiController;
 
 // MODULO RECARGAS (US2)
 use App\Http\Controllers\Api\RecargaApiController;
@@ -147,6 +151,51 @@ Route::middleware('api.key')->group(function () {
     Route::get('catalogo-integracion/vendedor/{id_vendedor}', [CatalogoIntegracionApiController::class, 'porVendedor']);
 });
 
+
+// ── CARRITO / TIENDA (auth) ─────────────────────────────────────────────────
+Route::middleware('auth')->prefix('carrito')->group(function () {
+    Route::get   ('/',                   [CartController::class, 'index']);         // ver carrito + saldo monedero
+    Route::post  ('/',                   [CartController::class, 'store']);         // agregar producto
+    Route::patch ('{item}/wishlist',     [CartController::class, 'moverWishlist']); // mover a/desde wishlist
+    Route::patch ('{item}/regalo',       [CartController::class, 'marcarRegalo']);  // marcar como regalo
+    Route::post  ('limpiar',             [CartController::class, 'limpiarInactivos']); // limpiar inactivos
+    Route::post  ('checkout',            [CartController::class, 'checkout']);      // procesar checkout
+});
+
+// ── VALIDACIÓN PÚBLICA DE TICKETS (sin API key, para escaneo QR) ───────────
+Route::get('/v1/validar-ticket/{hash}', [CartApiController::class, 'validarHash']);
+
+// ── VALIDACIÓN PÚBLICA DE REGALOS (sin API key, para el destinatario) ──────
+Route::get('/v1/regalo/validar/{hash}', [CartController::class, 'validarRegalo']);
+
+// ── CARRITO API v1 (interoperabilidad módulo 4.4) ──────────────────────────
+Route::middleware('api.key')->prefix('v1/carrito')->group(function () {
+    Route::get('usuarios/{id}/stats',    [CartApiController::class, 'getUserStats']);
+    Route::get('stats/global',           [CartApiController::class, 'getGlobalStats']);
+    Route::get('usuarios/{id}/historial',[CartApiController::class, 'getOrderHistory']);
+});
+
+// ── MÓDULO CARRITO — Endpoints privados (requieren JWT de módulo) ──────────
+Route::middleware('auth.module.jwt')->prefix('cart')->group(function () {
+    Route::post  ('carritos',                                [\App\Http\Controllers\Api\Cart\CarritoController::class, 'store']);
+    Route::get   ('carritos/{uuid}',                         [\App\Http\Controllers\Api\Cart\CarritoController::class, 'show']);
+    Route::post  ('carritos/{uuid}/items',                   [\App\Http\Controllers\Api\Cart\ItemController::class,    'store']);
+    Route::delete('carritos/{uuid}/items/{item_id}',         [\App\Http\Controllers\Api\Cart\ItemController::class,    'destroy']);
+    Route::post  ('carritos/{uuid}/checkout',                [\App\Http\Controllers\Api\Cart\CheckoutController::class,'checkout']);
+    Route::post  ('carritos/{uuid}/cancelar',                [\App\Http\Controllers\Api\Cart\CarritoController::class, 'cancelar']);
+    Route::get   ('historico',                               [\App\Http\Controllers\Api\Cart\CarritoController::class, 'historico']);
+    Route::post  ('carritos/{uuid}/items/{item_id}/devolver',[\App\Http\Controllers\Api\Cart\ItemController::class,    'devolver']);
+});
+
+// ── MÓDULO CARRITO — Token refresh (sin auth.module.jwt; recibe refresh, no access) ──
+Route::post('cart/tokens/refresh', [\App\Http\Controllers\Cart\TokenRefreshController::class, 'refresh']);
+
+// ── MÓDULO CARRITO — APIs Públicas (sin autenticación) ─────────────────────
+Route::prefix('public')->group(function () {
+    Route::get('categorias', [\App\Http\Controllers\Cart\CategoriasPublicController::class, 'index']);
+    Route::post('modulos/solicitud', [\App\Http\Controllers\Cart\SolicitudModuloController::class, 'store']);
+    Route::get('modulos/solicitud/{folio}/estado', [\App\Http\Controllers\Cart\SolicitudModuloController::class, 'estado']);
+});
 
 Route::prefix('rfid')->group(function () {
 
