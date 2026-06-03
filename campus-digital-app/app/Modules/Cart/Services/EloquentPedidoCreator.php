@@ -2,27 +2,28 @@
 
 namespace App\Modules\Cart\Services;
 
+use App\DTOs\CheckoutPedidoDTO;
 use App\Models\Cart\Carrito;
 use App\Models\Cart\ItemCarrito;
 use App\Models\Pedido;
 use App\Models\Usuario;
 use App\Modules\Cart\Contracts\PedidoCreatorInterface;
+use App\Services\Pedidos\CancelarPedidoDesdeCheckout;
+use App\Services\Pedidos\CrearPedidoDesdeCheckout;
+use Illuminate\Support\Facades\Log;
 
 /**
- * Implementación concreta de PedidoCreatorInterface usando Eloquent.
+ * Implementación concreta de PedidoCreatorInterface.
  *
- * Escribe directamente en la tabla `pedido` de la misma BD (campus_digital).
- * Diseñada para ejecutarse DENTRO de la DB::transaction que confirma el Carrito,
- * garantizando atomicidad entre ambas escrituras.
+ * Estrategia primaria: llama directamente al Service CrearPedidoDesdeCheckout
+ * del Módulo 4.5 (Pedidos y Seguimiento) usando el DTO CheckoutPedidoDTO.
  *
- * Idempotencia: usa `carrito_uuid` (columna unique en `pedido`) para garantizar
- * que una segunda llamada con el mismo carrito retorne sin crear un segundo Pedido.
+ * Fallback: si M4.5 no está disponible (no-2xx), crea el pedido localmente
+ * en la tabla `pedido` de la misma BD, preservando la atomicidad transaccional.
  *
- * `usuario_id` se resuelve desde `carrito->usuario_ref`:
- *   - Si es numérico → se usa directamente como FK integer.
- *   - Si es matrícula string → se busca en `usuario.matricula`.
- *   - Si no se puede resolver → se lanza RuntimeException (evita insertar null
- *     en columnas NOT NULL y producir errores crípticos de BD).
+ * Idempotencia: verifica `carrito_uuid` único en `pedido` antes de cualquier escritura.
+ *
+ * `usuario_id` se resuelve desde `carrito->usuario_ref` (numérico directo o matrícula).
  */
 final class EloquentPedidoCreator implements PedidoCreatorInterface
 {
@@ -76,32 +77,90 @@ final class EloquentPedidoCreator implements PedidoCreatorInterface
             );
         }
 
-        Pedido::create([
-            'usuario_id'       => $usuarioId,
-            'numero_folio'     => $folio,
-            'estado'           => 'creado',
-            'modulo'           => $moduloPedido,
-            'total'            => $carrito->total,
-            'descripcion'      => $descripcion ?: 'Pedido desde carrito',
-            'cobrado_de_saldo' => $carrito->requiere_saldo,
-            'carrito_uuid'     => (string) $carrito->uuid,
-            'meta_json'        => [
+        // ── Preparar payload para M4.5 ──────────────────────────────────────
+        $moduloMapCat = [
+            'cafeteria' => 'cafeteria',
+            'copias'    => 'copias',
+            'souvenirs' => 'souvenirs',
+            'tramites'  => 'otro',
+            'servicios' => 'otro',
+        ];
+        $moduloPorCategoria = $moduloMapCat[$items->first()?->categoria?->slug ?? ''] ?? $moduloPedido;
+
+        $itemsPayload = $items->map(function ($item) {
+            $idCatalogo = $item->metadata['id_catalogo']
+                ?? (int) str_replace('CAT-', '', $item->referencia_externa);
+            return [
+                'producto_id' => $idCatalogo,
+                'cantidad'    => $item->cantidad,
+            ];
+        })->toArray();
+
+        // ── Llamar al Service de M4.5 (estrategia primaria) ─────────────────
+        $enviado = false;
+        try {
+            app(CrearPedidoDesdeCheckout::class)->ejecutar(
+                new CheckoutPedidoDTO(
+                    usuarioId:   $usuarioId,
+                    modulo:      $moduloPorCategoria,
+                    items:       $itemsPayload,
+                    descripcion: $descripcion ?: 'Pedido desde carrito',
+                    metaJson:    [
+                        'carrito_uuid' => (string) $carrito->uuid,
+                        'usuario_ref'  => $carrito->usuario_ref,
+                        'modulo_slug'  => $carrito->modulo?->slug,
+                    ],
+                    carritoUuid: (string) $carrito->uuid,
+                )
+            );
+            $enviado = true;
+            // M4.5 creó el pedido con folio, ítems, historial y bitácora.
+            return;
+        } catch (\Throwable $e) {
+            Log::warning('[EloquentPedidoCreator] Servicio M4.5 falló; usando fallback local', [
+                'error'        => $e->getMessage(),
                 'carrito_uuid' => (string) $carrito->uuid,
-                'usuario_ref'  => $carrito->usuario_ref,
-                'modulo_slug'  => $carrito->modulo?->slug,
-                'items'        => $items->map(fn($i) => [
-                    'referencia_externa' => $i->referencia_externa,
-                    'nombre'             => $i->nombre,
-                    'precio_unitario'    => (float) $i->precio_unitario,
-                    'cantidad'           => $i->cantidad,
-                    'categoria_slug'     => $i->categoria?->slug,
-                ])->toArray(),
-            ],
-        ]);
+            ]);
+        }
+
+        // ── Fallback: escritura local si M4.5 no respondió exitosamente ─────
+        if (!$enviado) {
+            Pedido::create([
+                'usuario_id'       => $usuarioId,
+                'numero_folio'     => $folio,
+                'estado'           => 'creado',
+                'modulo'           => $moduloPedido,
+                'total'            => $carrito->total,
+                'descripcion'      => $descripcion ?: 'Pedido desde carrito',
+                'cobrado_de_saldo' => $carrito->requiere_saldo,
+                'carrito_uuid'     => (string) $carrito->uuid,
+                'meta_json'        => [
+                    'carrito_uuid' => (string) $carrito->uuid,
+                    'usuario_ref'  => $carrito->usuario_ref,
+                    'modulo_slug'  => $carrito->modulo?->slug,
+                    'items'        => $items->map(fn($i) => [
+                        'referencia_externa' => $i->referencia_externa,
+                        'nombre'             => $i->nombre,
+                        'precio_unitario'    => (float) $i->precio_unitario,
+                        'cantidad'           => $i->cantidad,
+                        'categoria_slug'     => $i->categoria?->slug,
+                    ])->toArray(),
+                ],
+            ]);
+        }
     }
 
     public function cancelarPedidoDeCarrito(string $carritoUuid): void
     {
+        // Notificar al Service de M4.5 (best-effort — ignora el resultado)
+        try {
+            app(CancelarPedidoDesdeCheckout::class)
+                ->ejecutar($carritoUuid, 'Conciliación fallida desde carrito');
+        } catch (\Throwable) {
+            // silencioso — el fallback local es la fuente de verdad
+        }
+
+        // Fallback local: cancelar en tabla `pedido` si existe
         $pedido = Pedido::where('carrito_uuid', $carritoUuid)->first();
 
         if ($pedido && $pedido->estado !== 'cancelado') {

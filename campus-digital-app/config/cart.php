@@ -41,6 +41,12 @@ return [
         'procesando_ttl_minutos' => (int) env('CART_CHECKOUT_PROCESANDO_TTL', 10),
     ],
 
+    // Integración con Módulo 4.5 — Pedidos y Seguimiento
+    'pedidos' => [
+        'url'     => env('PEDIDOS_API_URL', 'http://localhost:8000'),
+        'api_key' => env('PEDIDOS_API_KEY', 'dev-local-key-campus-digital-2026'),
+    ],
+
     // Configuración para módulos CLIENTES que consumen la API del Carrito
     'client' => [
         // JWT emitido por el panel admin al aprobar la solicitud del módulo
