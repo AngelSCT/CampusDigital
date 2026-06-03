@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Modules\Cart\Contracts\PedidoCreatorInterface;
-use App\Modules\Cart\Services\NullPedidoCreator;
+use App\Modules\Cart\Services\EloquentPedidoCreator;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,9 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Stub por defecto. Reemplazar por EloquentPedidoCreator cuando el
-        // módulo de Pedidos haya completado su implementación de la interfaz.
-        $this->app->bind(PedidoCreatorInterface::class, NullPedidoCreator::class);
+        $this->app->bind(PedidoCreatorInterface::class, EloquentPedidoCreator::class);
     }
 
     /**

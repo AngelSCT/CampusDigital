@@ -4,7 +4,7 @@ return [
     'jwt' => [
         // Secreto HS256 de 256 bits (64 chars hex). Generar con: php artisan carrito:gen-secret
         'secret'      => env('MODULE_JWT_SECRET', ''),
-        'ttl_access'  => (int) env('MODULE_JWT_TTL_ACCESS', 3600),    // segundos
+        'ttl_access'  => (int) env('MODULE_JWT_TTL_ACCESS', 604800),    // segundos
         'ttl_refresh' => (int) env('MODULE_JWT_TTL_REFRESH', 604800), // 7 días
     ],
 

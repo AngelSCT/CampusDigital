@@ -127,9 +127,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post ('/carrito/regalos/{pedido}/cancelar-remitente',  [CartController::class, 'cancelarRegaloRemitente'])->name('carrito.regalos.cancelar-remitente');
     Route::post ('/carrito/validar-destinatario',         [CartController::class, 'validarDestinatario'])->name('carrito.validar-destinatario');
     // Rutas con parámetro
-    Route::patch('/carrito/{item}/guardar',               [CartController::class, 'guardarParaDespues'])->name('carrito.guardar');
+    Route::patch('/carrito/{itemId}/guardar',              [CartController::class, 'guardarParaDespues'])->name('carrito.guardar');
     Route::patch('/carrito/{item}/mover-al-carrito',      [CartController::class, 'moverAlCarrito'])->name('carrito.mover');
-    Route::patch('/carrito/{item}/regalo',                [CartController::class, 'marcarRegalo'])->name('carrito.regalo');
+    Route::patch('/carrito/{itemId}/regalo',              [CartController::class, 'marcarRegalo'])->name('carrito.regalo');
     Route::post ('/carrito/{item}/rechazar-regalo',       [CartController::class, 'rechazarRegalo'])->name('carrito.rechazar-regalo');
     Route::post ('/carrito/pedido/{pedido}/cancelar-gracia', [CartController::class, 'cancelarConGracia'])->name('carrito.cancelar-gracia');
     Route::post ('/carrito/admin/pedidos-expirados',         [CartController::class, 'procesarPedidosExpirados'])->name('carrito.pedidos-expirados');
