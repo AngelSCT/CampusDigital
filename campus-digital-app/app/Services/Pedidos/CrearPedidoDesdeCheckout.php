@@ -52,8 +52,7 @@ class CrearPedidoDesdeCheckout
         $totalPedido = $this->calcularTotal($itemsResueltos);
 
         // 2) Validar saldo contra M4.8 (SaldoMonedero real)
-        $this->validarSaldo($dto->usuarioId, $totalPedido, true, null, $dto->modulo);
-
+        $this->validarSaldo($dto->usuarioId, $totalPedido, $dto->cobrarSaldo, null, $dto->modulo);
         // 3) Crear todo en una sola transacción
         return DB::transaction(function () use ($dto, $itemsResueltos, $totalPedido) {
             // 3.1) Crear el pedido (Pedido::generarFolio ya hace lockForUpdate)
