@@ -455,6 +455,55 @@ class CatalogoCartProxyController extends Controller
             session()->forget('cart_uuid');
             // Nota: errores 402 y similares NO borran la sesión;
             // el carrito permanece abierto para que el usuario reintente.
+
+            // ── Bridge de regalo: crear PedidoTienda en escrow por cada ítem regalo ──
+            try {
+                $carritoModel = \App\Models\Cart\Carrito::where('uuid', $uuid)->first();
+                $itemsRegalo  = $carritoModel
+                    ? $carritoModel->items()
+                        ->whereRaw("(metadata->>'es_regalo')::text = 'true'")
+                        ->get()
+                    : collect();
+
+                Log::info('[CatalogoCartProxy] Bridge regalo', [
+                    'carrito'       => $uuid,
+                    'items_regalo'  => $itemsRegalo->count(),
+                ]);
+
+                foreach ($itemsRegalo as $item) {
+                    $meta           = $item->metadata ?? [];
+                    $destinatarioId = $meta['destinatario_id'] ?? null;
+                    if (! $destinatarioId) continue;
+
+                    $total = round((float) $item->precio_unitario * $item->cantidad, 2);
+
+                    $pedidoTienda = \App\Models\PedidoTienda::create([
+                        'usuario_id'              => auth()->id(),
+                        'destinatario_id'         => (int) $destinatarioId,
+                        'total'                   => $total,
+                        'estado'                  => 'en_escrow',
+                        'metodo_pago'             => null,
+                        'gracia_hasta'            => now()->addMinutes(2),
+                        'notificado_destinatario' => false,
+                    ]);
+
+                    \App\Models\PedidoDetalle::create([
+                        'pedido_id'       => $pedidoTienda->id,
+                        'producto_id'     => null,
+                        'nombre_producto' => $item->nombre,
+                        'precio_unitario' => $item->precio_unitario,
+                        'cantidad'        => $item->cantidad,
+                        'subtotal'        => round((float) $item->precio_unitario * $item->cantidad, 2),
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::error('[CatalogoCartProxy] Bridge regalo error: ' . $e->getMessage(), [
+                    'uuid'  => $uuid,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                // El checkout ya fue exitoso — no revertimos, solo logueamos.
+            }
+            // ─────────────────────────────────────────────────────────────────
         }
 
         return response()->json($resp->json(), $resp->status());
@@ -602,11 +651,13 @@ class CatalogoCartProxyController extends Controller
             return $resp;
         }
 
-        // Si el Cart API no soporta PATCH de items, respondemos con los datos locales
-        // para que el frontend quede actualizado sin romper el flujo.
+        // Si el Cart API no soporta PATCH de items, persiste el metadata localmente.
         if ($resp->status() === 404 || $resp->status() === 405) {
+            $item    = \App\Models\Cart\ItemCarrito::findOrFail($item_id);
+            $newMeta = array_merge($item->metadata ?? [], $payload['metadata']);
+            $item->forceFill(['metadata' => $newMeta])->save();
             return response()->json([
-                'metadata' => $payload['metadata'],
+                'metadata' => $newMeta,
                 'item_id'  => $item_id,
             ]);
         }
