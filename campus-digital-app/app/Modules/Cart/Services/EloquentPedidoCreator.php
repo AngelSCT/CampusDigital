@@ -111,6 +111,7 @@ final class EloquentPedidoCreator implements PedidoCreatorInterface
                         'modulo_slug'  => $carrito->modulo?->slug,
                     ],
                     carritoUuid: (string) $carrito->uuid,
+                    cobrarSaldo: false, // M4.4 gestiona el saldo por separado vía SaldoClient
                 )
             );
             $enviado = true;

@@ -30,6 +30,7 @@ class CheckoutPedidoDTO
         public readonly ?string $descripcion = null,
         public readonly ?array $metaJson = null,
         public readonly ?string $carritoUuid = null,
+        public readonly bool $cobrarSaldo = true,
     ) {
         $this->validar();
     }
