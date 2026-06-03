@@ -500,6 +500,25 @@
                                 </p>
                             </div>
 
+                            <!-- Área (Módulo 4.9) -->
+                            <div>
+                                <label for="id_area" class="block text-sm font-medium text-white mb-2">
+                                    Área de Soporte
+                                    <span class="text-red-400">*</span>
+                                </label>
+                                <select
+                                    v-model="form.id_area"
+                                    id="id_area"
+                                    required
+                                    class="block w-full rounded-lg bg-slate-700/50 border border-slate-600 text-white focus:ring-2 focus:ring-blue-500/50 sm:text-sm transition-all duration-200"
+                                >
+                                    <option value="" disabled>Selecciona un área</option>
+                                    <option v-for="a in areas" :key="a.id_area" :value="a.id_area">
+                                        {{ a.name_area }}
+                                    </option>
+                                </select>
+                            </div>
+
                             <!-- Categoría -->
                             <div>
                                 <label
@@ -524,7 +543,7 @@
                                         Selecciona una categoría
                                     </option>
                                     <option
-                                        v-for="cat in categorias"
+                                        v-for="cat in categoriasFiltradas"
                                         :key="cat.id_categoria"
                                         :value="cat.id_categoria"
                                     >
@@ -721,7 +740,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from "vue";
 import { router } from "@inertiajs/vue3";
 import AuthLayout from "@/Layouts/AuthLayout.vue";
 
@@ -730,7 +749,17 @@ const props = defineProps({
     categorias: Array,
     equipos: Array,
     usuarios: Array,
+    areas: Array,
     filters: Object,
+});
+
+// Filtrar las categorías según el área seleccionada en el formulario
+const categoriasFiltradas = computed(() => {
+    if (!form.id_area) {
+        return props.categorias; // Si no hay área elegida, muestra todas
+    }
+    // Si hay un área seleccionada, filtra solo las categorías de esa área
+    return props.categorias.filter(cat => cat.id_area === form.id_area);
 });
 
 const estadosDisponibles = [
@@ -777,6 +806,7 @@ const errors = ref({});
 
 const form = reactive({
     id_usuario_solicitante: "",
+    id_area: "",
     id_categoria: "",
     id_equipo: null,
     estado: "",
@@ -788,6 +818,7 @@ function openCreateModal() {
     isEditing.value = false;
     editingId.value = null;
     form.id_usuario_solicitante = "";
+    form.id_area = "";
     form.id_categoria = "";
     form.id_equipo = null;
     form.estado = "";
@@ -801,6 +832,7 @@ function openEditModal(ticket) {
     isEditing.value = true;
     editingId.value = ticket.id_ticket;
     form.id_usuario_solicitante = ticket.id_usuario_solicitante;
+    form.id_area = ticket.categoria?.id_area || "";
     form.id_categoria = ticket.id_categoria;
     form.id_equipo = ticket.id_equipo;
     form.estado = ticket.estado;

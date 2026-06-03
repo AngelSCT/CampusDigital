@@ -10,6 +10,7 @@ use App\Models\Usuario;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Area;
 
 class TicketController extends Controller
 {
@@ -49,12 +50,14 @@ class TicketController extends Controller
         $categorias = CategoriaTicket::with('area')->orderBy('nombre_categoria')->get(['id_categoria', 'nombre_categoria', 'id_area']);
         $equipos    = EquipoActivo::orderBy('nombre_equipo')->get(['id_equipo', 'nombre_equipo']);
         $usuarios   = Usuario::orderBy('nombre')->get(['id', 'nombre', 'apellido']);
+        $areas = Area::orderBy('name_area')->get(['id_area', 'name_area']);
 
         return Inertia::render('Admin/Tickets/Index', [
             'tickets'    => $tickets,
             'categorias' => $categorias,
             'equipos'    => $equipos,
             'usuarios'   => $usuarios,
+            'areas'      => $areas,
             'filters'    => $request->only(['search', 'estado', 'prioridad', 'categoria', 'desde', 'hasta']),
         ]);
     }
