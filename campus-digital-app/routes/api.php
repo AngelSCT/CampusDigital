@@ -153,6 +153,7 @@ Route::middleware('auth.module.jwt')->prefix('cart')->group(function () {
     Route::post  ('carritos/{uuid}/cancelar',                [\App\Http\Controllers\Api\Cart\CarritoController::class, 'cancelar']);
     Route::get   ('historico',                               [\App\Http\Controllers\Api\Cart\CarritoController::class, 'historico']);
     Route::post  ('carritos/{uuid}/items/{item_id}/devolver',[\App\Http\Controllers\Api\Cart\ItemController::class,    'devolver']);
+    Route::get   ('comprobantes/{carritoUuid}',              [\App\Http\Controllers\Api\Cart\ComprobanteController::class, 'show'])->name('cart.comprobantes.show');
 });
 
 // ── MÓDULO CARRITO — Token refresh (sin auth.module.jwt; recibe refresh, no access) ──
