@@ -22,7 +22,10 @@ class PedidoApiController extends Controller
             ->whereNull('deleted_at');
 
         if ($request->filled('usuario_id'))  $query->where('usuario_id', $request->usuario_id);
-        if ($request->filled('estado'))      $query->where('estado', $request->estado);
+        if ($request->filled('estado')) {
+            $estados = explode(',', $request->estado);
+            $query->whereIn('estado', $estados);
+        }
         if ($request->filled('modulo'))      $query->where('modulo', $request->modulo);
         if ($request->filled('operador_id')) $query->where('operador_usuario_id', $request->operador_id);
         if ($request->filled('folio'))       $query->where('numero_folio', 'ilike', '%'.$request->folio.'%');

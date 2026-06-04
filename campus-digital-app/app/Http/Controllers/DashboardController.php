@@ -27,6 +27,8 @@ class DashboardController extends Controller
             return $this->dashboardAdministrador($user);
         } elseif ($user->hasRole('proveedor_area')) {
             return $this->dashboardProveedor($user);
+        } elseif ($user->hasRole('repartidor')) {
+            return redirect()->route('repartidor.dashboard');
         } else {
             return $this->dashboardEstudiante($user);
         }
@@ -186,6 +188,59 @@ class DashboardController extends Controller
             'nuevos_usuarios' => Usuario::whereNull('deleted_at')->where('created_at', '>=', now()->subHours(24))->count(),
         ];
 
+        // ── STATS EXTRA PARA DASHBOARDS ADMIN ──
+        $tiendasAdmin = \App\Models\Tienda::withCount(['productos', 'pedidos'])->get();
+        $ventasPorTienda = DB::table('pedido')
+            ->select('tienda_id', DB::raw('SUM(total) as total_ventas'), DB::raw('COUNT(*) as total_pedidos'))
+            ->where('estado', 'entregado')
+            ->groupBy('tienda_id')
+            ->get()
+            ->keyBy('tienda_id');
+
+        $tiendasData = $tiendasAdmin->map(function($t) use ($ventasPorTienda) {
+            $v = $ventasPorTienda->get($t->id);
+            return [
+                'id' => $t->id,
+                'nombre' => $t->nombre,
+                'tipo' => $t->tipo,
+                'activo' => $t->activo,
+                'productos_count' => $t->productos_count,
+                'pedidos_count' => $t->pedidos_count,
+                'total_ventas' => (float)($v?->total_ventas ?? 0.0),
+                'total_pedidos_entregados' => $v?->total_pedidos ?? 0,
+            ];
+        });
+
+        $proveedoresData = Usuario::whereHas('roles', fn($q) => $q->where('nombre', 'proveedor_area'))
+            ->with(['tienda', 'tiendas'])
+            ->get()
+            ->map(function($u) {
+                return [
+                    'id' => $u->id,
+                    'nombre' => $u->nombre . ' ' . $u->apellido,
+                    'email' => $u->email,
+                    'tiendas_count' => $u->tiendas->count(),
+                    'tiendas_nombres' => $u->tiendas->pluck('nombre')->join(', '),
+                    'ultimo_login' => $u->ultimo_login_at?->toIso8601String(),
+                ];
+            });
+
+        $repartidoresData = Usuario::whereHas('roles', fn($q) => $q->where('nombre', 'repartidor'))
+            ->with(['tienda'])
+            ->get()
+            ->map(function($u) {
+                $entregados = DB::table('pedido')->where('repartidor_id', $u->id)->where('estado', 'entregado')->count();
+                $activos = DB::table('pedido')->where('repartidor_id', $u->id)->whereIn('estado', ['aceptado', 'en_proceso', 'listo'])->count();
+                return [
+                    'id' => $u->id,
+                    'nombre' => $u->nombre . ' ' . $u->apellido,
+                    'email' => $u->email,
+                    'tienda_nombre' => $u->tienda?->nombre ?? 'General',
+                    'pedidos_entregados' => $entregados,
+                    'pedidos_activos' => $activos,
+                ];
+            });
+
         return Inertia::render('Dashboard/Admin', [
             'stats' => [
                 'usuarios_activos'       => $usuariosActivos,
@@ -225,6 +280,11 @@ class DashboardController extends Controller
                 'actividad_por_hora'     => $actividadPorHora,
                 'usuarios_nuevos_ayer'   => $usuariosNuevosAyer,
                 'resumen_24h'            => $resumen24h,
+                // Nuevas propiedades para dashboards de admin
+                'tiendas_admin'          => $tiendasData,
+                'proveedores_admin'      => $proveedoresData,
+                'repartidores_admin'     => $repartidoresData,
+                'tipos_tienda'           => \App\Models\Tienda::TIPOS,
             ],
             'top' => DB::table('movimientos')
                 ->join('catalogo', 'movimientos.id_catalogo', '=', 'catalogo.id_catalogo')
@@ -245,7 +305,44 @@ class DashboardController extends Controller
 
     private function dashboardProveedor($user)
     {
-        return Inertia::render('Dashboard/Proveedor', []);
+        $tiendas = $user->tiendas()->get();
+        
+        $selectedTiendaId = request()->query('tienda_id');
+        if (!$selectedTiendaId && $user->tienda_id) {
+            $selectedTiendaId = $user->tienda_id;
+        }
+
+        $tienda = null;
+        if ($selectedTiendaId) {
+            $tienda = $tiendas->where('id', $selectedTiendaId)->first();
+        }
+
+        if (!$tienda && $tiendas->isNotEmpty()) {
+            $tienda = $tiendas->first();
+        }
+
+        if (!$tienda) {
+            return Inertia::render('Dashboard/Proveedor', [
+                'tienda'  => null,
+                'tiendas' => [],
+                'stats'   => ['productos_count' => 0, 'repartidores_count' => 0],
+            ]);
+        }
+
+        $productosCount = \App\Models\Producto::where('tienda_id', $tienda->id)->count();
+        $repartidoresCount = \App\Models\Usuario::where('tienda_id', $tienda->id)
+            ->whereHas('roles', fn($q) => $q->where('nombre', 'repartidor'))
+            ->count();
+
+        return Inertia::render('Dashboard/Proveedor', [
+            'tienda'  => $tienda,
+            'tiendas' => $tiendas,
+            'tipos'   => \App\Models\Tienda::TIPOS,
+            'stats'   => [
+                'productos_count'    => $productosCount,
+                'repartidores_count' => $repartidoresCount,
+            ],
+        ]);
     }
 
     private function dashboardEstudiante($user)

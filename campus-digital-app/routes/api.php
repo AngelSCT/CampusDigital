@@ -35,6 +35,11 @@ use App\Http\Controllers\Api\TarjetaLecturaApiController;
 use App\Http\Controllers\Api\SaldoMonederoApiController;
 use App\Http\Controllers\Api\SaldoMovimientoApiController;
 use App\Http\Controllers\Api\PedidoApiController;
+use App\Http\Controllers\Api\ProviderApiController;
+
+// MODULO CARRITO / TIENDA (4.4)
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\Api\CartApiController;
 
 // MODULO CARRITO / TIENDA
 use App\Http\Controllers\CartController;
@@ -62,6 +67,7 @@ use App\Http\Controllers\Api\CatalogoIntegracionApiController;
 
 Route::middleware('api.key')->group(function () {
 
+Route::middleware('api.key')->group(function () {
     Route::apiResource('areas', AreaApiController::class);
     Route::apiResource('categorias-ticket', CategoriaTicketApiController::class);
     Route::apiResource('ubicaciones', UbicacionApiController::class);
@@ -172,6 +178,9 @@ Route::post('pedidos/checkout/cancelar',  [\App\Http\Controllers\Api\CheckoutApi
     Route::post('modulo8/recargas/iniciar',           [Modulo8ApiController::class, 'iniciarRecarga']);
     Route::get ('modulo8/usuarios/{usuario_id}/pagos',[Modulo8ApiController::class, 'pagosPorUsuario']);
 
+    // NUEVAS RUTAS PROVEEDOR (MODULO 4.9)
+    Route::get('proveedor/metrics', [ProviderApiController::class, 'getMetrics']);
+    Route::get('proveedor/reports', [ProviderApiController::class, 'getReports']);
 
     // ── INTEGRACIÓN MÓDULO 4.3 → 4.9 ─────────────────────────────────────────
     // Catálogo por vendedor: precio + disponibilidad + regla ya resueltos.
@@ -224,6 +233,29 @@ Route::prefix('public')->group(function () {
     Route::get('categorias', [\App\Http\Controllers\Cart\CategoriasPublicController::class, 'index']);
     Route::post('modulos/solicitud', [\App\Http\Controllers\Cart\SolicitudModuloController::class, 'store']);
     Route::get('modulos/solicitud/{folio}/estado', [\App\Http\Controllers\Cart\SolicitudModuloController::class, 'estado']);
+});
+
+// ── CARRITO / TIENDA (auth) ─────────────────────────────────────────────────
+Route::middleware('auth')->prefix('carrito')->group(function () {
+    Route::get   ('/',               [CartController::class, 'index']);            // ver carrito + saldo monedero
+    Route::post  ('/',               [CartController::class, 'store']);            // agregar producto
+    Route::patch ('{item}/wishlist', [CartController::class, 'moverWishlist']);   // mover a/desde wishlist
+    Route::patch ('{item}/regalo',   [CartController::class, 'marcarRegalo']);    // marcar como regalo
+    Route::post  ('limpiar',         [CartController::class, 'limpiarInactivos']); // limpiar inactivos
+    Route::post  ('checkout',        [CartController::class, 'checkout']);        // procesar checkout
+});
+
+// ── VALIDACIÓN PÚBLICA DE TICKETS (sin API key, para escaneo QR) ───────────
+Route::get('/v1/validar-ticket/{hash}', [CartApiController::class, 'validarHash']);
+
+// ── VALIDACIÓN PÚBLICA DE REGALOS (sin API key, para el destinatario) ──────
+Route::get('/v1/regalo/validar/{hash}', [CartController::class, 'validarRegalo']);
+
+// ── CARRITO API v1 (interoperabilidad módulo 4.4) ──────────────────────────
+Route::middleware('api.key')->prefix('v1/carrito')->group(function () {
+    Route::get('usuarios/{id}/stats',    [CartApiController::class, 'getUserStats']);
+    Route::get('stats/global',           [CartApiController::class, 'getGlobalStats']);
+    Route::get('usuarios/{id}/historial',[CartApiController::class, 'getOrderHistory']);
 });
 
 Route::prefix('rfid')->group(function () {
