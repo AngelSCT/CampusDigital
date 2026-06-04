@@ -31,6 +31,8 @@ return [
         // Si un job muere entre TX1 y TX2, la conciliación queda en 'procesando'.
         // Pasado este TTL → requiere_revision_manual (NUNCA → pendiente).
         'procesando_ttl_minutos'     => (int) env('CART_SALDO_PROCESANDO_TTL', 10),
+        // true → usa LocalSaldoClient (SaldoMonedero directo) en lugar de HTTP hacia M4.2
+        'local_mode'                 => (bool) env('CART_SALDO_LOCAL_MODE', false),
     ],
 
     // Configuración del checkout del Carrito
