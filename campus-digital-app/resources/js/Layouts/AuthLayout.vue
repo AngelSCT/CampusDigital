@@ -16,8 +16,33 @@
                                 </svg>
                                 Dashboard
                             </a>
+                            <a href="/catalogo" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                Catalogo
+                            </a>
+                            <a href="/movimientos" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                Movimientos
+                            </a>
+                            <a href="/catalogo-dashboard" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                Panel Catalogo
+                            </a>
 
+                            <!-- Links de Administrador -->
                             <template v-if="isAdmin">
+                                <a href="/categorias" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    Categorias
+                                </a>
+                                <a href="/areas" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    Areas
+                                </a>
+                                <a href="/precios" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    Precios
+                                </a>
+                                <a href="/disponibilidad" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    Disponibilidad
+                                </a>
+                                <a href="/reglas" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    Reglas
+                                </a>
                                 <a href="/admin/usuarios" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
                                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -191,6 +216,7 @@
                         <a href="/dashboard" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
                             Dashboard
                         </a>
+<<<<<<< HEAD
 
                         <template v-if="isEstudiante">
                             <a href="/carrito" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
@@ -201,7 +227,34 @@
                             </a>
                         </template>
 
+=======
+                        <a href="/catalogo" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                            Catalogo
+                        </a>
+                        <a href="/movimientos" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                            Movimientos
+                        </a>
+                        <a href="/catalogo-dashboard" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                            Panel Catalogo
+                        </a>
+                        
+>>>>>>> origin/4.3_Catalogos_final
                         <template v-if="isAdmin">
+                            <a href="/categorias" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                                Categorias
+                            </a>
+                            <a href="/areas" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                                Areas
+                            </a>
+                            <a href="/precios" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                                Precios
+                            </a>
+                            <a href="/disponibilidad" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                                Disponibilidad
+                            </a>
+                            <a href="/reglas" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                                Reglas
+                            </a>
                             <a href="/admin/usuarios" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
                                 Usuarios
                             </a>

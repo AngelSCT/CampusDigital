@@ -377,6 +377,59 @@ body {
 }
 
 .activity-table {
+.crud-theme {
+    min-height: 100vh;
+    padding: 1.5rem;
+    color: #e2e8f0;
+    background:
+        radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.18), transparent 40%),
+        radial-gradient(circle at 90% 10%, rgba(56, 189, 248, 0.16), transparent 45%),
+        linear-gradient(160deg, #020617 0%, #0f172a 45%, #111827 100%);
+}
+
+.crud-shell {
+    max-width: 80rem;
+    margin: 0 auto;
+}
+
+.crud-topbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.crud-title {
+    margin: 0;
+    font-size: 1.625rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #f8fafc;
+}
+
+.crud-subtitle {
+    margin-top: 0.25rem;
+    color: #94a3b8;
+}
+
+.crud-card {
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 0.9rem;
+    background: linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.92));
+    box-shadow: 0 12px 30px rgba(2, 6, 23, 0.35);
+    padding: 1rem;
+}
+
+.crud-table-wrap {
+    overflow-x: auto;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(15, 23, 42, 0.78);
+}
+
+.crud-table {
     width: 100%;
     border-collapse: collapse;
 }
@@ -517,4 +570,104 @@ body {
     .card-glow.error {
         background: rgba(239, 68, 68, 0.2);
     }
+}
+.crud-table th,
+.crud-table td {
+    text-align: left;
+    padding: 0.7rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.crud-table th {
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #cbd5e1;
+    background: rgba(15, 23, 42, 0.92);
+}
+
+.crud-table tbody tr:hover {
+    background: rgba(51, 65, 85, 0.36);
+}
+
+.crud-input,
+.crud-select,
+.crud-textarea {
+    width: 100%;
+    border-radius: 0.55rem;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    background: rgba(15, 23, 42, 0.82);
+    color: #e2e8f0;
+    padding: 0.55rem 0.65rem;
+}
+
+.crud-input::placeholder,
+.crud-textarea::placeholder {
+    color: #94a3b8;
+}
+
+.crud-input:focus,
+.crud-select:focus,
+.crud-textarea:focus {
+    outline: none;
+    border-color: rgba(125, 211, 252, 0.9);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18);
+}
+
+.crud-label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: #cbd5e1;
+    font-size: 0.87rem;
+}
+
+.crud-btn-primary,
+.crud-btn-secondary,
+.crud-btn-danger,
+.crud-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.55rem;
+    padding: 0.5rem 0.9rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: transform 0.12s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+
+.crud-btn-primary {
+    color: #eff6ff;
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    border: 1px solid rgba(125, 211, 252, 0.4);
+}
+
+.crud-btn-secondary {
+    color: #e2e8f0;
+    background: rgba(51, 65, 85, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.45);
+}
+
+.crud-btn-danger {
+    color: #fee2e2;
+    background: rgba(153, 27, 27, 0.72);
+    border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+.crud-link {
+    color: #7dd3fc;
+    padding: 0;
+}
+
+.crud-btn-primary:hover,
+.crud-btn-secondary:hover,
+.crud-btn-danger:hover,
+.crud-link:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+}
+
+.crud-muted {
+    color: #94a3b8;
+    font-size: 0.82rem;
+}
 }

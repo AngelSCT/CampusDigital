@@ -308,6 +308,43 @@
                             </div>
                         </div>
                     </div>
+                    <!-- 🔥 Top Productos -->
+<div class="content-card">
+    <div class="content-header">
+        <h3 class="content-title">🔥 Top Productos / Servicios</h3>
+    </div>
+    <div class="content-body">
+        <div class="roles-list" v-if="top && top.length">
+            <div v-for="item in top" :key="item.nombre" class="role-row">
+                <span class="role-name">{{ item.nombre }}</span>
+                <div class="role-stats">
+                    <span class="role-count">{{ item.total }}</span>
+                    <span class="role-label">consumos</span>
+                </div>
+            </div>
+        </div>
+        <p v-else style="color:white;">Sin datos</p>
+    </div>
+</div>
+
+<!-- 📊 Categorías -->
+<div class="content-card">
+    <div class="content-header">
+        <h3 class="content-title">📊 Consumo por Categoría</h3>
+    </div>
+    <div class="content-body">
+        <div class="roles-list" v-if="categorias && categorias.length">
+            <div v-for="cat in categorias" :key="cat.nombre" class="role-row">
+                <span class="role-name">{{ cat.nombre }}</span>
+                <div class="role-stats">
+                    <span class="role-count">{{ cat.total }}</span>
+                    <span class="role-label">consumos</span>
+                </div>
+            </div>
+        </div>
+        <p v-else style="color:white;">Sin datos</p>
+    </div>
+</div>
                 </div>
 
                 <div class="content-card">
@@ -401,13 +438,20 @@ const chartInstances = ref([]);
 
 const resizeObserver = ref(null);
 
-const props = defineProps({ stats: Object });
+const props = defineProps({
+    stats: Object,
+    top: { type: Array, default: () => [] },
+    categorias: { type: Array, default: () => [] }
+});
 
 const chartAccesos    = ref(null);
 const chartModulos    = ref(null);
 const chartTarjetas   = ref(null);
 const chartCrecimiento= ref(null);
 const chartHoras      = ref(null);
+
+const top = computed(() => props.top ?? []);
+const categorias = computed(() => props.categorias ?? []);
 
 const tasaExito = computed(() => {
     const total = props.stats.accesos_exitosos + props.stats.accesos_fallidos;

@@ -22,7 +22,7 @@ use App\Http\Controllers\Pedidos\PedidoDashboardController;
 use App\Http\Controllers\Pedidos\PedidoReporteController;
 use App\Http\Controllers\RecargaController;
 use App\Http\Controllers\Archivos\ArchivoController;
-use App\Http\Controllers\Admin\AreaController;
+use App\Http\Controllers\Admin\AreaController as AdminAreaController;
 use App\Http\Controllers\Admin\CategoriaTicketController;
 use App\Http\Controllers\Admin\UbicacionController;
 use App\Http\Controllers\Admin\EquipoActivoController;
@@ -39,11 +39,101 @@ use App\Http\Controllers\Recargas\RecargaController as RecargasRecargaController
 use App\Http\Controllers\Recargas\ReportesController;
 
 // Redirección inicial
+use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\CatalogoController;
+use App\Http\Controllers\MovimientoController;
+use App\Http\Controllers\CatalogoDashboardController;
+use App\Http\Controllers\PrecioController;
+use App\Http\Controllers\AreaController;
+use App\Http\Controllers\DisponibilidadController;
+use App\Http\Controllers\ReglaController;
+use App\Http\Controllers\VendedorController;
+use App\Http\Controllers\CatalogoVendedorController;
+use App\Http\Controllers\PromocionController;
+use App\Http\Controllers\CatalogoUsuarioDemoController;
+use App\Http\Controllers\InventarioController;
+
+Route::get('/reglas', [ReglaController::class, 'index']);
+Route::get('/reglas/create', [ReglaController::class, 'create']);
+Route::post('/reglas', [ReglaController::class, 'store']);
+Route::get('/reglas/{id}/edit', [ReglaController::class, 'edit']);
+Route::put('/reglas/{id}', [ReglaController::class, 'update']);
+Route::delete('/reglas/{id}', [ReglaController::class, 'destroy']);
+
+Route::get('/vendedores', [VendedorController::class, 'index'])->name('vendedores.index');
+Route::get('/vendedores/create', [VendedorController::class, 'create'])->name('vendedores.create');
+Route::post('/vendedores', [VendedorController::class, 'store'])->name('vendedores.store');
+Route::get('/vendedores/{id}/edit', [VendedorController::class, 'edit'])->name('vendedores.edit');
+Route::put('/vendedores/{id}', [VendedorController::class, 'update'])->name('vendedores.update');
+Route::delete('/vendedores/{id}', [VendedorController::class, 'destroy'])->name('vendedores.destroy');
+
+Route::get('/disponibilidad', [DisponibilidadController::class, 'index']);
+Route::get('/disponibilidad/create', [DisponibilidadController::class, 'create']);
+Route::post('/disponibilidad', [DisponibilidadController::class, 'store']);
+Route::get('/disponibilidad/{id}/edit', [DisponibilidadController::class, 'edit']);
+Route::put('/disponibilidad/{id}', [DisponibilidadController::class, 'update']);
+Route::delete('/disponibilidad/{id}', [DisponibilidadController::class, 'destroy']);
+
+Route::get('/areas', [AreaController::class, 'index']);
+Route::get('/areas/create', [AreaController::class, 'create']);
+Route::post('/areas', [AreaController::class, 'store']);
+Route::post('/areas/quick-store', [AreaController::class, 'quickStore'])->name('areas.quick-store');
+Route::get('/areas/{id}/edit', [AreaController::class, 'edit']);
+Route::put('/areas/{id}', [AreaController::class, 'update']);
+Route::delete('/areas/{id}', [AreaController::class, 'destroy']);
+
+Route::get('/catalogo-dashboard', [CatalogoDashboardController::class, 'index']);
+Route::get('/catalogo-usuario-demo', [CatalogoUsuarioDemoController::class, 'index'])->name('catalogo-usuario-demo.index');
+
+Route::get('/precios', [PrecioController::class, 'index']);
+Route::get('/precios/create', [PrecioController::class, 'create']);
+Route::post('/precios', [PrecioController::class, 'store']);
+
+Route::get('/movimientos', [MovimientoController::class, 'index']);
+Route::get('/movimientos/create', [MovimientoController::class, 'create']);
+Route::post('/movimientos', [MovimientoController::class, 'store']);
+
+Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');
+Route::get('/inventario/agregar-stock', [InventarioController::class, 'createAddStock'])->name('inventario.add-stock');
+Route::post('/inventario/agregar-stock', [InventarioController::class, 'storeAddStock'])->name('inventario.store-add-stock');
+
+Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.index');
+Route::get('/catalogo/create', [CatalogoController::class, 'create'])->name('catalogo.create');
+Route::post('/catalogo', [CatalogoController::class, 'store'])->name('catalogo.store');
+Route::post('/catalogo/bulk-update', [CatalogoController::class, 'bulkUpdate'])->name('catalogo.bulk-update');
+Route::patch('/catalogo/{id}/quick-update', [CatalogoController::class, 'quickUpdate'])->name('catalogo.quick-update');
+Route::get('/catalogo/{id}/edit', [CatalogoController::class, 'edit'])->name('catalogo.edit');
+Route::put('/catalogo/{id}', [CatalogoController::class, 'update'])->name('catalogo.update');
+Route::delete('/catalogo/{id}', [CatalogoController::class, 'destroy'])->name('catalogo.destroy');
+
+Route::get('/catalogo-vendedor', [CatalogoVendedorController::class, 'index'])->name('catalogo-vendedor.index');
+Route::get('/catalogo-vendedor/create', [CatalogoVendedorController::class, 'create'])->name('catalogo-vendedor.create');
+Route::post('/catalogo-vendedor', [CatalogoVendedorController::class, 'store'])->name('catalogo-vendedor.store');
+Route::get('/catalogo-vendedor/{id}/edit', [CatalogoVendedorController::class, 'edit'])->name('catalogo-vendedor.edit');
+Route::put('/catalogo-vendedor/{id}', [CatalogoVendedorController::class, 'update'])->name('catalogo-vendedor.update');
+Route::delete('/catalogo-vendedor/{id}', [CatalogoVendedorController::class, 'destroy'])->name('catalogo-vendedor.destroy');
+
+Route::get('/promociones', [PromocionController::class, 'index'])->name('promociones.index');
+Route::get('/promociones/create', [PromocionController::class, 'create'])->name('promociones.create');
+Route::post('/promociones', [PromocionController::class, 'store'])->name('promociones.store');
+Route::get('/promociones/{id}/edit', [PromocionController::class, 'edit'])->name('promociones.edit');
+Route::put('/promociones/{id}', [PromocionController::class, 'update'])->name('promociones.update');
+Route::delete('/promociones/{id}', [PromocionController::class, 'destroy'])->name('promociones.destroy');
+
+Route::get('/categorias', [CategoriaController::class, 'index'])->name('categorias.index');
+Route::get('/categorias/create', [CategoriaController::class, 'create'])->name('categorias.create');
+Route::post('/categorias', [CategoriaController::class, 'store'])->name('categorias.store');
+Route::post('/categorias/quick-store', [CategoriaController::class, 'quickStore'])->name('categorias.quick-store');
+Route::get('/categorias/{id}/edit', [CategoriaController::class, 'edit'])->name('categorias.edit');
+Route::put('/categorias/{id}', [CategoriaController::class, 'update'])->name('categorias.update');
+Route::delete('/categorias/{id}', [CategoriaController::class, 'destroy'])->name('categorias.destroy');
+
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
 Route::post('/auth/rfid-login', [RfidLoginController::class, 'login'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
     ->name('rfid.login');
 
 Route::post('/simulador/uid', function (Request $request) {
@@ -86,7 +176,7 @@ Route::post('/simulador/login-rfid', function (Request $request) {
     Cache::put('simulador_login_timestamp', now()->toIso8601String(), 60);
     return response()->json(['ok' => true])
         ->header('Access-Control-Allow-Origin', '*');
-})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+})->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 Route::options('/simulador/login-rfid', function () {
     return response('', 200)
@@ -108,10 +198,8 @@ Route::post('/simulador/limpiar-login', function () {
     Cache::forget('simulador_login_uid');
     Cache::forget('simulador_login_pin');
     Cache::forget('simulador_login_timestamp');
-    return response()->json([
-        'ok' => true
-    ]);
-});
+    return response()->json(['ok' => true]);
+})->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 
 // ── PROVEEDOR (Módulo 4.9 – Preview) ─────────────────────────────────────────
@@ -280,11 +368,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         Route::prefix('areas')->name('areas.')->group(function () {
-            Route::get('/',          [AreaController::class, 'index'])->name('index');
-            Route::post('/',         [AreaController::class, 'store'])->name('store');
-            Route::get('/{area}',    [AreaController::class, 'show'])->name('show');
-            Route::put('/{area}',    [AreaController::class, 'update'])->name('update');
-            Route::delete('/{area}', [AreaController::class, 'destroy'])->name('destroy');
+            Route::get('/',          [AdminAreaController::class, 'index'])->name('index');
+            Route::post('/',         [AdminAreaController::class, 'store'])->name('store');
+            Route::get('/{area}',    [AdminAreaController::class, 'show'])->name('show');
+            Route::put('/{area}',    [AdminAreaController::class, 'update'])->name('update');
+            Route::delete('/{area}', [AdminAreaController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('categorias-ticket')->name('categorias-ticket.')->group(function () {

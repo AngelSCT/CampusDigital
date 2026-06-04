@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             UsuariosPruebaSeeder::class,
             ProductSeeder::class,
             CarritoSeeder::class,
+            CatalogoSeeder::class,
         ]);
 
         // CategoriasSeeder inserta datos base del módulo Carrito-servicio.
