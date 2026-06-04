@@ -334,14 +334,21 @@ class CatalogoController extends Controller
         $resolver      = app(\App\Services\Catalogo\CatalogoCartResolver::class);
         $estadoCarrito = $resolver->estadoCarrito($catalogo);
 
+        $saldo = 0;
+        try {
+            $monedero = \App\Models\SaldoMonedero::where('usuario_id', auth()->id())->first();
+            $saldo    = $monedero ? (float) $monedero->saldo_disponible : 0;
+        } catch (\Throwable) {}
+
         return Inertia::render('Catalogo/Show', [
             'producto' => array_merge($catalogo->only([
                 'id_catalogo', 'nombre', 'descripcion', 'tipo', 'aplica_iva',
             ]), $estadoCarrito),
-            'categoria'      => $catalogo->categoria?->nombre,
-            'precio_vigente' => $catalogo->precioVigenteValor()
+            'categoria'          => $catalogo->categoria?->nombre,
+            'precio_vigente'     => $catalogo->precioVigenteValor()
                 ? number_format((float) $catalogo->precioVigenteValor(), 2, '.', '')
                 : null,
+            'saldo_disponible'   => $saldo,
         ]);
     }
 }

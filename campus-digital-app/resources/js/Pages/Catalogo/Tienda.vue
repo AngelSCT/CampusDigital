@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, Link } from '@inertiajs/vue3'
 import AuthLayout from '@/Components/AuthLayout.vue'
 
 const props = defineProps({
@@ -50,18 +50,18 @@ const hayProductos = computed(() => props.productos.length > 0)
                         {{ productos.length === 1 ? 'artículo' : 'artículos' }}
                     </span>
 
-                    <a id="btn-mi-carrito-header"
-                       :href="route('carrito.index')"
-                       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
-                              bg-blue-600/20 text-blue-400 ring-1 ring-blue-500/40
-                              hover:bg-blue-600/30 hover:ring-blue-500/60
-                              transition-all duration-200">
+                    <Link id="btn-mi-carrito-header"
+                          :href="route('catalogo.mi-carrito')"
+                          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
+                                 bg-blue-600/20 text-blue-400 ring-1 ring-blue-500/40
+                                 hover:bg-blue-600/30 hover:ring-blue-500/60
+                                 transition-all duration-200">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007 17h11M7 13L5.4 5M17 17a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
                         </svg>
                         Mi carrito
-                    </a>
+                    </Link>
                 </div>
             </div>
 

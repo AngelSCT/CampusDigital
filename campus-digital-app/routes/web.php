@@ -93,6 +93,10 @@ Route::post('/catalogo', [CatalogoController::class, 'store'])->name('catalogo.s
 Route::post('/catalogo/bulk-update', [CatalogoController::class, 'bulkUpdate'])->name('catalogo.bulk-update');
 Route::patch('/catalogo/{id}/quick-update', [CatalogoController::class, 'quickUpdate'])->name('catalogo.quick-update');
 Route::get('/catalogo/{id}/edit', [CatalogoController::class, 'edit'])->name('catalogo.edit');
+Route::get('/catalogo/mi-carrito',
+    [App\Http\Controllers\Catalogo\CarritoViewController::class, 'index'])
+    ->middleware(['web', 'auth'])
+    ->name('catalogo.mi-carrito');
 Route::get('/catalogo/{id}', [CatalogoController::class, 'show'])->middleware(['auth'])->name('catalogo.show');
 Route::put('/catalogo/{id}', [CatalogoController::class, 'update'])->name('catalogo.update');
 Route::delete('/catalogo/{id}', [CatalogoController::class, 'destroy'])->name('catalogo.destroy');
@@ -537,6 +541,7 @@ Route::prefix('demo/biblioteca')->name('demo.biblioteca.')->group(function () {
     });
 });
 
+
 // ── CATÁLOGO — Cart Proxy (Capa A3/A4) ──────────────────────────────────────
 Route::prefix('catalogo/cart-proxy')
     ->middleware(['web', 'auth'])
@@ -559,4 +564,7 @@ Route::prefix('catalogo/cart-proxy')
             [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'validarDestinatario']);
         Route::patch('/carritos/{uuid}/items/{item_id}/regalo',
             [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'marcarRegalo']);
+        Route::get('/comprobante/{uuid}',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'obtenerComprobante'])
+            ->name('catalogo.cart-proxy.comprobante');
     });

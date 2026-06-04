@@ -84,7 +84,32 @@ export function useCart(userRef, config, apiBaseUrl, emit) {
             emit('cart-updated', { items: items.value, total: total.value });
             emit('item-added', { item_id: item.item_id ?? null, referencia_externa: item.referencia_externa });
         } catch (e) {
-            error.value = buildError(e);
+            const err = buildError(e);
+
+            // Carrito expirado → crear uno nuevo y reintentar UNA vez
+            if (err.code === 'CART_STATE_ERROR' && err.mensaje?.toLowerCase().includes('expirado')) {
+                localStorage.removeItem(storageKey);
+                cart.value = null;
+                await init();
+                if (uuid.value) {
+                    // Reintentar con el UUID nuevo
+                    try {
+                        await api.addItem(uuid.value, item);
+                        const cartRes = await api.getCart(uuid.value);
+                        cart.value = normalizeCart(cartRes.data);
+                        emit('cart-updated', { items: items.value, total: total.value });
+                        emit('item-added', { item_id: item.item_id ?? null, referencia_externa: item.referencia_externa });
+                        return;
+                    } catch (e2) {
+                        error.value = buildError(e2);
+                        emit('cart-error', error.value);
+                        return;
+                    }
+                }
+                return;
+            }
+
+            error.value = err;
             emit('cart-error', error.value);
         }
     }
@@ -101,7 +126,17 @@ export function useCart(userRef, config, apiBaseUrl, emit) {
             emit('cart-updated', { items: items.value, total: total.value });
             emit('item-removed', { item_id: itemId });
         } catch (e) {
-            error.value = buildError(e);
+            const err = buildError(e);
+
+            // Carrito expirado → limpiar y reiniciar (no reintentar remove, el carrito ya no existe)
+            if (err.code === 'CART_STATE_ERROR' && err.mensaje?.toLowerCase().includes('expirado')) {
+                localStorage.removeItem(storageKey);
+                cart.value = null;
+                await init();
+                return;
+            }
+
+            error.value = err;
             emit('cart-error', error.value);
         }
     }
@@ -143,6 +178,16 @@ export function useCart(userRef, config, apiBaseUrl, emit) {
             });
         } catch (e) {
             const err = buildError(e);
+
+            // Carrito expirado durante checkout → limpiar y reiniciar
+            if (err.code === 'CART_STATE_ERROR' && err.mensaje?.toLowerCase().includes('expirado')) {
+                localStorage.removeItem(storageKey);
+                cart.value = null;
+                checkingOut.value = false;
+                await init();
+                return;
+            }
+
             error.value = err;
             emit('checkout-error', err);
         } finally {
@@ -154,7 +199,8 @@ export function useCart(userRef, config, apiBaseUrl, emit) {
         const status  = e.response?.status;
         const body    = e.response?.data ?? {};
         const code    = body.error ?? body.code ?? 'ERROR';
-        const mensaje = body.message ?? body.error ?? 'Error inesperado.';
+        // El backend devuelve 'mensaje' (español); body.message es el fallback para APIs inglesas
+        const mensaje = body.message ?? body.mensaje ?? body.error ?? 'Error inesperado.';
         return { code, mensaje, http_status: status };
     }
 

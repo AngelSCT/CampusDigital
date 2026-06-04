@@ -124,5 +124,21 @@ class CategoriasSeeder extends Seeder
                 );
             }
         }
+
+        // Categorías adicionales
+        $extras = [
+            'cafeteria' => 'Cafetería',
+            'copias'    => 'Copias e Impresiones',
+            'tramites'  => 'Trámites',
+            'souvenirs' => 'Souvenirs',
+            'servicios' => 'Servicios Internos',
+        ];
+
+        foreach ($extras as $slug => $nombre) {
+            Categoria::updateOrCreate(
+                ['slug' => $slug],
+                ['nombre' => $nombre]
+            );
+        }
     }
 }

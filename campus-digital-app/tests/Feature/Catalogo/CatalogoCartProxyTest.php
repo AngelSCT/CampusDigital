@@ -7,14 +7,14 @@ use App\Models\Catalogo\Categoria;
 use App\Models\Catalogo\Inventario;
 use App\Models\Catalogo\Precio;
 use App\Models\Usuario;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\ConnectionException;
 use Tests\TestCase;
 
 class CatalogoCartProxyTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected string $baseUrl;
     protected string $testUuid = 'test-uuid-1234';

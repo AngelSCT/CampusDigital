@@ -155,7 +155,7 @@ class CatalogoCartProxyController extends Controller
     {
         $resp = $this->cartCall('post', '/carritos', [
             'usuario_ref'       => strval(auth()->id()),
-            'requiere_saldo'    => false,
+            'requiere_saldo'    => true,
             'expira_en_minutos' => 120,
             'metadata'          => [],
         ]);
@@ -165,7 +165,11 @@ class CatalogoCartProxyController extends Controller
         }
 
         if ($resp->successful()) {
-            session(['cart_uuid' => $resp->json('carrito_uuid')]);
+            $uuid = $resp->json('carrito_uuid');
+            session([
+                'cart_uuid'             => $uuid,
+                'catalogo_carrito_uuid' => $uuid,
+            ]);
         }
 
         return $resp;
@@ -215,7 +219,10 @@ class CatalogoCartProxyController extends Controller
 
         // Carrito no encontrado o en estado terminal → limpiar sesión
         if ($resp->status() === 404 || $resp->status() === 409) {
-            session()->forget('cart_uuid');
+            session()->forget(['cart_uuid', 'catalogo_carrito_uuid']);
+        } elseif ($resp->successful()) {
+            // Refrescar el UUID en sesión por si acaso
+            session(['catalogo_carrito_uuid' => $uuid]);
         }
 
         return response()->json($resp->json(), $resp->status());
@@ -550,6 +557,27 @@ class CatalogoCartProxyController extends Controller
         $usuarioRef = auth()->user()->matricula ?? auth()->id();
 
         $resp = $this->cartCall('get', '/historico?usuario_ref=' . urlencode($usuarioRef));
+
+        if ($resp instanceof JsonResponse) {
+            return $resp;
+        }
+
+        return response()->json($resp->json(), $resp->status());
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 7b. obtenerComprobante
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * GET /catalogo/cart-proxy/comprobante/{uuid}
+     *
+     * Proxea al endpoint de comprobantes del Cart API.
+     * El frontend lo llama tras un checkout exitoso para mostrar folio e ítems.
+     */
+    public function obtenerComprobante(string $uuid): JsonResponse
+    {
+        $resp = $this->cartCall('get', "/comprobantes/{$uuid}");
 
         if ($resp instanceof JsonResponse) {
             return $resp;

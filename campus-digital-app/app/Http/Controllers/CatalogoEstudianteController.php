@@ -48,6 +48,7 @@ class CatalogoEstudianteController extends Controller
             'productos'        => $productos,
             'categorias'       => $categorias,
             'categoria_activa' => $categoriaActiva,
+            'cart_web_url'     => rtrim(env('CART_WEB_URL', 'http://campusdigital.test'), '/') . '/carrito',
         ]);
     }
 }

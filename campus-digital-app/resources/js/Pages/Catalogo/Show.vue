@@ -1,22 +1,26 @@
 <script setup>
 import { ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
+import axios from 'axios'
 import AuthLayout from '@/Components/AuthLayout.vue'
 import CartControl from '@/Modules/Cart/Control/CartControl.vue'
 
 const props = defineProps({
-    producto:       Object,
-    categoria:      String,
-    precio_vigente: String,
+    producto:          Object,
+    categoria:         String,
+    precio_vigente:    String,
+    saldo_disponible:  { type: Number, default: 0 },
 })
 
 const page    = usePage()
 const userRef = page.props.auth?.user?.matricula
     ?? String(page.props.auth?.user?.id ?? '')
 
-const cartRef            = ref(null)
-const pedidoConfirmado   = ref(false)
-const checkoutData       = ref(null)
+const cartRef          = ref(null)
+const pedidoConfirmado = ref(false)
+const checkoutData     = ref(null)
+const comprobante      = ref(null)
+const loadingComp      = ref(false)
 
 function agregarAlCarrito() {
     cartRef.value?.addItem({
@@ -25,15 +29,44 @@ function agregarAlCarrito() {
     })
 }
 
-function onCheckoutSuccess(data) {
+async function onCheckoutSuccess(data) {
     pedidoConfirmado.value = true
     checkoutData.value     = data ?? null
+
+    const uuid = data?.carrito_uuid ?? data?.uuid ?? null
+    if (!uuid) return
+
+    loadingComp.value = true
+    try {
+        const res = await axios.get(`/catalogo/cart-proxy/comprobante/${uuid}`)
+        if (res.status === 200) {
+            comprobante.value = res.data
+        }
+    } catch {
+        // Fallback: muestra total simple sin comprobante
+    } finally {
+        loadingComp.value = false
+    }
 }
 
 const totalMostrado = () => {
-    const t = checkoutData.value?.total ?? checkoutData.value?.carrito?.total
+    const t = comprobante.value?.total
+        ?? checkoutData.value?.total
+        ?? checkoutData.value?.carrito?.total
     if (t !== undefined && t !== null) return Number(t).toFixed(2)
     return props.precio_vigente ?? null
+}
+
+function formatMoney(val) {
+    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val ?? 0)
+}
+
+function formatFecha(val) {
+    if (!val) return ''
+    return new Date(val).toLocaleString('es-MX', {
+        year: 'numeric', month: 'long', day: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+    })
 }
 </script>
 
@@ -45,26 +78,79 @@ const totalMostrado = () => {
             <div v-if="pedidoConfirmado"
                  class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm
                         border border-emerald-500/20 rounded-2xl shadow-xl shadow-emerald-500/5
-                        p-10 flex flex-col items-center gap-6 text-center">
+                        p-8 flex flex-col items-center gap-6">
 
                 <!-- Ícono ✅ -->
                 <div class="w-20 h-20 rounded-full bg-emerald-500/15 border border-emerald-500/30
                             flex items-center justify-center shadow-lg shadow-emerald-500/20">
                     <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M5 13l4 4L19 7"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
                 </div>
 
                 <!-- Título -->
-                <div class="space-y-1">
+                <div class="text-center space-y-1">
                     <h1 class="text-2xl font-bold text-slate-100">¡Pedido confirmado!</h1>
                     <p class="text-slate-400">Tu compra fue procesada exitosamente</p>
                 </div>
 
-                <!-- Total pagado -->
-                <div v-if="totalMostrado()"
-                     class="bg-slate-800/60 border border-slate-700/50 rounded-xl px-8 py-4">
+                <!-- Spinner mientras carga comprobante -->
+                <div v-if="loadingComp" class="flex items-center gap-2 text-slate-400 text-sm">
+                    <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                    </svg>
+                    Obteniendo comprobante…
+                </div>
+
+                <!-- Comprobante completo -->
+                <div v-if="comprobante && !loadingComp"
+                     class="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
+
+                    <!-- Folio + fecha -->
+                    <div class="flex items-center justify-between px-5 py-3 border-b border-slate-700/50">
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Folio</p>
+                            <p class="text-slate-200 font-mono font-semibold text-sm">
+                                {{ comprobante.folio ?? comprobante.numero_pedido ?? 'Generando…' }}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Fecha</p>
+                            <p class="text-slate-400 text-xs">
+                                {{ formatFecha(comprobante.fecha_confirmacion ?? comprobante.created_at) }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de ítems -->
+                    <div v-if="comprobante.items?.length"
+                         class="divide-y divide-slate-700/50">
+                        <div v-for="item in comprobante.items" :key="item.id ?? item.referencia_externa"
+                             class="flex items-center justify-between px-5 py-3">
+                            <div>
+                                <p class="text-slate-200 text-sm font-medium">{{ item.nombre }}</p>
+                                <p class="text-slate-500 text-xs">× {{ item.cantidad }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-slate-400 text-xs">{{ formatMoney(item.precio_unitario) }} / ud.</p>
+                                <p class="text-slate-200 text-sm font-semibold">
+                                    {{ formatMoney(item.precio_unitario * item.cantidad) }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="flex items-center justify-between px-5 py-4 bg-slate-800/80 border-t border-slate-700/50">
+                        <p class="text-slate-400 text-sm uppercase tracking-wider font-medium">Total pagado</p>
+                        <p class="text-2xl font-bold text-emerald-400">{{ formatMoney(comprobante.total) }}</p>
+                    </div>
+                </div>
+
+                <!-- Fallback simple (sin comprobante) -->
+                <div v-else-if="!loadingComp && totalMostrado()"
+                     class="bg-slate-800/60 border border-slate-700/50 rounded-xl px-8 py-4 text-center">
                     <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Total pagado</p>
                     <p class="text-3xl font-bold text-emerald-400">${{ totalMostrado() }}</p>
                 </div>
@@ -143,11 +229,21 @@ const totalMostrado = () => {
 
                     <p class="text-slate-400 leading-relaxed">{{ producto.descripcion }}</p>
 
-                    <div class="flex items-center gap-3 pt-1">
-                        <span v-if="precio_vigente" class="text-3xl font-bold text-emerald-400">
-                            ${{ precio_vigente }}
-                        </span>
-                        <span v-else class="text-lg text-slate-500 italic">Sin precio disponible</span>
+                    <!-- Precio + saldo disponible -->
+                    <div class="space-y-1 pt-1">
+                        <div class="flex items-center gap-3">
+                            <span v-if="precio_vigente" class="text-3xl font-bold text-emerald-400">
+                                ${{ precio_vigente }}
+                            </span>
+                            <span v-else class="text-lg text-slate-500 italic">Sin precio disponible</span>
+                        </div>
+                        <!-- PASO 5: Saldo disponible -->
+                        <p class="text-sm text-slate-400">
+                            Saldo disponible:
+                            <span class="text-green-400 font-semibold">
+                                {{ formatMoney(saldo_disponible) }}
+                            </span>
+                        </p>
                     </div>
 
                     <!-- Badge indisponible -->
@@ -190,7 +286,7 @@ const totalMostrado = () => {
                         ref="cartRef"
                         api-base-url="/catalogo/cart-proxy"
                         :user-ref="userRef"
-                        :config="{ requiereSaldo: false, expiraEnMinutos: 120 }"
+                        :config="{ requiereSaldo: true, expiraEnMinutos: 120 }"
                         @checkout-success="onCheckoutSuccess"
                     />
                 </div>
