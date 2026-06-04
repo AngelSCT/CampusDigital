@@ -17,10 +17,6 @@
                                 Dashboard
                             </a>
 
-<<<<<<< HEAD
-                            <!-- Links de Administrador -->
-=======
->>>>>>> origin/main
                             <template v-if="isAdmin">
                                 <a href="/admin/usuarios" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
                                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,12 +58,6 @@
                             </a>
                         </div>
                     </div>
-<<<<<<< HEAD
-
-                    <!-- User Menu Desktop -->
-=======
-
->>>>>>> origin/main
                     <div class="hidden sm:ml-6 sm:flex sm:items-center">
                         <div class="ml-3 relative">
                             <button @click="toggleUserMenu" type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-slate-900 transition-all duration-300 group">
@@ -77,12 +67,6 @@
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </button>
-<<<<<<< HEAD
-
-                            <!-- Dropdown Menu -->
-=======
-
->>>>>>> origin/main
                             <transition
                                 enter-active-class="transition ease-out duration-200"
                                 enter-from-class="transform opacity-0 scale-95"
@@ -110,8 +94,6 @@
                                             Mi Perfil
                                         </a>
 
-<<<<<<< HEAD
-=======
                                         <!-- Mi Tarjeta -->
                                         <a href="/mi-tarjeta" class="block px-4 py-2 text-sm text-white hover:bg-cyan-500/10 hover:text-cyan-400 flex items-center transition-all duration-200">
                                             <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +118,6 @@
                                             Lector[EX!]
                                         </a>
 
->>>>>>> origin/main
                                         <!-- Cerrar Sesión -->
                                         <button @click="logout" type="button" class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center border-t border-blue-500/20 transition-all duration-200">
                                             <svg class="w-4 h-4 mr-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,12 +173,6 @@
                             </a>
                         </template>
                     </div>
-<<<<<<< HEAD
-
-                    <!-- User section mobile -->
-=======
-
->>>>>>> origin/main
                     <div class="pt-4 pb-3 border-t border-blue-500/20">
                         <div class="flex items-center px-4">
                             <div class="flex-shrink-0">
