@@ -12,12 +12,11 @@ use Tests\TestCase;
 /**
  * Clase base para todos los tests del módulo Carrito.
  *
- * Corre SOLO las migraciones del módulo (2026_04_28_*) sobre SQLite en memoria,
- * evitando las migraciones PostgreSQL-específicas del monorepo (citext, funciones PL/pgSQL).
- * No usa RefreshDatabase para no depender del comando artisan migrate global.
+ * Usa DatabaseTransactions sobre la base de datos de tests en PostgreSQL.
  */
 abstract class CartTestCase extends TestCase
 {
+    use \Illuminate\Foundation\Testing\DatabaseTransactions;
     protected function setUp(): void
     {
         parent::setUp();
@@ -31,26 +30,10 @@ abstract class CartTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        // La BD in-memory se destruye automáticamente al cerrar la conexión.
-        DB::disconnect('sqlite');
         parent::tearDown();
     }
 
-    private function setUpSqliteInMemory(): void
-    {
-        config([
-            'database.default' => 'sqlite',
-            'database.connections.sqlite' => [
-                'driver'                  => 'sqlite',
-                'database'                => ':memory:',
-                'prefix'                  => '',
-                'foreign_key_constraints' => false,
-            ],
-        ]);
 
-        DB::purge('sqlite');
-        DB::reconnect('sqlite');
-    }
 
     /** Configura el JWT del módulo Carrito con valores de prueba fijos. */
     protected function setUpJwtConfig(): void
@@ -82,14 +65,5 @@ abstract class CartTestCase extends TestCase
         (new \Database\Seeders\CategoriasSeeder())->run();
     }
 
-    private function runCartMigrations(): void
-    {
-        $files = glob(database_path('migrations/2026_04_28_*.php'));
-        sort($files);
 
-        foreach ($files as $file) {
-            // require (no require_once) para que cada setUp reciba una instancia fresca.
-            (require $file)->up();
-        }
-    }
 }

@@ -292,9 +292,9 @@ class CatalogoController extends Controller
     public function bulkUpdate(Request $request)
     {
         $validated = $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'integer|exists:catalogo,id_catalogo',
-            'action' => 'required|in:activar,desactivar,cambiar_categoria,eliminar',
+            'ids'          => 'required|array|min:1',
+            'ids.*'        => 'integer|exists:catalogo,id_catalogo',
+            'action'       => 'required|in:activar,desactivar,cambiar_categoria,eliminar',
             'id_categoria' => 'nullable|required_if:action,cambiar_categoria|exists:categorias,id_categoria',
         ]);
 
@@ -322,5 +322,33 @@ class CatalogoController extends Controller
         });
 
         return redirect()->route('catalogo.index');
+    }
+
+    public function show($id)
+    {
+        $catalogo = \App\Models\Catalogo\Catalogo::with(['categoria', 'inventario', 'precios'])
+            ->where('id_catalogo', $id)
+            ->where('activo', true)
+            ->firstOrFail();
+
+        $resolver      = app(\App\Services\Catalogo\CatalogoCartResolver::class);
+        $estadoCarrito = $resolver->estadoCarrito($catalogo);
+
+        $saldo = 0;
+        try {
+            $monedero = \App\Models\SaldoMonedero::where('usuario_id', auth()->id())->first();
+            $saldo    = $monedero ? (float) $monedero->saldo_disponible : 0;
+        } catch (\Throwable) {}
+
+        return Inertia::render('Catalogo/Show', [
+            'producto' => array_merge($catalogo->only([
+                'id_catalogo', 'nombre', 'descripcion', 'tipo', 'aplica_iva',
+            ]), $estadoCarrito),
+            'categoria'          => $catalogo->categoria?->nombre,
+            'precio_vigente'     => $catalogo->precioVigenteValor()
+                ? number_format((float) $catalogo->precioVigenteValor(), 2, '.', '')
+                : null,
+            'saldo_disponible'   => $saldo,
+        ]);
     }
 }

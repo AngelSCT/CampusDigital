@@ -1,7 +1,7 @@
 <template>
     <div class="cart-summary border-t border-gray-100 pt-3">
         <div class="flex items-center justify-between text-sm">
-            <span class="text-gray-500">{{ items.length }} artículo(s)</span>
+            <span class="text-gray-500">{{ items.reduce((s, i) => s + (i.cantidad ?? 1), 0) }} artículo(s)</span>
             <span class="font-bold text-gray-900">{{ formatMoney(total) }}</span>
         </div>
     </div>

@@ -30,6 +30,22 @@
                                 Dashboard
                             </a>
 
+                            <a
+                                :href="route('tienda.index')"
+                                :class="[
+                                    'inline-flex items-center gap-1.5 px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300',
+                                    estaActiva('tienda')
+                                        ? 'border-blue-500 text-blue-400 shadow-lg shadow-blue-500/20'
+                                        : 'border-transparent text-slate-400 hover:border-blue-500/50 hover:text-slate-200',
+                                ]"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                </svg>
+                                Tienda
+                            </a>
+
                             <template v-if="tieneRol('administrador')">
                                 <a
                                     :href="route('admin.usuarios.index')"
@@ -384,6 +400,18 @@
                             ]"
                         >
                             Dashboard
+                        </a>
+
+                        <a
+                            :href="route('tienda.index')"
+                            :class="[
+                                'block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300',
+                                estaActiva('tienda')
+                                    ? 'border-blue-500 text-blue-400 bg-blue-500/10'
+                                    : 'border-transparent text-slate-400 hover:bg-slate-800/50 hover:text-slate-200',
+                            ]"
+                        >
+                            🛍️ Tienda
                         </a>
 
                         <template v-if="tieneRol('administrador')">

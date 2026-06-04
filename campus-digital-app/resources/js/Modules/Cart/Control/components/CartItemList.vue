@@ -4,7 +4,9 @@
             v-for="item in items"
             :key="item.id"
             :item="item"
-            @remove="$emit('remove', $event)">
+            :api-base-url="apiBaseUrl"
+            @remove="$emit('remove', $event)"
+            @toggle-regalo="$emit('toggle-regalo', $event)">
             <template #item-extra="{ item: i }">
                 <slot name="item-extra" :item="i" />
             </template>
@@ -14,6 +16,9 @@
 
 <script setup>
 import CartItem from './CartItem.vue';
-defineProps({ items: { type: Array, required: true } });
-defineEmits(['remove']);
+defineProps({
+    items:      { type: Array, required: true },
+    apiBaseUrl: { type: String, default: '/catalogo/cart-proxy' },
+});
+defineEmits(['remove', 'toggle-regalo']);
 </script>

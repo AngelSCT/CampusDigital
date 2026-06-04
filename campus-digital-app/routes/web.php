@@ -112,6 +112,11 @@ Route::post('/catalogo', [CatalogoController::class, 'store'])->name('catalogo.s
 Route::post('/catalogo/bulk-update', [CatalogoController::class, 'bulkUpdate'])->name('catalogo.bulk-update');
 Route::patch('/catalogo/{id}/quick-update', [CatalogoController::class, 'quickUpdate'])->name('catalogo.quick-update');
 Route::get('/catalogo/{id}/edit', [CatalogoController::class, 'edit'])->name('catalogo.edit');
+Route::get('/catalogo/mi-carrito',
+    [App\Http\Controllers\Catalogo\CarritoViewController::class, 'index'])
+    ->middleware(['web', 'auth'])
+    ->name('catalogo.mi-carrito');
+Route::get('/catalogo/{id}', [CatalogoController::class, 'show'])->middleware(['auth'])->name('catalogo.show');
 Route::put('/catalogo/{id}', [CatalogoController::class, 'update'])->name('catalogo.update');
 Route::delete('/catalogo/{id}', [CatalogoController::class, 'destroy'])->name('catalogo.destroy');
 
@@ -225,6 +230,7 @@ Route::middleware(['auth'])->prefix('proveedor')->name('proveedor.')->group(func
 // ── CARRITO / TIENDA (solo auth, sin verified) ───────────────────────────────
 Route::middleware(['auth'])->group(function () {
     // Rutas sin parámetro — deben ir ANTES de las rutas con {item}/{pedido}
+    Route::get  ('/tienda',                               [\App\Http\Controllers\CatalogoEstudianteController::class, 'index'])->name('tienda.index');
     Route::get  ('/carrito',                              [CartController::class, 'indexWeb'])->name('carrito.index');
     Route::post ('/carrito/confirmar',                    [CartController::class, 'confirmarPedido'])->name('carrito.confirmar');
     Route::get  ('/carrito/exito',                        [CartController::class, 'exitoPedido'])->name('carrito.exito');
@@ -638,4 +644,31 @@ Route::prefix('demo/biblioteca')->name('demo.biblioteca.')->group(function () {
         Route::post('/pagar',       [WalletController::class, 'pagar'])->name('pagar');
         Route::get('/movimientos',  [WalletController::class, 'movimientos'])->name('movimientos');
         Route::get('/comprobantes', [WalletController::class, 'comprobantes'])->name('comprobantes');
+    });
+
+// ── CATÁLOGO — Cart Proxy (Capa A3/A4) ──────────────────────────────────────
+Route::prefix('catalogo/cart-proxy')
+    ->middleware(['web', 'auth'])
+    ->group(function () {
+        Route::post('/carritos',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'crearCarrito']);
+        Route::get('/carritos/{uuid}',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'obtenerCarrito']);
+        Route::post('/carritos/{uuid}/items',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'agregarItem']);
+        Route::delete('/carritos/{uuid}/items/{item_id}',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'eliminarItem']);
+        Route::post('/carritos/{uuid}/checkout',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'checkout']);
+        Route::post('/carritos/{uuid}/cancelar',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'cancelar']);
+        Route::get('/historico',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'historico']);
+        Route::post('/validar-destinatario',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'validarDestinatario']);
+        Route::patch('/carritos/{uuid}/items/{item_id}/regalo',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'marcarRegalo']);
+        Route::get('/comprobante/{uuid}',
+            [App\Http\Controllers\Catalogo\CatalogoCartProxyController::class, 'obtenerComprobante'])
+            ->name('catalogo.cart-proxy.comprobante');
     });

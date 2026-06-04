@@ -1,7 +1,5 @@
 <?php
-
 namespace Database\Seeders;
-
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,13 +15,11 @@ class DatabaseSeeder extends Seeder
             CatalogoSeeder::class,
         ]);
 
-        // CategoriasSeeder inserta datos base del módulo Carrito-servicio.
-        // Usa updateOrCreate, por lo que es idempotente y seguro repetirlo.
-        if (!app()->environment('production')) {
-            $this->call([
-                CategoriasSeeder::class,
-                RolesCartSeeder::class,  // crea el rol 'admin_carrito'
-            ]);
-        }
+    if (!app()->environment('production')) {
+        $this->call([
+            CategoriasSeeder::class,
+            RolesCartSeeder::class,
+        ]);
     }
+}
 }

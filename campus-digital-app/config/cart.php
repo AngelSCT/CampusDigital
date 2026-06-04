@@ -1,6 +1,13 @@
 <?php
 
 return [
+    // URL base de la Cart API (Capa A4).
+    // Prioridad: CART_API_BASE_URL → CART_API_URL → http://127.0.0.1:8000/api/cart
+    'api' => [
+        'base_url' => env('CART_API_BASE_URL', 'http://127.0.0.1:8000/api/cart'),
+    ],
+
+
     'jwt' => [
         // Secreto HS256 de 256 bits (64 chars hex). Generar con: php artisan carrito:gen-secret
         'secret'      => env('MODULE_JWT_SECRET', ''),
@@ -47,6 +54,11 @@ return [
     'pedidos' => [
         'url'     => env('PEDIDOS_API_URL', 'http://localhost:8000'),
         'api_key' => env('PEDIDOS_API_KEY', 'dev-local-key-campus-digital-2026'),
+    // Configuración de integración del Catálogo con el Carrito (Capa A2)
+    'catalogo' => [
+        // Cuando un producto no tiene fila en la tabla inventario, ¿se permite
+        // agregarlo al carrito de todas formas? (política D4)
+        'permitir_sin_inventario' => (bool) env('CART_CATALOGO_PERMITIR_SIN_INVENTARIO', true),
     ],
 
     // Configuración para módulos CLIENTES que consumen la API del Carrito
@@ -56,4 +68,5 @@ return [
         'refresh_token' => env('CART_CLIENT_REFRESH_TOKEN'),
         // URL base: ahora en config/services.php → services.cart.url (CART_API_URL)
     ],
+]
 ];
