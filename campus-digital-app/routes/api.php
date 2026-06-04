@@ -1,11 +1,9 @@
 <?php
 
-// MÓDULO 8
-use App\Http\Controllers\Api\Modulo8ApiController;
-
-//RUTAS DE LA API REST DE LA APLICACION ANADIR EN EL ORDEN CORRESPONDIENTE PORFAVOR
-
 use Illuminate\Support\Facades\Route;
+
+// MODULO 8
+use App\Http\Controllers\Api\Modulo8ApiController;
 
 // MODULO 4.1
 use App\Http\Controllers\Api\AreaApiController;
@@ -41,10 +39,6 @@ use App\Http\Controllers\Api\ProviderApiController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Api\CartApiController;
 
-// MODULO CARRITO / TIENDA
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\Api\CartApiController;
-
 // MODULO RECARGAS (US2)
 use App\Http\Controllers\Api\RecargaApiController;
 
@@ -62,14 +56,14 @@ use App\Http\Controllers\Api\DisponibilidadApiController;
 use App\Http\Controllers\Api\ReglaApiController;
 use App\Http\Controllers\Api\MovimientoApiController;
 
-// ── INTEGRACIÓN 4.3 → 4.9 ────────────────────────────────────────────────────
+// INTEGRACIÓN 4.3 → 4.9
 use App\Http\Controllers\Api\CatalogoIntegracionApiController;
+
 // ENDPOINTS INTERNOS — Módulo 4.4 Carrito/Checkout
 use App\Http\Controllers\Api\Internal\SaldoInternalApiController;
 
 Route::middleware('api.key')->group(function () {
 
-Route::middleware('api.key')->group(function () {
     Route::apiResource('areas', AreaApiController::class);
     Route::apiResource('categorias-ticket', CategoriaTicketApiController::class);
     Route::apiResource('ubicaciones', UbicacionApiController::class);
@@ -83,7 +77,6 @@ Route::middleware('api.key')->group(function () {
     Route::apiResource('inventario', InventarioApiController::class);
     Route::get('inventario-stock-bajo', [InventarioApiController::class, 'stockBajo']);
 
-    // Control de CRUDs adicionales (catalogos, vendedores, categorias, promociones, precios, disponibilidades, reglas, movimientos)
     Route::apiResource('catalogos', CatalogoApiController::class);
     Route::apiResource('vendedores', CatalogoVendedorApiController::class);
     Route::apiResource('categorias', CategoriaApiController::class);
@@ -139,133 +132,81 @@ Route::middleware('api.key')->group(function () {
     Route::get ('saldo-movimientos',      [SaldoMovimientoApiController::class, 'index']);
     Route::post('saldo-movimientos',      [SaldoMovimientoApiController::class, 'store']);
     Route::get ('saldo-movimientos/{id}', [SaldoMovimientoApiController::class, 'show']);
-    Route::get('pedidos/retrasados', [\App\Http\Controllers\Pedidos\PedidoDashboardController::class, 'retrasados']);
 
-    // ── Pedidos ──────────────────────────────────────────────────
-// Rutas FIJAS primero (antes de /{id}) para evitar que 'operador' se interprete como ID
-Route::get   ('pedidos/operador/cola',          [PedidoApiController::class, 'colaOperador']);
+    Route::get('pedidos/retrasados',      [\App\Http\Controllers\Pedidos\PedidoDashboardController::class, 'retrasados']);
+    Route::get('pedidos/operador/cola',   [PedidoApiController::class, 'colaOperador']);
 
-// Rutas principales
-Route::get   ('pedidos',                        [PedidoApiController::class, 'index']);
-Route::post  ('pedidos',                        [PedidoApiController::class, 'store']);
-Route::get   ('pedidos/{id}',                   [PedidoApiController::class, 'show'])->whereNumber('id');
-Route::put   ('pedidos/{id}',                   [PedidoApiController::class, 'update'])->whereNumber('id');
-Route::delete('pedidos/{id}',                   [PedidoApiController::class, 'destroy'])->whereNumber('id');
-
-// Acciones sobre un pedido
-Route::get   ('pedidos/{id}/historial',         [PedidoApiController::class, 'historial'])->whereNumber('id');
-Route::post  ('pedidos/{id}/estado',            [PedidoApiController::class, 'cambiarEstado'])->whereNumber('id');
-Route::post  ('pedidos/{id}/cancelar',          [PedidoApiController::class, 'cancelar'])->whereNumber('id');
-Route::post  ('pedidos/{id}/confirmar-tarjeta', [PedidoApiController::class, 'confirmarConTarjeta'])->whereNumber('id');
-
-// ── CHECKOUT (M4.4 y consumidores externos) ──
-
-Route::post('pedidos/checkout',           [\App\Http\Controllers\Api\CheckoutApiController::class, 'checkout']);
-Route::post('pedidos/checkout/cancelar',  [\App\Http\Controllers\Api\CheckoutApiController::class, 'cancelar']);
     Route::get   ('pedidos',                        [PedidoApiController::class, 'index']);
     Route::post  ('pedidos',                        [PedidoApiController::class, 'store']);
-    Route::get   ('pedidos/{id}',                   [PedidoApiController::class, 'show']);
-    Route::put   ('pedidos/{id}',                   [PedidoApiController::class, 'update']);
-    Route::delete('pedidos/{id}',                   [PedidoApiController::class, 'destroy']);
-    Route::post  ('pedidos/{id}/estado',            [PedidoApiController::class, 'cambiarEstado']);
-    Route::post  ('pedidos/{id}/confirmar-tarjeta', [PedidoApiController::class, 'confirmarConTarjeta']);
+    Route::get   ('pedidos/{id}',                   [PedidoApiController::class, 'show'])->whereNumber('id');
+    Route::put   ('pedidos/{id}',                   [PedidoApiController::class, 'update'])->whereNumber('id');
+    Route::delete('pedidos/{id}',                   [PedidoApiController::class, 'destroy'])->whereNumber('id');
+    Route::get   ('pedidos/{id}/historial',         [PedidoApiController::class, 'historial'])->whereNumber('id');
+    Route::post  ('pedidos/{id}/estado',            [PedidoApiController::class, 'cambiarEstado'])->whereNumber('id');
+    Route::post  ('pedidos/{id}/cancelar',          [PedidoApiController::class, 'cancelar'])->whereNumber('id');
+    Route::post  ('pedidos/{id}/confirmar-tarjeta', [PedidoApiController::class, 'confirmarConTarjeta'])->whereNumber('id');
 
-    // ── RECARGAS (US2) ────────────────────────────────────────────────────
+    Route::post('pedidos/checkout',          [\App\Http\Controllers\Api\CheckoutApiController::class, 'checkout']);
+    Route::post('pedidos/checkout/cancelar', [\App\Http\Controllers\Api\CheckoutApiController::class, 'cancelar']);
+
     Route::get ('recargas',                      [RecargaApiController::class, 'index']);
     Route::post('recargas',                      [RecargaApiController::class, 'store']);
-    Route::get ('recargas/usuario/{usuario_id}', [RecargaApiController::class, 'porUsuario']); // ANTES de /{id}
-    Route::get ('recargas/{id}',                 [RecargaApiController::class, 'show']);
     Route::get ('recargas/usuario/{usuario_id}', [RecargaApiController::class, 'porUsuario']);
-    // ── MÓDULO 8: Pagos y Recargas ───────────────────────────────────────────
-    Route::get ('modulo8/pagos/{id}/status',          [Modulo8ApiController::class, 'statusPago']);
-    Route::get ('modulo8/pagos/{id}/detalle',         [Modulo8ApiController::class, 'detallePago']);
-    Route::post('modulo8/recargas/iniciar',           [Modulo8ApiController::class, 'iniciarRecarga']);
-    Route::get ('modulo8/usuarios/{usuario_id}/pagos',[Modulo8ApiController::class, 'pagosPorUsuario']);
+    Route::get ('recargas/{id}',                 [RecargaApiController::class, 'show']);
 
-    // NUEVAS RUTAS PROVEEDOR (MODULO 4.9)
+    Route::get ('modulo8/pagos/{id}/status',           [Modulo8ApiController::class, 'statusPago']);
+    Route::get ('modulo8/pagos/{id}/detalle',          [Modulo8ApiController::class, 'detallePago']);
+    Route::post('modulo8/recargas/iniciar',            [Modulo8ApiController::class, 'iniciarRecarga']);
+    Route::get ('modulo8/usuarios/{usuario_id}/pagos', [Modulo8ApiController::class, 'pagosPorUsuario']);
+
     Route::get('proveedor/metrics', [ProviderApiController::class, 'getMetrics']);
     Route::get('proveedor/reports', [ProviderApiController::class, 'getReports']);
 
-    // ── INTEGRACIÓN MÓDULO 4.3 → 4.9 ─────────────────────────────────────────
-    // Catálogo por vendedor: precio + disponibilidad + regla ya resueltos.
-    // Consumido por el panel operativo del módulo 4.9 (ProductoController).
     Route::get('catalogo-integracion/vendedores',             [CatalogoIntegracionApiController::class, 'vendedores']);
     Route::get('catalogo-integracion/vendedor/{id_vendedor}', [CatalogoIntegracionApiController::class, 'porVendedor']);
 });
 
-// ── CARRITO / TIENDA (auth) ─────────────────────────────────────────────────
+// ── CARRITO / TIENDA (auth) ───────────────────────────────────────────────
 Route::middleware('auth')->prefix('carrito')->group(function () {
-    Route::get   ('/',                   [CartController::class, 'index']);         // ver carrito + saldo monedero
-    Route::post  ('/',                   [CartController::class, 'store']);         // agregar producto
-    Route::patch ('{item}/wishlist',     [CartController::class, 'moverWishlist']); // mover a/desde wishlist
-    Route::patch ('{item}/regalo',       [CartController::class, 'marcarRegalo']);  // marcar como regalo
-    Route::post  ('limpiar',             [CartController::class, 'limpiarInactivos']); // limpiar inactivos
-    Route::post  ('checkout',            [CartController::class, 'checkout']);      // procesar checkout
+    Route::get   ('/',               [CartController::class, 'index']);
+    Route::post  ('/',               [CartController::class, 'store']);
+    Route::patch ('{item}/wishlist', [CartController::class, 'moverWishlist']);
+    Route::patch ('{item}/regalo',   [CartController::class, 'marcarRegalo']);
+    Route::post  ('limpiar',         [CartController::class, 'limpiarInactivos']);
+    Route::post  ('checkout',        [CartController::class, 'checkout']);
 });
 
-// ── VALIDACIÓN PÚBLICA DE TICKETS (sin API key, para escaneo QR) ───────────
 Route::get('/v1/validar-ticket/{hash}', [CartApiController::class, 'validarHash']);
-
-// ── VALIDACIÓN PÚBLICA DE REGALOS (sin API key, para el destinatario) ──────
 Route::get('/v1/regalo/validar/{hash}', [CartController::class, 'validarRegalo']);
 
-// ── CARRITO API v1 (interoperabilidad módulo 4.4) ──────────────────────────
 Route::middleware('api.key')->prefix('v1/carrito')->group(function () {
-    Route::get('usuarios/{id}/stats',    [CartApiController::class, 'getUserStats']);
-    Route::get('stats/global',           [CartApiController::class, 'getGlobalStats']);
-    Route::get('usuarios/{id}/historial',[CartApiController::class, 'getOrderHistory']);
+    Route::get('usuarios/{id}/stats',     [CartApiController::class, 'getUserStats']);
+    Route::get('stats/global',            [CartApiController::class, 'getGlobalStats']);
+    Route::get('usuarios/{id}/historial', [CartApiController::class, 'getOrderHistory']);
 });
 
-// ── MÓDULO CARRITO — Endpoints privados (requieren JWT de módulo) ──────────
 Route::middleware('auth.module.jwt')->prefix('cart')->group(function () {
-    Route::post  ('carritos',                                [\App\Http\Controllers\Api\Cart\CarritoController::class, 'store']);
-    Route::get   ('carritos/{uuid}',                         [\App\Http\Controllers\Api\Cart\CarritoController::class, 'show']);
-    Route::post  ('carritos/{uuid}/items',                   [\App\Http\Controllers\Api\Cart\ItemController::class,    'store']);
-    Route::delete('carritos/{uuid}/items/{item_id}',         [\App\Http\Controllers\Api\Cart\ItemController::class,    'destroy']);
-    Route::post  ('carritos/{uuid}/checkout',                [\App\Http\Controllers\Api\Cart\CheckoutController::class,'checkout']);
-    Route::post  ('carritos/{uuid}/cancelar',                [\App\Http\Controllers\Api\Cart\CarritoController::class, 'cancelar']);
-    Route::get   ('historico',                               [\App\Http\Controllers\Api\Cart\CarritoController::class, 'historico']);
-    Route::post  ('carritos/{uuid}/items/{item_id}/devolver',[\App\Http\Controllers\Api\Cart\ItemController::class,    'devolver']);
-    Route::get   ('comprobantes/{carritoUuid}',              [\App\Http\Controllers\Api\Cart\ComprobanteController::class, 'show'])->name('cart.comprobantes.show');
+    Route::post  ('carritos',                                 [\App\Http\Controllers\Api\Cart\CarritoController::class,    'store']);
+    Route::get   ('carritos/{uuid}',                          [\App\Http\Controllers\Api\Cart\CarritoController::class,    'show']);
+    Route::post  ('carritos/{uuid}/items',                    [\App\Http\Controllers\Api\Cart\ItemController::class,       'store']);
+    Route::delete('carritos/{uuid}/items/{item_id}',          [\App\Http\Controllers\Api\Cart\ItemController::class,       'destroy']);
+    Route::post  ('carritos/{uuid}/checkout',                 [\App\Http\Controllers\Api\Cart\CheckoutController::class,   'checkout']);
+    Route::post  ('carritos/{uuid}/cancelar',                 [\App\Http\Controllers\Api\Cart\CarritoController::class,    'cancelar']);
+    Route::get   ('historico',                                [\App\Http\Controllers\Api\Cart\CarritoController::class,    'historico']);
+    Route::post  ('carritos/{uuid}/items/{item_id}/devolver', [\App\Http\Controllers\Api\Cart\ItemController::class,       'devolver']);
+    Route::get   ('comprobantes/{carritoUuid}',               [\App\Http\Controllers\Api\Cart\ComprobanteController::class,'show'])->name('cart.comprobantes.show');
 });
 
-// ── MÓDULO CARRITO — Token refresh (sin auth.module.jwt; recibe refresh, no access) ──
 Route::post('cart/tokens/refresh', [\App\Http\Controllers\Cart\TokenRefreshController::class, 'refresh']);
 
-// ── MÓDULO CARRITO — APIs Públicas (sin autenticación) ─────────────────────
 Route::prefix('public')->group(function () {
-    Route::get('categorias', [\App\Http\Controllers\Cart\CategoriasPublicController::class, 'index']);
-    Route::post('modulos/solicitud', [\App\Http\Controllers\Cart\SolicitudModuloController::class, 'store']);
-    Route::get('modulos/solicitud/{folio}/estado', [\App\Http\Controllers\Cart\SolicitudModuloController::class, 'estado']);
-});
-
-// ── CARRITO / TIENDA (auth) ─────────────────────────────────────────────────
-Route::middleware('auth')->prefix('carrito')->group(function () {
-    Route::get   ('/',               [CartController::class, 'index']);            // ver carrito + saldo monedero
-    Route::post  ('/',               [CartController::class, 'store']);            // agregar producto
-    Route::patch ('{item}/wishlist', [CartController::class, 'moverWishlist']);   // mover a/desde wishlist
-    Route::patch ('{item}/regalo',   [CartController::class, 'marcarRegalo']);    // marcar como regalo
-    Route::post  ('limpiar',         [CartController::class, 'limpiarInactivos']); // limpiar inactivos
-    Route::post  ('checkout',        [CartController::class, 'checkout']);        // procesar checkout
-});
-
-// ── VALIDACIÓN PÚBLICA DE TICKETS (sin API key, para escaneo QR) ───────────
-Route::get('/v1/validar-ticket/{hash}', [CartApiController::class, 'validarHash']);
-
-// ── VALIDACIÓN PÚBLICA DE REGALOS (sin API key, para el destinatario) ──────
-Route::get('/v1/regalo/validar/{hash}', [CartController::class, 'validarRegalo']);
-
-// ── CARRITO API v1 (interoperabilidad módulo 4.4) ──────────────────────────
-Route::middleware('api.key')->prefix('v1/carrito')->group(function () {
-    Route::get('usuarios/{id}/stats',    [CartApiController::class, 'getUserStats']);
-    Route::get('stats/global',           [CartApiController::class, 'getGlobalStats']);
-    Route::get('usuarios/{id}/historial',[CartApiController::class, 'getOrderHistory']);
+    Route::get ('categorias',                         [\App\Http\Controllers\Cart\CategoriasPublicController::class,  'index']);
+    Route::post('modulos/solicitud',                  [\App\Http\Controllers\Cart\SolicitudModuloController::class,   'store']);
+    Route::get ('modulos/solicitud/{folio}/estado',   [\App\Http\Controllers\Cart\SolicitudModuloController::class,   'estado']);
 });
 
 Route::prefix('rfid')->group(function () {
-
     Route::post('/auth', [RfidApiController::class, 'auth']);
-
     Route::middleware('api.key')->group(function () {
         Route::post('/verificar',       [RfidApiController::class, 'verificar']);
         Route::get ('/usuario/{uid}',   [RfidApiController::class, 'datosUsuario']);
@@ -276,45 +217,26 @@ Route::prefix('rfid')->group(function () {
     });
 });
 
-// ── MÓDULO 4.2: MONEDERO DIGITAL (ADMIN) ──────────────────────────────────────
 Route::prefix('admin/monedero')->middleware(['auth:sanctum', 'admin:administrador'])->group(function () {
-    // Analytics
-    Route::get('analytics/dashboard',       [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'dashboard']);
-    Route::get('analytics/top-usuarios',    [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'topUsuarios']);
-    Route::get('analytics/movimientos-modulo', [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'movimientosPorModulo']);
-    Route::get('analytics/timeseries',      [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'timeseriesData']);
-
-    // Reportes
-    Route::get('reportes/estado-cuenta',    [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'estadoCuenta']);
-    Route::get('reportes/movimientos',      [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'movimientos']);
-    Route::get('reportes/uso-categoria',    [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'usoCategoria']);
-
-    // Exportes
-    Route::get('exportes/estado-cuenta/pdf', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportEstadoCuentaPDF']);
-    Route::get('exportes/estado-cuenta/csv', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportEstadoCuentaCSV']);
-    Route::get('exportes/movimientos/pdf',   [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportMovimientosPDF']);
-    Route::get('exportes/movimientos/csv',   [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportMovimientosCSV']);
-    Route::get('exportes/uso-categoria/pdf', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportUsoCategoriaPDF']);
-    Route::get('exportes/uso-categoria/csv', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportUsoCategoriaCSV']);
-
-    // Reglas (CRUD)
-    Route::apiResource('reglas', App\Http\Controllers\Api\Admin\MonederoReglasApiController::class);
+    Route::get('analytics/dashboard',            [\App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'dashboard']);
+    Route::get('analytics/top-usuarios',         [\App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'topUsuarios']);
+    Route::get('analytics/movimientos-modulo',   [\App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'movimientosPorModulo']);
+    Route::get('analytics/timeseries',           [\App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'timeseriesData']);
+    Route::get('reportes/estado-cuenta',         [\App\Http\Controllers\Api\Admin\MonederoReportesApiController::class,  'estadoCuenta']);
+    Route::get('reportes/movimientos',           [\App\Http\Controllers\Api\Admin\MonederoReportesApiController::class,  'movimientos']);
+    Route::get('reportes/uso-categoria',         [\App\Http\Controllers\Api\Admin\MonederoReportesApiController::class,  'usoCategoria']);
+    Route::get('exportes/estado-cuenta/pdf',     [\App\Http\Controllers\Api\Admin\MonederoReportesApiController::class,  'exportEstadoCuentaPDF']);
+    Route::get('exportes/estado-cuenta/csv',     [\App\Http\Controllers\Api\Admin\MonederoReportesApiController::class,  'exportEstadoCuentaCSV']);
+    Route::get('exportes/movimientos/pdf',       [\App\Http\Controllers\Api\Admin\MonederoReportesApiController::class,  'exportMovimientosPDF']);
+    Route::get('exportes/movimientos/csv',       [\App\Http\Controllers\Api\Admin\MonederoReportesApiController::class,  'exportMovimientosCSV']);
+    Route::get('exportes/uso-categoria/pdf',     [\App\Http\Controllers\Api\Admin\MonederoReportesApiController::class,  'exportUsoCategoriaPDF']);
+    Route::get('exportes/uso-categoria/csv',     [\App\Http\Controllers\Api\Admin\MonederoReportesApiController::class,  'exportUsoCategoriaCSV']);
+    Route::apiResource('reglas',                 \App\Http\Controllers\Api\Admin\MonederoReglasApiController::class);
 });
 
-// ── MÓDULO 4.4 CARRITO — Endpoints internos de Saldo (X-Internal-Token) ──────
-//
-// Llamados por SaldoClient del módulo 4.4 (Carrito/Checkout).
-// Requieren el header X-Internal-Token con el secreto compartido.
-// NO están bajo 'api.key' ni 'auth:sanctum' — usan su propio middleware.
-//
-// Configurar en .env (ambos módulos deben tener el mismo valor):
-//   CART_SALDO_INTERNAL_TOKEN=tu_secreto_de_256_bits
-//
-Route::prefix('internal/saldo')
-    ->middleware('internal.token')
-    ->group(function () {
-        Route::post('reservar',                          [SaldoInternalApiController::class, 'reservar']);
-        Route::post('confirmar/{reserva_id}',            [SaldoInternalApiController::class, 'confirmar']);
-        Route::post('liberar/{reserva_id}',              [SaldoInternalApiController::class, 'liberar']);
-        Route::post('cargo-forzoso',                     [SaldoInternalApiController::class, 'cargoForzoso']);
-    });
+Route::prefix('internal/saldo')->middleware('internal.token')->group(function () {
+    Route::post('reservar',                 [SaldoInternalApiController::class, 'reservar']);
+    Route::post('confirmar/{reserva_id}',   [SaldoInternalApiController::class, 'confirmar']);
+    Route::post('liberar/{reserva_id}',     [SaldoInternalApiController::class, 'liberar']);
+    Route::post('cargo-forzoso',            [SaldoInternalApiController::class, 'cargoForzoso']);
+});

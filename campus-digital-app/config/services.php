@@ -35,28 +35,19 @@ return [
         ],
     ],
 
-<<<<<<< HEAD
     // Módulo Carrito — URL base del servidor que expone la Cart API.
     // En local apunta al mismo Laravel. En producción/staging ajustar CART_API_URL.
+    // Módulo Carrito
     'cart' => [
         'url'                      => env('CART_API_URL', env('APP_URL', 'http://localhost')),
-        // Tokens del módulo Demo Biblioteca — generados por: php artisan carrito:demo-biblioteca-setup
         'biblioteca_token'         => env('BIBLIOTECA_CART_TOKEN'),
         'biblioteca_refresh_token' => env('BIBLIOTECA_REFRESH_TOKEN'),
-=======
-    /*
-    |--------------------------------------------------------------------------
-    | Módulo 2 — API REST (Recargas, Saldo, Pedidos)
-    |--------------------------------------------------------------------------
-    |
-    | MODULO2_API_URL  → URL base del servidor del Módulo 2
-    | MODULO2_API_KEY  → Clave para el header X-API-KEY
-    |
-    */
+    ],
+
+    // Módulo 2 — API REST
     'modulo2_api' => [
         'base_url' => env('MODULO2_API_URL', 'http://localhost:8001'),
         'api_key'  => env('MODULO2_API_KEY', ''),
->>>>>>> origin/4.8_Recargas_final
     ],
 
 ];

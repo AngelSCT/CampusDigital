@@ -39,15 +39,15 @@ class Usuario extends Authenticatable implements MustVerifyEmail
     ];
 
     protected $casts = [
-        'email_verificado' => 'boolean',
-        'bloqueado' => 'boolean',
+        'email_verificado'       => 'boolean',
+        'bloqueado'              => 'boolean',
         'bloqueado_hasta'        => 'datetime',
         'sancion_efectivo_hasta' => 'datetime',
         'ultimo_login_at'        => 'datetime',
-        'seguridad_json' => 'array',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
+        'seguridad_json'         => 'array',
+        'created_at'             => 'datetime',
+        'updated_at'             => 'datetime',
+        'deleted_at'             => 'datetime',
     ];
 
     public function getAuthPassword()
@@ -170,47 +170,21 @@ class Usuario extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Movimiento::class);
     }
-}
-<<<<<<< HEAD
 
-public function roles()
-{
-    return $this->belongsToMany(Rol::class, 'usuario_rol', 'usuario_id', 'rol_id')
-        ->withTimestamps()
-        ->wherePivotNull('deleted_at');
-}
+    // ── Carrito / Tienda ──────────────────────────────────────────────────
 
-public function tarjeta()
-{
-    return $this->hasOne(TarjetaUniversitaria::class, 'usuario_id');
-}
+    public function carritoItems()
+    {
+        return $this->hasMany(CarritoItem::class, 'usuario_id');
+    }
 
+    public function pedidosTienda()
+    {
+        return $this->hasMany(PedidoTienda::class, 'usuario_id');
+    }
 
-public function archivos()
-{
-    return $this->hasMany(\App\Models\Archivo::class, 'usuario_id');
-}
+    // ── Módulo 4.9 Proveedores ────────────────────────────────────────────
 
-public function carpetas()
-{
-    return $this->hasMany(\App\Models\ArchivosCarpeta::class, 'usuario_id');
-}
-
-<<<<<<< HEAD
-public function carritoItems()
-{
-    return $this->hasMany(CarritoItem::class, 'usuario_id');
-}
-
-public function pedidosTienda()
-{
-    return $this->hasMany(PedidoTienda::class, 'usuario_id');
-}
-
-}
-=======
->>>>>>> origin/4.8_Recargas_final
-=======
     public function pedidosRepartidor()
     {
         return $this->hasMany(Pedido::class, 'repartidor_id');
@@ -226,4 +200,3 @@ public function pedidosTienda()
         return $this->belongsToMany(Tienda::class, 'usuario_tienda', 'usuario_id', 'tienda_id')->withTimestamps();
     }
 }
->>>>>>> origin/feature/modulo-proveedor-final

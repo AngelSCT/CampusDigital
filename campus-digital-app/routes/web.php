@@ -631,4 +631,3 @@ Route::prefix('demo/biblioteca')->name('demo.biblioteca.')->group(function () {
         Route::get('/movimientos',  [WalletController::class, 'movimientos'])->name('movimientos');
         Route::get('/comprobantes', [WalletController::class, 'comprobantes'])->name('comprobantes');
     });
-});

@@ -7,8 +7,9 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class MonederoReglasController extends Controller
-{
+use App\Http\Controllers\Controller;
+
+class MonederoReglasController extends Controller{
     /**
      * GET /admin/monedero/reglas
      * Listar todas las reglas

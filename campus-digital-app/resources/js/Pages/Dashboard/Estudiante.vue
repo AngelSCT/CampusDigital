@@ -328,7 +328,6 @@ const props = defineProps({
     </AuthLayout>
 </template>
 
-<script setup>
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 
 const props = defineProps({
@@ -342,4 +341,3 @@ const props = defineProps({
 function formatMonto(v) {
     return Number(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
-</script>
