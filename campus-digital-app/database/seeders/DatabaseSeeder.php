@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             UsuariosPruebaSeeder::class,
             ProductSeeder::class,
             CarritoSeeder::class,
+            PedidoSeeder::class,
             CatalogoSeeder::class,
         ]);
 

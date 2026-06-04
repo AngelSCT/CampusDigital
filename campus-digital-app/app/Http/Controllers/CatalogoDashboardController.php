@@ -49,20 +49,30 @@ class CatalogoDashboardController extends Controller
         ];
 
         // 🔥 TOP PRODUCTOS / SERVICIOS
-        $top = DB::table('movimientos')
-            ->join('catalogo', 'movimientos.id_catalogo', '=', 'catalogo.id_catalogo')
-            ->select('catalogo.nombre', DB::raw('SUM(movimientos.cantidad) as total'))
-            ->groupBy('catalogo.nombre')
+        $top = DB::table('carrito_items')
+            ->join('productos', 'carrito_items.producto_id', '=', 'productos.id')
+            ->select(
+                'productos.nombre',
+                DB::raw('SUM(carrito_items.cantidad) as total')
+            )
+            ->where('carrito_items.guardado_para_despues', false)
+            ->where('carrito_items.en_wishlist', false)
+            ->groupBy('productos.nombre')
             ->orderByDesc('total')
             ->limit(5)
             ->get();
 
         // 📊 CONSUMO POR CATEGORÍA
-        $categorias = DB::table('movimientos')
-            ->join('catalogo', 'movimientos.id_catalogo', '=', 'catalogo.id_catalogo')
-            ->join('categorias', 'catalogo.id_categoria', '=', 'categorias.id_categoria')
-            ->select('categorias.nombre', DB::raw('SUM(movimientos.cantidad) as total'))
-            ->groupBy('categorias.nombre')
+        $categorias = DB::table('carrito_items')
+            ->join('productos', 'carrito_items.producto_id', '=', 'productos.id')
+            ->select(
+                'productos.categoria as nombre',
+                DB::raw('SUM(carrito_items.cantidad) as total')
+            )
+            ->where('carrito_items.guardado_para_despues', false)
+            ->where('carrito_items.en_wishlist', false)
+            ->whereNotNull('productos.categoria')
+            ->groupBy('productos.categoria')
             ->orderByDesc('total')
             ->get();
 

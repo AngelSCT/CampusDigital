@@ -9,25 +9,22 @@
                                 Campus Digital
                             </Link>
                         </div>
-                        <div class="hidden sm:ml-6 sm:flex sm:items-center sm:gap-x-4">
-                            <a href="/dashboard" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <div class="hidden sm:ml-6 sm:flex sm:items-center sm:gap-x-5 whitespace-nowrap">
                             <Link :href="route('dashboard')" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
                                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                                 </svg>
                                 Dashboard
-                            </a>
+                            </Link>
                             <a href="/catalogo" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
                                 Catalogo
                             </a>
-                            <a href="/movimientos" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                            <a href="/monedero/mi-saldo" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
                                 Movimientos
                             </a>
                             <a href="/catalogo-dashboard" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
                                 Panel Catalogo
                             </a>
-                            </Link>
 
                             <!-- Links de Administrador -->
                             <a href="/monedero/mi-saldo" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
@@ -38,76 +35,78 @@
                             </a>
 
                             <template v-if="isAdmin">
-                                <a href="/categorias" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    Categorias
-                                </a>
-                                <a href="/areas" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    Areas
-                                </a>
-                                <a href="/precios" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    Precios
-                                </a>
-                                <a href="/disponibilidad" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    Disponibilidad
-                                </a>
-                                <a href="/reglas" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    Reglas
-                                </a>
-                                <a href="/admin/usuarios" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                <Link :href="route('admin.usuarios.index')" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                                    </svg>
-                                    Usuarios
-                                </Link>
-                                <Link :href="route('admin.tiendas.index')" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                    </svg>
-                                    Tiendas
-                                </Link>
-                                <Link :href="route('admin.proveedores.index')" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    Proveedores
-                                </Link>
-                                <Link :href="route('admin.roles.index')" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                    </svg>
-                                    Roles
-                                </Link>
-                                <a href="/admin/permisos" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-                                    </svg>
-                                    Permisos
-                                </a>
-                                <a href="/admin/bitacora/accesos" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                    </svg>
-                                    Bitácora
-                                </a>
-                                <a href="/admin/tarjetas/dashboard" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3-3v8a3 3 0 003 3z"/>
-                                    </svg>
-                                    Tarjetas
-                                </a>
-                                <Link :href="route('admin.tickets.index')" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 012-2h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5z" />
-                                    </svg>
-                                    Tickets
-                                </Link>
-                                <a href="/admin/monedero/dashboard" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    Monedero
-                                </a>
+                                <div class="relative">
+                                    <button
+                                        @click="showAdminMenu = !showAdminMenu"
+                                        class="text-white hover:text-blue-400 inline-flex items-center px-3 py-2 text-sm font-medium transition-all duration-300"
+                                    >
+                                        ⚙ Administración
+
+                                        <svg
+                                            class="ml-1 h-4 w-4 transition-transform"
+                                            :class="{ 'rotate-180': showAdminMenu }"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                clip-rule="evenodd"
+                                            />
+                                        </svg>
+                                    </button>
+
+                                    <div
+                                        v-show="showAdminMenu"
+                                        class="absolute left-0 top-full mt-2 w-64 rounded-xl bg-slate-900 border border-blue-500/20 shadow-2xl z-[9999]"
+                                    >
+                                        <a href="/categorias" class="admin-link">Categorías</a>
+                                        <a href="/areas" class="admin-link">Áreas</a>
+                                        <a href="/precios" class="admin-link">Precios</a>
+                                        <a href="/disponibilidad" class="admin-link">Disponibilidad</a>
+                                        <a href="/reglas" class="admin-link">Reglas</a>
+
+                                        <Link :href="route('admin.usuarios.index')" class="admin-link">
+                                            Usuarios
+                                        </Link>
+
+                                        <Link :href="route('admin.tiendas.index')" class="admin-link">
+                                            Tiendas
+                                        </Link>
+
+                                        <Link :href="route('admin.proveedores.index')" class="admin-link">
+                                            Proveedores
+                                        </Link>
+
+                                        <Link :href="route('admin.roles.index')" class="admin-link">
+                                            Roles
+                                        </Link>
+
+                                        <a href="/admin/permisos" class="admin-link">
+                                            Permisos
+                                        </a>
+
+                                        <a href="/admin/bitacora/accesos" class="admin-link">
+                                            Bitácora
+                                        </a>
+
+                                        <a href="/admin/tarjetas/dashboard" class="admin-link">
+                                            Tarjetas
+                                        </a>
+
+                                        <Link :href="route('admin.tickets.index')" class="admin-link">
+                                            Tickets
+                                        </Link>
+
+                                        <a href="/pedidos" class="admin-link">
+                                            Pedidos
+                                        </a>
+
+                                        <a href="/admin/monedero/dashboard" class="admin-link">
+                                            Monedero
+                                        </a>
+                                    </div>
+                                </div>
                             </template>
 
 
@@ -270,7 +269,7 @@
                             </transition>
                         </div>
                     </div>
-
+                    </div>
                     <div class="flex items-center sm:hidden">
                         <button @click="toggleMobileMenu" type="button" class="inline-flex items-center justify-center p-2 rounded-lg text-white hover:text-blue-400 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-all duration-300">
                             <svg class="h-6 w-6" :class="{ 'hidden': showMobileMenu, 'block': !showMobileMenu }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -313,7 +312,7 @@
                         <a href="/catalogo" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
                             Catalogo
                         </a>
-                        <a href="/movimientos" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                        <a href="/monedero/mi-saldo" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
                             Movimientos
                         </a>
                         <a href="/catalogo-dashboard" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
@@ -448,6 +447,7 @@ import { router, usePage, Link } from '@inertiajs/vue3';
 const page = usePage();
 const showUserMenu = ref(false);
 const showMobileMenu = ref(false);
+const showAdminMenu = ref(false);
 
 const userName = computed(() => {
     const user = page.props.auth?.user;
@@ -520,3 +520,18 @@ onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
 });
 </script>
+
+<style scoped>
+.admin-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: white;
+    font-size: 0.875rem;
+    transition: all .2s ease;
+}
+
+.admin-link:hover {
+    background: rgba(59,130,246,.15);
+    color: #60a5fa;
+}
+</style>

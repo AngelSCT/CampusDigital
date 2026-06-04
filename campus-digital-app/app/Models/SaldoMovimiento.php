@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Movimiento;
 
 class SaldoMovimiento extends Model
 {
@@ -30,21 +29,26 @@ class SaldoMovimiento extends Model
     ];
 
     protected $casts = [
-        'monto'          => 'decimal:2',
+        'monto' => 'decimal:2',
         'saldo_anterior' => 'decimal:2',
-        'saldo_nuevo'    => 'decimal:2',
-        'meta_json'      => 'array',
-        'created_at'     => 'datetime',
-        'updated_at'     => 'datetime',
-        'deleted_at'     => 'datetime',
+        'saldo_nuevo' => 'decimal:2',
+        'meta_json' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     const TIPO_ABONO = 'abono';
     const TIPO_CARGO = 'cargo';
 
     const MODULOS = [
-        'cafeteria', 'copias', 'souvenirs',
-        'biblioteca', 'recarga', 'rfid', 'otro',
+        'cafeteria',
+        'copias',
+        'souvenirs',
+        'biblioteca',
+        'recarga',
+        'rfid',
+        'otro',
     ];
 
     public function usuario()
@@ -65,5 +69,11 @@ class SaldoMovimiento extends Model
     public function tarjetaLectura()
     {
         return $this->belongsTo(TarjetaLectura::class, 'tarjeta_lectura_id');
+    }
+
+    public function recarga()
+    {
+        return $this->belongsTo(Recarga::class, 'referencia_id')
+            ->where($this->getTable() . '.referencia_tabla', 'recarga');
     }
 }

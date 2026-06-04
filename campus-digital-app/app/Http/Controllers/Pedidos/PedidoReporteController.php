@@ -68,7 +68,7 @@ class PedidoReporteController extends Controller
     {
         $this->checkAdmin();
         $pedidos  = $this->getPedidosFiltrados($request);
-        $filename = 'pedidos_' . now()->format('Ymd_His') . '.xlsx';
+        $filename = 'pedidos_' . now()->format('Ymd_His') . '.xls';
 
         // Generamos XLSX manualmente con XML (sin dependencia extra)
         $rows = [];
@@ -89,8 +89,9 @@ class PedidoReporteController extends Controller
         $xml = $this->buildXlsx($rows);
 
         return response($xml, 200, [
-            'Content-Type'        => 'application/vnd.ms-excel',
+            'Content-Type'        => 'application/vnd.ms-excel; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Cache-Control'       => 'max-age=0',
         ]);
     }
 

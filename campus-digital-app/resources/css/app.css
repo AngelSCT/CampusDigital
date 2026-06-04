@@ -15,7 +15,6 @@ body {
     font-family: 'Inter', 'Roboto', sans-serif;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap');
 
 .dashboard-container {
     font-family: 'Inter', sans-serif;
@@ -378,6 +377,10 @@ body {
 }
 
 .activity-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
 .crud-theme {
     min-height: 100vh;
     padding: 1.5rem;
@@ -670,5 +673,4 @@ body {
 .crud-muted {
     color: #94a3b8;
     font-size: 0.82rem;
-}
 }

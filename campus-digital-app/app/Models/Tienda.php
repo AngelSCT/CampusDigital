@@ -53,7 +53,7 @@ class Tienda extends Model
 
     public function productos()
     {
-        return $this->hasMany(Producto::class, 'tienda_id');
+        return $this->hasMany(Producto::class, 'tienda', 'nombre');
     }
 
     public function pedidos()

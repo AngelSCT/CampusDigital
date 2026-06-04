@@ -25,17 +25,5 @@ class Movimiento extends Model
     public function referenciable()
     {
         return $this->morphTo();
-    protected $primaryKey = 'id_movimiento';
-    public $timestamps = false;
-
-    protected $fillable = [
-        'id_catalogo',
-        'cantidad',
-        'fecha'
-    ];
-
-    public function catalogo()
-    {
-        return $this->belongsTo(Catalogo::class, 'id_catalogo');
     }
 }

@@ -4,7 +4,7 @@
             <div class="crud-topbar">
                 <h1 class="crud-title">Categorias</h1>
                 <div class="flex items-center gap-2">
-                    <a href="/catalogo-dashboard" class="crud-btn-secondary">Volver al dashboard</a>
+                    <a href="/dashboard" class="crud-btn-secondary">Volver al dashboard</a>
                     <a href="/categorias/create" class="crud-btn-primary">Nueva categoria</a>
                 </div>
             </div>

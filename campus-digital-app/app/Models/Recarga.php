@@ -17,38 +17,32 @@ class Recarga extends Model
         'monto',
         'metodo_pago',
         'estado',
-        'referencia_pago',
         'razon_fallo',
         'saldo_movimiento_id',
         'meta_json',
     ];
 
     protected $casts = [
-        'monto'      => 'decimal:2',
-        'meta_json'  => 'array',
+        'monto' => 'decimal:2',
+        'meta_json' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
 
-    // Estados posibles
     const ESTADO_PENDIENTE = 'pendiente';
-    const ESTADO_EXITOSO   = 'exitoso';
-    const ESTADO_FALLIDO   = 'fallido';
+    const ESTADO_EXITOSO = 'exitosa';
+    const ESTADO_FALLIDO = 'fallida';
 
-    // Métodos de pago aceptados
-    const METODOS_PAGO = ['tarjeta', 'transferencia', 'efectivo', 'billetera_digital'];
-
-    // ── Relaciones ────────────────────────────────────────────────────────
+    const METODOS_PAGO = [
+        'tarjeta',
+        'transferencia',
+        'efectivo',
+    ];
 
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
-    }
-
-    public function movimiento()
-    {
-        return $this->morphMany(Movimiento::class, 'referenciable');
     }
 
     public function comprobante()
@@ -60,8 +54,6 @@ class Recarga extends Model
     {
         return $this->belongsTo(SaldoMovimiento::class, 'saldo_movimiento_id');
     }
-
-    // ── Scopes ────────────────────────────────────────────────────────────
 
     public function scopeExitosas($query)
     {
@@ -83,8 +75,6 @@ class Recarga extends Model
         return $query->orderByDesc('created_at');
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────
-
     public function esExitosa(): bool
     {
         return $this->estado === self::ESTADO_EXITOSO;
@@ -98,10 +88,5 @@ class Recarga extends Model
     public function esPendiente(): bool
     {
         return $this->estado === self::ESTADO_PENDIENTE;
-    }
-
-    public function generarFolio(): string
-    {
-        return 'WEB-' . strtoupper(uniqid());
     }
 }

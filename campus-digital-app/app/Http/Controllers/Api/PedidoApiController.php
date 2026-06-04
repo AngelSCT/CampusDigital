@@ -121,7 +121,6 @@ class PedidoApiController extends Controller
 
         $pedido = Pedido::whereNull('deleted_at')->findOrFail($id);
 
-<<<<<<< HEAD
         // ✅ Validación de transición centralizada
         if (!MaquinaEstadosPedido::puedeTransicionar($pedido->estado, $validated['estado'])) {
             return response()->json([
@@ -168,9 +167,6 @@ class PedidoApiController extends Controller
             'message' => "Pedido actualizado a: {$validated['estado']}.",
             'pedido'  => $pedido->fresh()->load(['usuario', 'operador']),
         ]);
-=======
-        return response()->json(['message' => "Pedido actualizado a: {$request->estado}.", 'pedido' => new PedidoResource($pedido->fresh())]);
->>>>>>> origin/4.4_Modulo_Carrito_Consumo_Checkout_Final
     }
 
     // POST /api/pedidos/{id}/confirmar-tarjeta  ← confirmar entrega con tarjeta RFID
@@ -182,7 +178,6 @@ class PedidoApiController extends Controller
 
         $pedido = Pedido::whereNull('deleted_at')->findOrFail($id);
 
-<<<<<<< HEAD
         // ✅ Solo se puede confirmar con tarjeta si el pedido está listo para entregarse
         if (!MaquinaEstadosPedido::puedeTransicionar($pedido->estado, 'entregado')) {
             return response()->json([
@@ -224,9 +219,6 @@ class PedidoApiController extends Controller
             'message' => 'Entrega confirmada con tarjeta.',
             'pedido'  => $pedido->fresh()->load(['usuario', 'operador', 'tarjetaLectura']),
         ]);
-=======
-        return response()->json(['message' => 'Entrega confirmada con tarjeta.', 'pedido' => new PedidoResource($pedido->fresh())]);
->>>>>>> origin/4.4_Modulo_Carrito_Consumo_Checkout_Final
     }
 
     // DELETE /api/pedidos/{id}
