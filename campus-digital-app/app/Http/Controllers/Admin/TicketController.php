@@ -7,8 +7,10 @@ use App\Models\Ticket;
 use App\Models\CategoriaTicket;
 use App\Models\EquipoActivo;
 use App\Models\Usuario;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Area;
 
 class TicketController extends Controller
 {
@@ -48,12 +50,14 @@ class TicketController extends Controller
         $categorias = CategoriaTicket::with('area')->orderBy('nombre_categoria')->get(['id_categoria', 'nombre_categoria', 'id_area']);
         $equipos    = EquipoActivo::orderBy('nombre_equipo')->get(['id_equipo', 'nombre_equipo']);
         $usuarios   = Usuario::orderBy('nombre')->get(['id', 'nombre', 'apellido']);
+        $areas = Area::orderBy('name_area')->get(['id_area', 'name_area']);
 
         return Inertia::render('Admin/Tickets/Index', [
             'tickets'    => $tickets,
             'categorias' => $categorias,
             'equipos'    => $equipos,
             'usuarios'   => $usuarios,
+            'areas'      => $areas,
             'filters'    => $request->only(['search', 'estado', 'prioridad', 'categoria', 'desde', 'hasta']),
         ]);
     }
@@ -61,13 +65,22 @@ class TicketController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'id_usuario_solicitante' => ['required', 'integer', 'exists:usuario,id'],
-            'id_categoria'           => ['required', 'integer', 'exists:categorias_ticket,id_categoria'],
+            'id_usuario_solicitante' => ['nullable', 'integer', 'exists:usuario,id'],
+            'id_categoria'           => ['nullable', 'integer', 'exists:categorias_ticket,id_categoria'],
             'id_equipo'              => ['nullable', 'integer', 'exists:equipos_activos,id_equipo'],
-            'estado'                 => ['required', 'string', 'max:50'],
-            'prioridad'              => ['required', 'string', 'max:30'],
+            'estado'                 => ['nullable', 'string', 'max:50'],
+            'prioridad'              => ['nullable', 'string', 'max:30'],
             'fecha_creacion'         => ['nullable', 'date'],
         ]);
+
+        $validated['id_usuario_solicitante'] = $validated['id_usuario_solicitante'] ?? Usuario::orderBy('id')->value('id');
+        $validated['id_categoria'] = $validated['id_categoria'] ?? CategoriaTicket::orderBy('id_categoria')->value('id_categoria');
+        $validated['estado'] = $validated['estado'] ?? 'Abierto';
+        $validated['prioridad'] = $validated['prioridad'] ?? 'Media';
+
+        if (empty($validated['fecha_creacion'])) {
+            unset($validated['fecha_creacion']);
+        }
 
         Ticket::create($validated);
 
@@ -109,5 +122,21 @@ class TicketController extends Controller
         $ticket->delete();
 
         return redirect()->route('admin.tickets.index')->with('success', 'Ticket eliminado correctamente.');
+    }
+
+    public function pdf(Ticket $ticket)
+    {
+        $ticket->load(['usuarioSolicitante', 'categoria.area', 'equipo']);
+
+        $user = auth()->user();
+        $generadoPor = $user ? "{$user->nombre} {$user->apellido}" : 'Sistema';
+
+        $pdf = Pdf::loadView('pdf.ticket', [
+            'ticket'      => $ticket,
+            'fecha'       => now()->locale('es')->isoFormat('D [de] MMMM [de] YYYY, HH:mm'),
+            'generadoPor' => $generadoPor,
+        ]);
+
+        return $pdf->download("ticket-{$ticket->id_ticket}.pdf");
     }
 }
