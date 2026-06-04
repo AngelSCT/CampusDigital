@@ -15,7 +15,7 @@
             </div>
 
             <div class="resumen-24h">
-                <div class="resumen-title">Últimas 24 horas</div>
+                <div class="resumen-title">�ltimas 24 horas</div>
                 <div class="resumen-items">
                     <div class="resumen-item" v-for="item in resumen24hItems" :key="item.label">
                         <span :class="['resumen-val', item.color]">{{ item.val }}</span>
@@ -23,7 +23,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="kpi-grid">
                 <div class="kpi-card blue">
                     <div class="kpi-top">
@@ -143,51 +142,13 @@
             <div class="section">
                 <h3 class="section-title">Accesos Rápidos</h3>
                 <div class="quick-grid">
-                    <a :href="route('admin.usuarios.index')" class="quick-card primary"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg><span>Usuarios</span></a>
-                    <a :href="route('admin.roles.index')" class="quick-card success"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg><span>Roles</span></a>
-                    <a :href="route('admin.permisos.index')" class="quick-card warning"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>Permisos</span></a>
-                    <a :href="route('admin.bitacora.actividad')" class="quick-card secondary"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><span>Bitácora Actividad</span></a>
-                    <a :href="route('admin.bitacora.accesos')" class="quick-card info"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg><span>Bitácora Accesos</span></a>
-                    <a :href="route('admin.tarjetas.dashboard')" class="quick-card accent"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18M3 14h18M3 18h18"/></svg><span>Tarjetas</span></a>
-                </div>
-            </div>
-
-            <div class="charts-row">
-                <div class="chart-card wide">
-                    <div class="chart-header">
-                        <h3 class="chart-title">Accesos últimos 7 días</h3>
-                        <div class="chart-legend">
-                            <span class="legend-dot green"></span><span>Exitosos</span>
-                            <span class="legend-dot red"></span><span>Fallidos</span>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas ref="chartAccesos"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header"><h3 class="chart-title">Actividad por módulo (30d)</h3></div>
-                    <div class="chart-wrapper h-180">
-                        <canvas ref="chartModulos"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="charts-row">
-                <div class="chart-card">
-                    <div class="chart-header"><h3 class="chart-title">Crecimiento de usuarios (14d)</h3></div>
-                    <div class="chart-wrapper">
-                        <canvas ref="chartCrecimiento"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card wide">
-                    <div class="chart-header">
-                        <h3 class="chart-title">Actividad por hora del día (30d)</h3>
-                        <span class="chart-sub">Distribución de acciones por hora</span>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas ref="chartHoras"></canvas>
-                    </div>
+                <a :href="route('admin.usuarios.index')" class="quick-card primary"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg><span>Usuarios</span></a>
+                <a :href="route('admin.roles.index')" class="quick-card success"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg><span>Roles</span></a>
+                <a :href="route('admin.permisos.index')" class="quick-card warning"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>Permisos</span></a>
+                <a :href="route('admin.bitacora.actividad')" class="quick-card secondary"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><span>Bitácora Actividad</span></a>
+                <a :href="route('admin.bitacora.accesos')" class="quick-card info"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg><span>Bitácora Accesos</span></a>
+                <a :href="route('admin.tarjetas.dashboard')" class="quick-card accent"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18M3 14h18M3 18h18"/></svg><span>Tarjetas</span></a>
+                <a href="/modulo_8" class="quick-card" style="border-color:rgba(6,182,212,0.4)"><svg class="quick-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#22d3ee"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>Módulo 8 - Recargas</span></a>
                 </div>
             </div>
 
@@ -415,8 +376,8 @@
                                     <tr v-for="actividad in stats.actividad_reciente" :key="actividad.id">
                                         <td class="user-col">{{ actividad.email_intentado || 'N/A' }}</td>
                                         <td class="event-col">{{ actividad.evento }}</td>
-                                        <td class="ip-col">{{ actividad.ip || '—' }}</td>
-                                        <td><span class="badge" :class="actividad.exito ? 'badge-success' : 'badge-error'">{{ actividad.exito ? 'Éxito' : 'Fallido' }}</span></td>
+                                        <td class="ip-col">{{ actividad.ip || '-' }}</td>
+                                        <td><span class="badge" :class="actividad.exito ? 'badge-success' : 'badge-error'">{{ actividad.exito ? '�xito' : 'Fallido' }}</span></td>
                                         <td class="date-col">{{ formatDate(actividad.created_at) }}</td>
                                     </tr>
                                 </tbody>
@@ -425,7 +386,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </AuthLayout>
 </template>
@@ -527,7 +487,7 @@ onMounted(async () => {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            layout: { padding: { right: 8 } }, 
+            layout: { padding: { right: 8 } },
             scales: {
                 x: {
                     grid: { color: gc },
@@ -537,8 +497,8 @@ onMounted(async () => {
                     grid: { display: false },
                     ticks: {
                         color: tc,
-                        font: { size: 10 },  
-                        maxTicksLimit: 8,   
+                        font: { size: 10 },
+                        maxTicksLimit: 8,
                     }
                 }
             }
@@ -579,15 +539,15 @@ onMounted(async () => {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            layout: { padding: { left: 4, right: 4 } }, 
+            layout: { padding: { left: 4, right: 4 } },
             scales: {
                 x: {
                     grid: { display: false },
                     ticks: {
                         color: tc,
                         font: { size: 9 },
-                        maxTicksLimit: 12,    
-                        maxRotation: 0,     
+                        maxTicksLimit: 12,
+                        maxRotation: 0,
                     }
                 },
                 y: {
@@ -615,7 +575,7 @@ onMounted(async () => {
 onUnmounted(() => {
     chartInstances.value.forEach(c => c.destroy());
     chartInstances.value = [];
-    resizeObserver.value?.disconnect(); 
+    resizeObserver.value?.disconnect();
 });
 </script>
 
@@ -693,11 +653,11 @@ onUnmounted(() => {
     position: relative;
     height: 160px;
     width: 100%;
-    overflow: hidden;   
+    overflow: hidden;
 }
 .chart-wrapper.h-180 {
     height: 180px;
-    overflow: hidden;   
+    overflow: hidden;
 }
 .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
 .chart-card { background:#1e293b; border:1px solid rgba(30,58,138,0.35); border-radius:1.25rem; padding:1.5rem; overflow: hidden;}

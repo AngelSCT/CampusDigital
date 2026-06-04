@@ -1,5 +1,6 @@
 <?php
 
+use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
@@ -32,16 +33,18 @@ use App\Http\Controllers\Admin\InsumoController;
 use App\Http\Controllers\Admin\GastoTicketController;
 use App\Http\Controllers\Admin\HistorialTicketController;
 use App\Http\Controllers\CartController;
+// Módulo 8 – namespace propio para evitar conflicto con RecargaController del monedero
+use App\Http\Controllers\Recargas\WalletController;
+use App\Http\Controllers\Recargas\RecargaController as RecargasRecargaController;
+use App\Http\Controllers\Recargas\ReportesController;
 
-
+// Redirección inicial
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-
 Route::post('/auth/rfid-login', [RfidLoginController::class, 'login'])
     ->name('rfid.login');
-
 
 Route::post('/simulador/uid', function (Request $request) {
     $uid = strtoupper(trim($request->input('uid', '')));
@@ -65,10 +68,10 @@ Route::options('/simulador/uid', function () {
 });
 
 Route::get('/simulador/uid-pendiente', function () {
-        return response()->json([
-            'uid'       => Cache::get('simulador_uid_pendiente'),
-            'timestamp' => Cache::get('simulador_uid_timestamp'),
-        ]);
+    return response()->json([
+        'uid'       => Cache::get('simulador_uid_pendiente'),
+        'timestamp' => Cache::get('simulador_uid_timestamp'),
+    ]);
 })->name('simulador.uid-pendiente');
 
 Route::post('/simulador/login-rfid', function (Request $request) {
@@ -81,10 +84,9 @@ Route::post('/simulador/login-rfid', function (Request $request) {
     Cache::put('simulador_login_uid', $uid, 60);
     Cache::put('simulador_login_pin', $pin, 60);
     Cache::put('simulador_login_timestamp', now()->toIso8601String(), 60);
-    return response()->json([
-        'ok' => true
-    ])->header('Access-Control-Allow-Origin', '*');
-});
+    return response()->json(['ok' => true])
+        ->header('Access-Control-Allow-Origin', '*');
+})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
 Route::options('/simulador/login-rfid', function () {
     return response('', 200)
@@ -144,7 +146,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ── MONEDERO / RECARGAS ──────────────────────────────────────
+    // ── MONEDERO / RECARGAS ──────────────────────────────────────────────
     Route::prefix('monedero')->name('monedero.')->group(function () {
         Route::get('/recargas',  [RecargaController::class, 'index'])->name('recargas');
         Route::post('/recargas', [RecargaController::class, 'store'])->name('recargas.store');
@@ -154,10 +156,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return inertia('Errors/SinPermiso');
     })->name('sin-permiso');
 
-    Route::get('/lector',                  [TarjetaLecturaController::class, 'index'])->name('lector.index');
-    Route::post('/lector/leer',            [TarjetaLecturaController::class, 'leer'])->name('lector.leer');
-    Route::post('/lector/confirmar-pedido',[TarjetaLecturaController::class, 'confirmarPedido'])->name('lector.confirmar-pedido');
-
+    Route::get('/lector',                   [TarjetaLecturaController::class, 'index'])->name('lector.index');
+    Route::post('/lector/leer',             [TarjetaLecturaController::class, 'leer'])->name('lector.leer');
+    Route::post('/lector/confirmar-pedido', [TarjetaLecturaController::class, 'confirmarPedido'])->name('lector.confirmar-pedido');
 
     Route::middleware(['role'])
         ->prefix('mi-tarjeta')
@@ -194,46 +195,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{archivo}/nota',                     [ArchivoController::class, 'agregarNota'])->middleware('permission:file.admin')->name('nota');
     });
 
+    // ── ADMINISTRACIÓN ───────────────────────────────────────────────────
     Route::middleware(['role:administrador'])->prefix('admin')->name('admin.')->group(function () {
 
         Route::prefix('tarjetas')->name('tarjetas.')->group(function () {
-
-            Route::get('/dashboard', [TarjetaDashboardController::class, 'index'])
-                ->middleware('permission:card.read.any')
-                ->name('dashboard');
-
-            Route::get('/', [TarjetaController::class, 'index'])
-                ->middleware('permission:card.read.any')
-                ->name('index');
-
-            Route::get('/create', [TarjetaController::class, 'create'])
-                ->middleware('permission:card.write')
-                ->name('create');
-
-            Route::post('/', [TarjetaController::class, 'store'])
-                ->middleware('permission:card.write')
-                ->name('store');
-
-            Route::get('/{tarjeta}', [TarjetaController::class, 'show'])
-                ->middleware('permission:card.read.any')
-                ->name('show');
-
-            Route::get('/{tarjeta}/edit', [TarjetaController::class, 'edit'])
-                ->middleware('permission:card.write')
-                ->name('edit');
-
-            Route::put('/{tarjeta}', [TarjetaController::class, 'update'])
-                ->middleware('permission:card.write')
-                ->name('update');
-
-            Route::delete('/{tarjeta}', [TarjetaController::class, 'destroy'])
-                ->middleware('permission:card.write')
-                ->name('destroy');
-
-            Route::post('/{tarjeta}/toggle-block', [TarjetaController::class, 'toggleBlock'])
-                ->middleware('permission:card.block')
-                ->name('toggle-block');
-
+            Route::get('/dashboard', [TarjetaDashboardController::class, 'index'])->middleware('permission:card.read.any')->name('dashboard');
+            Route::get('/',          [TarjetaController::class, 'index'])->middleware('permission:card.read.any')->name('index');
+            Route::get('/create',    [TarjetaController::class, 'create'])->middleware('permission:card.write')->name('create');
+            Route::post('/',         [TarjetaController::class, 'store'])->middleware('permission:card.write')->name('store');
+            Route::get('/{tarjeta}',        [TarjetaController::class, 'show'])->middleware('permission:card.read.any')->name('show');
+            Route::get('/{tarjeta}/edit',   [TarjetaController::class, 'edit'])->middleware('permission:card.write')->name('edit');
+            Route::put('/{tarjeta}',        [TarjetaController::class, 'update'])->middleware('permission:card.write')->name('update');
+            Route::delete('/{tarjeta}',     [TarjetaController::class, 'destroy'])->middleware('permission:card.write')->name('destroy');
+            Route::post('/{tarjeta}/toggle-block', [TarjetaController::class, 'toggleBlock'])->middleware('permission:card.block')->name('toggle-block');
             Route::prefix('reportes')->name('reportes.')->middleware('permission:report.cards')->group(function () {
                 Route::get('/index',                 [TarjetaReporteController::class, 'index'])->name('index');
                 Route::get('/export-csv',            [TarjetaReporteController::class, 'exportCsv'])->name('export-csv');
@@ -245,71 +219,37 @@ Route::middleware(['auth', 'verified'])->group(function () {
             });
         });
 
-
         Route::prefix('usuarios')->name('usuarios.')->group(function () {
-
-
-            Route::get('/', [UsuarioController::class, 'index'])
-                ->middleware('permission:user.read')
-                ->name('index');
-
-
-            Route::get('/create', [UsuarioController::class, 'create'])
-                ->middleware('permission:user.write')
-                ->name('create');
-
-            Route::get('/export',            [UsuarioController::class, 'export'])->middleware('permission:report.users')->name('export');
-            Route::get('/export-by-role',    [UsuarioController::class, 'exportByRole'])->middleware('permission:report.users')->name('export-by-role');
-            Route::get('/export-pdf',        [UsuarioController::class, 'exportPdf'])->middleware('permission:report.users')->name('export-pdf');
+            Route::get('/',              [UsuarioController::class, 'index'])->middleware('permission:user.read')->name('index');
+            Route::get('/create',        [UsuarioController::class, 'create'])->middleware('permission:user.write')->name('create');
+            Route::get('/export',        [UsuarioController::class, 'export'])->middleware('permission:report.users')->name('export');
+            Route::get('/export-by-role',[UsuarioController::class, 'exportByRole'])->middleware('permission:report.users')->name('export-by-role');
+            Route::get('/export-pdf',    [UsuarioController::class, 'exportPdf'])->middleware('permission:report.users')->name('export-pdf');
             Route::get('/export-by-role-pdf',[UsuarioController::class, 'exportByRolePdf'])->middleware('permission:report.users')->name('export-by-role-pdf');
-
-            Route::post('/', [UsuarioController::class, 'store'])
-                ->middleware('permission:user.write')
-                ->name('store');
-
-            Route::get('/{usuario}', [UsuarioController::class, 'show'])
-                ->middleware('permission:user.show')
-                ->name('show');
-
-            Route::get('/{usuario}/edit', [UsuarioController::class, 'edit'])
-                ->middleware('permission:user.write')
-                ->name('edit');
-
-            Route::put('/{usuario}', [UsuarioController::class, 'update'])
-                ->middleware('permission:user.write')
-                ->name('update');
-
-            Route::delete('/{usuario}', [UsuarioController::class, 'destroy'])
-                ->middleware('permission:user.delete')
-                ->name('destroy');
-
-            Route::post('/{usuario}/toggle-block', [UsuarioController::class, 'toggleBlock'])
-                ->middleware('permission:user.block')
-                ->name('toggle-block');
-
-            Route::post('/{usuario}/reset-password', [UsuarioController::class, 'resetPassword'])
-                ->middleware('permission:user.write')
-                ->name('reset-password');
-
+            Route::post('/',             [UsuarioController::class, 'store'])->middleware('permission:user.write')->name('store');
+            Route::get('/{usuario}',     [UsuarioController::class, 'show'])->middleware('permission:user.show')->name('show');
+            Route::get('/{usuario}/edit',[UsuarioController::class, 'edit'])->middleware('permission:user.write')->name('edit');
+            Route::put('/{usuario}',     [UsuarioController::class, 'update'])->middleware('permission:user.write')->name('update');
+            Route::delete('/{usuario}',  [UsuarioController::class, 'destroy'])->middleware('permission:user.delete')->name('destroy');
+            Route::post('/{usuario}/toggle-block',   [UsuarioController::class, 'toggleBlock'])->middleware('permission:user.block')->name('toggle-block');
+            Route::post('/{usuario}/reset-password', [UsuarioController::class, 'resetPassword'])->middleware('permission:user.write')->name('reset-password');
         });
-
 
         Route::prefix('roles')->name('roles.')->group(function () {
             Route::get('/',           [RolController::class, 'index'])->middleware('permission:role.read')->name('index');
             Route::get('/create',     [RolController::class, 'create'])->middleware('permission:role.write')->name('create');
             Route::post('/',          [RolController::class, 'store'])->middleware('permission:role.write')->name('store');
-            Route::get('/{rol}',      [RolController::class, 'show'])->middleware('permission:role.show')->name('show'); 
+            Route::get('/{rol}',      [RolController::class, 'show'])->middleware('permission:role.show')->name('show');
             Route::get('/{rol}/edit', [RolController::class, 'edit'])->middleware('permission:role.write')->name('edit');
             Route::put('/{rol}',      [RolController::class, 'update'])->middleware('permission:role.write')->name('update');
             Route::delete('/{rol}',   [RolController::class, 'destroy'])->middleware('permission:role.delete')->name('destroy');
         });
 
-
         Route::prefix('permisos')->name('permisos.')->group(function () {
             Route::get('/',               [PermisoController::class, 'index'])->middleware('permission:permission.read')->name('index');
             Route::get('/create',         [PermisoController::class, 'create'])->middleware('permission:permission.write')->name('create');
             Route::post('/',              [PermisoController::class, 'store'])->middleware('permission:permission.write')->name('store');
-            Route::get('/{permiso}',      [PermisoController::class, 'show'])->middleware('permission:permission.show')->name('show');  
+            Route::get('/{permiso}',      [PermisoController::class, 'show'])->middleware('permission:permission.show')->name('show');
             Route::get('/{permiso}/edit', [PermisoController::class, 'edit'])->middleware('permission:permission.write')->name('edit');
             Route::put('/{permiso}',      [PermisoController::class, 'update'])->middleware('permission:permission.write')->name('update');
             Route::delete('/{permiso}',   [PermisoController::class, 'destroy'])->middleware('permission:permission.delete')->name('destroy');
@@ -330,7 +270,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/export-actividad-modulo-pdf',  [BitacoraController::class, 'exportActividadModuloPdf'])->name('export-actividad-modulo-pdf');
         });
 
-
         Route::prefix('reportes')->name('reportes.')->middleware('permission:report.users')->group(function () {
             Route::get('/usuarios',         [ReporteController::class, 'usuarios'])->name('usuarios');
             Route::get('/accesos',          [ReporteController::class, 'accesos'])->name('accesos');
@@ -349,11 +288,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         Route::prefix('categorias-ticket')->name('categorias-ticket.')->group(function () {
-            Route::get('/',                       [CategoriaTicketController::class, 'index'])->name('index');
-            Route::post('/',                      [CategoriaTicketController::class, 'store'])->name('store');
-            Route::get('/{categoriaTicket}',      [CategoriaTicketController::class, 'show'])->name('show');
-            Route::put('/{categoriaTicket}',      [CategoriaTicketController::class, 'update'])->name('update');
-            Route::delete('/{categoriaTicket}',   [CategoriaTicketController::class, 'destroy'])->name('destroy');
+            Route::get('/',                     [CategoriaTicketController::class, 'index'])->name('index');
+            Route::post('/',                    [CategoriaTicketController::class, 'store'])->name('store');
+            Route::get('/{categoriaTicket}',    [CategoriaTicketController::class, 'show'])->name('show');
+            Route::put('/{categoriaTicket}',    [CategoriaTicketController::class, 'update'])->name('update');
+            Route::delete('/{categoriaTicket}', [CategoriaTicketController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('ubicaciones')->name('ubicaciones.')->group(function () {
@@ -365,18 +304,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         Route::prefix('equipos-activos')->name('equipos-activos.')->group(function () {
-            Route::get('/',                [EquipoActivoController::class, 'index'])->name('index');
-            Route::post('/',               [EquipoActivoController::class, 'store'])->name('store');
-            Route::get('/{equipoActivo}',  [EquipoActivoController::class, 'show'])->name('show');
-            Route::put('/{equipoActivo}',  [EquipoActivoController::class, 'update'])->name('update');
+            Route::get('/',                 [EquipoActivoController::class, 'index'])->name('index');
+            Route::post('/',                [EquipoActivoController::class, 'store'])->name('store');
+            Route::get('/{equipoActivo}',   [EquipoActivoController::class, 'show'])->name('show');
+            Route::put('/{equipoActivo}',   [EquipoActivoController::class, 'update'])->name('update');
             Route::delete('/{equipoActivo}',[EquipoActivoController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('mantenimientos-preventivos')->name('mantenimientos-preventivos.')->group(function () {
-            Route::get('/',                          [MantenimientoPreventivoController::class, 'index'])->name('index');
-            Route::post('/',                         [MantenimientoPreventivoController::class, 'store'])->name('store');
-            Route::get('/{mantenimientoPreventivo}', [MantenimientoPreventivoController::class, 'show'])->name('show');
-            Route::put('/{mantenimientoPreventivo}', [MantenimientoPreventivoController::class, 'update'])->name('update');
+            Route::get('/',                           [MantenimientoPreventivoController::class, 'index'])->name('index');
+            Route::post('/',                          [MantenimientoPreventivoController::class, 'store'])->name('store');
+            Route::get('/{mantenimientoPreventivo}',  [MantenimientoPreventivoController::class, 'show'])->name('show');
+            Route::put('/{mantenimientoPreventivo}',  [MantenimientoPreventivoController::class, 'update'])->name('update');
             Route::delete('/{mantenimientoPreventivo}',[MantenimientoPreventivoController::class, 'destroy'])->name('destroy');
         });
 
@@ -437,6 +376,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{id}/ticket-pdf', [PedidoController::class, 'ticketPdf'])->name('ticket-pdf')->whereNumber('id');
         Route::get('/panel/retrasados', [PedidoDashboardController::class, 'retrasados'])->name('retrasados');
     });
+
+    // ── MÓDULO 8: RECARGAS Y WALLET ──────────────────────────────────────
+    Route::prefix('modulo_8')->name('modulo_8.')->group(function () {
+        Route::get('/', [ReportesController::class, 'dashboard'])->name('index');
+        Route::get('/recargar',                  [RecargasRecargaController::class, 'mostrarFormulario'])->name('recargar.form');
+        Route::post('/recargar',                 [RecargasRecargaController::class, 'procesarRecarga'])->name('recargar');
+        Route::post('/recargar/{id}/reintentar', [RecargasRecargaController::class, 'reintentar'])->name('recargar.reintentar');
+        Route::get('/recargar/{id}/comprobante', [RecargasRecargaController::class, 'descargarComprobante'])->name('comprobante');
+        Route::prefix('reportes')->name('reportes.')->group(function () {
+            Route::get('/historial',    [ReportesController::class, 'historialRecargas'])->name('historial');
+            Route::get('/fallidos',     [ReportesController::class, 'pagosFallidos'])->name('fallidos');
+            Route::get('/conciliacion', [ReportesController::class, 'conciliacionPeriodo'])->name('conciliacion');
+        });
+        Route::get('/saldo',        [WalletController::class, 'saldo'])->name('saldo');
+        Route::post('/pagar',       [WalletController::class, 'pagar'])->name('pagar');
+        Route::get('/movimientos',  [WalletController::class, 'movimientos'])->name('movimientos');
+        Route::get('/comprobantes', [WalletController::class, 'comprobantes'])->name('comprobantes');
+    });
 });
 
 // ── MÓDULO CARRITO — Panel Admin ──────────────────────────────────────────────
@@ -466,5 +423,28 @@ Route::prefix('demo/biblioteca')->name('demo.biblioteca.')->group(function () {
         Route::delete('carritos/{uuid}/items/{itemId}', [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyRemoveItem']) ->name('carritos.items.remove');
         Route::post('carritos/{uuid}/checkout',         [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyCheckout'])   ->name('carritos.checkout');
         Route::post('carritos/{uuid}/cancelar',         [\App\Http\Controllers\Demo\Biblioteca\PrestamoController::class, 'proxyCancel'])     ->name('carritos.cancel');
+    });
+});
+
+    // ── MÓDULO 8: RECARGAS Y WALLET ──────────────────────────────────────
+    Route::prefix('modulo_8')->name('modulo_8.')->group(function () {
+
+        Route::get('/', [ReportesController::class, 'dashboard'])->name('index');
+
+        Route::get('/recargar',                  [RecargasRecargaController::class, 'mostrarFormulario'])->name('recargar.form');
+        Route::post('/recargar',                 [RecargasRecargaController::class, 'procesarRecarga'])->name('recargar');
+        Route::post('/recargar/{id}/reintentar', [RecargasRecargaController::class, 'reintentar'])->name('recargar.reintentar');
+        Route::get('/recargar/{id}/comprobante', [RecargasRecargaController::class, 'descargarComprobante'])->name('comprobante');
+
+        Route::prefix('reportes')->name('reportes.')->group(function () {
+            Route::get('/historial',    [ReportesController::class, 'historialRecargas'])->name('historial');
+            Route::get('/fallidos',     [ReportesController::class, 'pagosFallidos'])->name('fallidos');
+            Route::get('/conciliacion', [ReportesController::class, 'conciliacionPeriodo'])->name('conciliacion');
+        });
+
+        Route::get('/saldo',        [WalletController::class, 'saldo'])->name('saldo');
+        Route::post('/pagar',       [WalletController::class, 'pagar'])->name('pagar');
+        Route::get('/movimientos',  [WalletController::class, 'movimientos'])->name('movimientos');
+        Route::get('/comprobantes', [WalletController::class, 'comprobantes'])->name('comprobantes');
     });
 });

@@ -96,28 +96,6 @@
                                 <p v-if="errors.metodo_pago" class="text-xs text-red-400 mt-1">{{ errors.metodo_pago }}</p>
                             </div>
 
-                            <!-- Resultado del pago (simulación) -->
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1.5">Resultado del pago</label>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <button @click="form.resultado_pago = 'exitoso'" type="button"
-                                            class="py-2 rounded-lg border text-xs font-medium transition-all duration-200"
-                                            :class="form.resultado_pago === 'exitoso'
-                                                ? 'bg-green-500/20 border-green-500/40 text-green-300'
-                                                : 'bg-slate-700/50 border-slate-600 text-slate-400 hover:border-slate-500'">
-                                        ✅ Exitoso
-                                    </button>
-                                    <button @click="form.resultado_pago = 'fallido'" type="button"
-                                            class="py-2 rounded-lg border text-xs font-medium transition-all duration-200"
-                                            :class="form.resultado_pago === 'fallido'
-                                                ? 'bg-red-500/20 border-red-500/40 text-red-300'
-                                                : 'bg-slate-700/50 border-slate-600 text-slate-400 hover:border-slate-500'">
-                                        ❌ Fallido
-                                    </button>
-                                </div>
-                                <p v-if="errors.resultado_pago" class="text-xs text-red-400 mt-1">{{ errors.resultado_pago }}</p>
-                            </div>
-
                             <!-- Botón enviar -->
                             <button @click="submit" :disabled="procesando"
                                     class="w-full py-2.5 bg-gradient-to-br from-cyan-600 to-blue-700 border border-transparent rounded-lg text-sm font-semibold text-white hover:from-cyan-500 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/20 transition-all duration-200 flex items-center justify-center gap-2">
@@ -217,9 +195,8 @@ const metodosPago = [
 ];
 
 const form = useForm({
-    monto:          '',
-    metodo_pago:    'tarjeta',
-    resultado_pago: 'exitoso',
+    monto:       '',
+    metodo_pago: 'tarjeta',
 });
 
 const procesando = ref(false);
@@ -228,7 +205,6 @@ const errors     = reactive({});
 function submit() {
     errors.monto          = '';
     errors.metodo_pago    = '';
-    errors.resultado_pago = '';
 
     if (!form.monto || form.monto < 1) {
         errors.monto = 'El monto debe ser mayor a $1';

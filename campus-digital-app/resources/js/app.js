@@ -47,6 +47,9 @@ window.route = (name, params) => {
         "perfil.photo.update": "/perfil/foto",
         "perfil.photo.delete": "/perfil/foto",
         "user-password.update": "/user/password",
+        "sin-permiso": "/sin-permiso",
+
+        // Usuarios
         "admin.usuarios.index": "/admin/usuarios",
         "admin.usuarios.show": "/admin/usuarios/:id",
         "admin.usuarios.create": "/admin/usuarios/create",
@@ -58,28 +61,15 @@ window.route = (name, params) => {
         "admin.usuarios.export": "/admin/usuarios/export",
         "admin.usuarios.export-by-role": "/admin/usuarios/export-by-role",
         "admin.usuarios.export-pdf": "/admin/usuarios/export-pdf",
-        "admin.usuarios.export-by-role-pdf":
-            "/admin/usuarios/export-by-role-pdf",
+        "admin.usuarios.export-by-role-pdf": "/admin/usuarios/export-by-role-pdf",
+
+        // Reportes
         "admin.reportes.usuarios": "/admin/reportes/usuarios",
         "admin.reportes.accesos": "/admin/reportes/accesos",
         "admin.reportes.actividad": "/admin/reportes/actividad",
+
+        // Roles
         "admin.roles.index": "/admin/roles",
-        "admin.bitacora.export-accesos-pdf":
-            "/admin/bitacora/export-accesos-pdf",
-        "admin.bitacora.export-accesos-periodo":
-            "/admin/bitacora/export-accesos-periodo",
-        "admin.bitacora.export-accesos-periodo-pdf":
-            "/admin/bitacora/export-accesos-periodo-pdf",
-        "admin.bitacora.export-actividad-pdf":
-            "/admin/bitacora/export-actividad-pdf",
-        "admin.bitacora.export-actividad-periodo":
-            "/admin/bitacora/export-actividad-periodo",
-        "admin.bitacora.export-actividad-periodo-pdf":
-            "/admin/bitacora/export-actividad-periodo-pdf",
-        "admin.bitacora.export-actividad-modulo":
-            "/admin/bitacora/export-actividad-modulo",
-        "admin.bitacora.export-actividad-modulo-pdf":
-            "/admin/bitacora/export-actividad-modulo-pdf",
         "admin.roles.create": "/admin/roles/create",
         "admin.roles.store": "/admin/roles",
         "admin.roles.show": "/admin/roles/:id",
@@ -87,6 +77,7 @@ window.route = (name, params) => {
         "admin.roles.update": "/admin/roles/:id",
         "admin.roles.destroy": "/admin/roles/:id",
 
+        // Permisos
         "admin.permisos.index": "/admin/permisos",
         "admin.permisos.create": "/admin/permisos/create",
         "admin.permisos.store": "/admin/permisos",
@@ -95,10 +86,19 @@ window.route = (name, params) => {
         "admin.permisos.update": "/admin/permisos/:id",
         "admin.permisos.destroy": "/admin/permisos/:id",
 
+        // Bitácora
         "admin.bitacora.accesos": "/admin/bitacora/accesos",
         "admin.bitacora.actividad": "/admin/bitacora/actividad",
         "admin.bitacora.export-accesos": "/admin/bitacora/export-accesos",
         "admin.bitacora.export-actividad": "/admin/bitacora/export-actividad",
+        "admin.bitacora.export-accesos-pdf": "/admin/bitacora/export-accesos-pdf",
+        "admin.bitacora.export-accesos-periodo": "/admin/bitacora/export-accesos-periodo",
+        "admin.bitacora.export-accesos-periodo-pdf": "/admin/bitacora/export-accesos-periodo-pdf",
+        "admin.bitacora.export-actividad-pdf": "/admin/bitacora/export-actividad-pdf",
+        "admin.bitacora.export-actividad-periodo": "/admin/bitacora/export-actividad-periodo",
+        "admin.bitacora.export-actividad-periodo-pdf": "/admin/bitacora/export-actividad-periodo-pdf",
+        "admin.bitacora.export-actividad-modulo": "/admin/bitacora/export-actividad-modulo",
+        "admin.bitacora.export-actividad-modulo-pdf": "/admin/bitacora/export-actividad-modulo-pdf",
 
         // Tarjetas
         "admin.tarjetas.dashboard": "/admin/tarjetas/dashboard",
@@ -111,35 +111,24 @@ window.route = (name, params) => {
         "admin.tarjetas.destroy": "/admin/tarjetas/:id",
         "admin.tarjetas.toggle-block": "/admin/tarjetas/:id/toggle-block",
         "admin.tarjetas.reportes.index": "/admin/tarjetas/reportes/index",
-        "admin.tarjetas.reportes.export-csv":
-            "/admin/tarjetas/reportes/export-csv",
-        "admin.tarjetas.reportes.export-incidentes":
-            "/admin/tarjetas/reportes/export-incidentes",
-        "admin.tarjetas.reportes.export-lecturas-pdf":
-            "/admin/tarjetas/reportes/export-lecturas-pdf",
-        "admin.tarjetas.reportes.export-modulo-csv":
-            "/admin/tarjetas/reportes/export-modulo-csv",
-        "admin.tarjetas.reportes.export-modulo-pdf":
-            "/admin/tarjetas/reportes/export-modulo-pdf",
-        "admin.tarjetas.reportes.export-incidentes-pdf":
-            "/admin/tarjetas/reportes/export-incidentes-pdf",
+        "admin.tarjetas.reportes.export-csv": "/admin/tarjetas/reportes/export-csv",
+        "admin.tarjetas.reportes.export-incidentes": "/admin/tarjetas/reportes/export-incidentes",
+        "admin.tarjetas.reportes.export-lecturas-pdf": "/admin/tarjetas/reportes/export-lecturas-pdf",
+        "admin.tarjetas.reportes.export-modulo-csv": "/admin/tarjetas/reportes/export-modulo-csv",
+        "admin.tarjetas.reportes.export-modulo-pdf": "/admin/tarjetas/reportes/export-modulo-pdf",
+        "admin.tarjetas.reportes.export-incidentes-pdf": "/admin/tarjetas/reportes/export-incidentes-pdf",
 
         // Lector
         "lector.index": "/lector",
         "lector.leer": "/lector/leer",
         "lector.confirmar-pedido": "/lector/confirmar-pedido",
 
-        //UUID DE INICIO DE SESSION
+        // RFID
         "rfid.login": "/auth/rfid-login",
-
-        //CONFIG DE PIN DE USUARIO CON UUID
         "mi-tarjeta.show": "/mi-tarjeta",
         "mi-tarjeta.pin.store": "/mi-tarjeta/pin",
         "mi-tarjeta.escanear": "/mi-tarjeta/escanear",
         "mi-tarjeta.pin": "/mi-tarjeta/pin",
-
-        //RUTA DE ERROR DE PERMISO POR MIDDLEWARE
-        "sin-permiso": "/sin-permiso",
 
         // Áreas
         "admin.areas.index": "/admin/areas",
@@ -155,49 +144,42 @@ window.route = (name, params) => {
         "admin.categorias-ticket.update": "/admin/categorias-ticket/:id",
         "admin.categorias-ticket.destroy": "/admin/categorias-ticket/:id",
 
-        //RUTAS DE UBICACIONES
+        // Ubicaciones
         "admin.ubicaciones.index": "/admin/ubicaciones",
         "admin.ubicaciones.store": "/admin/ubicaciones",
         "admin.ubicaciones.show": "/admin/ubicaciones/:id",
         "admin.ubicaciones.update": "/admin/ubicaciones/:id",
         "admin.ubicaciones.destroy": "/admin/ubicaciones/:id",
 
-        //RUTAS DE EQUIPOS ACTIVOS
+        // Equipos Activos
         "admin.equipos-activos.index": "/admin/equipos-activos",
         "admin.equipos-activos.store": "/admin/equipos-activos",
         "admin.equipos-activos.show": "/admin/equipos-activos/:id",
         "admin.equipos-activos.update": "/admin/equipos-activos/:id",
         "admin.equipos-activos.destroy": "/admin/equipos-activos/:id",
 
-        //RUTAS DE TICKETS
+        // Tickets
         "admin.tickets.index": "/admin/tickets",
         "admin.tickets.store": "/admin/tickets",
         "admin.tickets.show": "/admin/tickets/:id",
         "admin.tickets.update": "/admin/tickets/:id",
         "admin.tickets.destroy": "/admin/tickets/:id",
 
-        //RUTAS DE MANTENIMIENTOS PREVENTIVOS
-        "admin.mantenimientos-preventivos.index":
-            "/admin/mantenimientos-preventivos",
-        "admin.mantenimientos-preventivos.store":
-            "/admin/mantenimientos-preventivos",
-        "admin.mantenimientos-preventivos.show":
-            "/admin/mantenimientos-preventivos/:id",
-        "admin.mantenimientos-preventivos.update":
-            "/admin/mantenimientos-preventivos/:id",
-        "admin.mantenimientos-preventivos.destroy":
-            "/admin/mantenimientos-preventivos/:id",
+        // Mantenimientos Preventivos
+        "admin.mantenimientos-preventivos.index": "/admin/mantenimientos-preventivos",
+        "admin.mantenimientos-preventivos.store": "/admin/mantenimientos-preventivos",
+        "admin.mantenimientos-preventivos.show": "/admin/mantenimientos-preventivos/:id",
+        "admin.mantenimientos-preventivos.update": "/admin/mantenimientos-preventivos/:id",
+        "admin.mantenimientos-preventivos.destroy": "/admin/mantenimientos-preventivos/:id",
 
-        //RUTAS DE ASIGNACIONES TECNICAS
+        // Asignaciones Técnicas
         "admin.asignaciones-tecnicas.index": "/admin/asignaciones-tecnicas",
         "admin.asignaciones-tecnicas.store": "/admin/asignaciones-tecnicas",
         "admin.asignaciones-tecnicas.show": "/admin/asignaciones-tecnicas/:id",
-        "admin.asignaciones-tecnicas.update":
-            "/admin/asignaciones-tecnicas/:id",
-        "admin.asignaciones-tecnicas.destroy":
-            "/admin/asignaciones-tecnicas/:id",
+        "admin.asignaciones-tecnicas.update": "/admin/asignaciones-tecnicas/:id",
+        "admin.asignaciones-tecnicas.destroy": "/admin/asignaciones-tecnicas/:id",
 
-        //RUTAS DEL EXPLORADOR DE ARCHIVOS
+        // Archivos
         "archivos.index": "/archivos",
         "archivos.carpeta.crear": "/archivos/carpeta",
         "archivos.carpeta.eliminar": "/archivos/carpeta/:id",
@@ -209,15 +191,39 @@ window.route = (name, params) => {
         "archivos.marcar-visto": "/archivos/:id/marcar-visto",
         "archivos.desmarcar-visto": "/archivos/:id/desmarcar-visto",
         "archivos.nota": "/archivos/:id/nota",
+
+        // Módulo 8 - Recargas
+        "modulo_8.index": "/modulo_8",
+        "modulo_8.recargar.form": "/modulo_8/recargar",
+        "modulo_8.recargar": "/modulo_8/recargar",
+        "modulo_8.recargar.reintentar": "/modulo_8/recargar/:id/reintentar",
+        "modulo_8.comprobante": "/modulo_8/recargar/:id/comprobante",
+        "modulo_8.reportes.historial": "/modulo_8/reportes/historial",
+        "modulo_8.reportes.fallidos": "/modulo_8/reportes/fallidos",
+        "modulo_8.reportes.conciliacion": "/modulo_8/reportes/conciliacion",
+        "modulo_8.saldo": "/modulo_8/saldo",
+        "modulo_8.pagar": "/modulo_8/pagar",
+        "modulo_8.movimientos": "/modulo_8/movimientos",
+        "modulo_8.comprobantes": "/modulo_8/comprobantes",
     };
 
     let url = routes[name] || "/";
 
     if (params) {
         if (typeof params === "object") {
+            const queryParams = {};
+
             Object.keys(params).forEach((key) => {
-                url = url.replace(`:${key}`, params[key]);
+                if (url.includes(`:${key}`)) {
+                    url = url.replace(`:${key}`, params[key]);
+                } else {
+                    queryParams[key] = params[key];
+                }
             });
+
+            const query = new URLSearchParams(queryParams).toString();
+            if (query) url = `${url}?${query}`;
+
         } else {
             url = url.replace(":id", params);
         }

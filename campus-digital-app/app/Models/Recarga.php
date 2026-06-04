@@ -10,7 +10,7 @@ class Recarga extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'recarga';
+    protected $table = 'recargas';
 
     protected $fillable = [
         'usuario_id',
@@ -37,13 +37,23 @@ class Recarga extends Model
     const ESTADO_FALLIDO   = 'fallido';
 
     // Métodos de pago aceptados
-    const METODOS_PAGO = ['tarjeta', 'transferencia', 'efectivo'];
+    const METODOS_PAGO = ['tarjeta', 'transferencia', 'efectivo', 'billetera_digital'];
 
-    // ─── Relaciones ───────────────────────────────────────────
+    // ── Relaciones ────────────────────────────────────────────────────────
 
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
+    }
+
+    public function movimiento()
+    {
+        return $this->morphMany(Movimiento::class, 'referenciable');
+    }
+
+    public function comprobante()
+    {
+        return $this->morphOne(Comprobante::class, 'referencia');
     }
 
     public function saldoMovimiento()
@@ -51,20 +61,47 @@ class Recarga extends Model
         return $this->belongsTo(SaldoMovimiento::class, 'saldo_movimiento_id');
     }
 
-    // ─── Helpers ──────────────────────────────────────────────
+    // ── Scopes ────────────────────────────────────────────────────────────
+
+    public function scopeExitosas($query)
+    {
+        return $query->where('estado', self::ESTADO_EXITOSO);
+    }
+
+    public function scopeFallidas($query)
+    {
+        return $query->where('estado', self::ESTADO_FALLIDO);
+    }
+
+    public function scopeDelUsuario($query, $usuarioId)
+    {
+        return $query->where('usuario_id', $usuarioId);
+    }
+
+    public function scopeRecientes($query)
+    {
+        return $query->orderByDesc('created_at');
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────
+
+    public function esExitosa(): bool
+    {
+        return $this->estado === self::ESTADO_EXITOSO;
+    }
+
+    public function esFallida(): bool
+    {
+        return $this->estado === self::ESTADO_FALLIDO;
+    }
 
     public function esPendiente(): bool
     {
         return $this->estado === self::ESTADO_PENDIENTE;
     }
 
-    public function fueExitosa(): bool
+    public function generarFolio(): string
     {
-        return $this->estado === self::ESTADO_EXITOSO;
-    }
-
-    public function falló(): bool
-    {
-        return $this->estado === self::ESTADO_FALLIDO;
+        return 'WEB-' . strtoupper(uniqid());
     }
 }

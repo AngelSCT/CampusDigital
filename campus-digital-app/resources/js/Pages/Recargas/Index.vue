@@ -1,19 +1,145 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+<script setup>
+import { computed } from 'vue';
 
-:root {
-    --color-primary: #1E40AF;
-    --color-secondary: #64748B;
-    --color-success: #16A34A;
-    --color-error: #DC2626;
-    --color-warning: #F59E0B;
-}
+const props = defineProps({
+    saldo: Object,
+    movimientos: Array
+})
 
-body {
-    font-family: 'Inter', 'Roboto', sans-serif;
-}
+// puedes calcular aquí
+const exitosos = computed(() => 
+    props.movimientos.filter(m => m.estado === 'exitosa').length
+)
 
+const fallidos = computed(() => 
+    props.movimientos.filter(m => m.estado === 'fallida').length
+)
+</script>
+
+<template>
+<div class="dashboard-container">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Dashboard</h1>
+        <p class="dashboard-subtitle">Resumen de movimientos del sistema</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+
+        <!-- Saldo -->
+        <div class="stat-card primary-card">
+            <div class="card-glow primary"></div>
+
+            <div class="stat-header">
+                <div class="stat-icon-box primary">
+                    💰
+                </div>
+                <span class="stat-label">Saldo</span>
+            </div>
+
+            <div class="stat-value-section">
+                <div class="stat-number">${{ props.saldo.saldo }}</div>
+            </div>
+        </div>
+
+        <!-- Exitosos -->
+        <div class="stat-card success-card">
+            <div class="card-glow success"></div>
+
+            <div class="stat-header">
+                <div class="stat-icon-box success">
+                    ✔
+                </div>
+                <span class="stat-label">Movimientos exitosos</span>
+            </div>
+
+            <div class="stat-value-section">
+                <div class="stat-number">{{ exitosos }}</div>
+            </div>
+        </div>
+
+        <!-- Fallidos -->
+        <div class="stat-card error-card">
+            <div class="card-glow error"></div>
+
+            <div class="stat-header">
+                <div class="stat-icon-box error">
+                    ✖
+                </div>
+                <span class="stat-label">Movimientos fallidos</span>
+            </div>
+
+            <div class="stat-value-section">
+                <div class="stat-number">{{ fallidos }}</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="section">
+        <h2 class="section-title">Acciones rápidas</h2>
+
+        <div class="quick-grid">
+            <a href="/modulo_8/recargar" class="quick-card success">
+                <span>➕ Recargar saldo</span>
+            </a>
+
+            <router-link to="/pago" class="quick-card primary">
+                <span>💳 Realizar pago</span>
+            </router-link>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="content-card">
+        <div class="content-header">
+            <h2 class="content-title">Historial de movimientos</h2>
+        </div>
+
+        <div class="content-body">
+            <div class="activity-table-wrapper">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="mov in movimientos" :key="mov.id">
+                            <td class="event-col">{{ mov.tipo }}</td>
+
+                            <td class="user-col">
+                                {{ mov.monto }}
+                            </td>
+
+                            <td>
+                                <span 
+                                    :class="mov.estado === 'exitoso' 
+                                    ? 'badge badge-success' 
+                                    : 'badge badge-error'">
+                                    {{ mov.estado }}
+                                </span>
+                            </td>
+
+                            <td class="date-col">{{ mov.created_at }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+</template>
+
+<style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap');
 
 .dashboard-container {
@@ -486,35 +612,5 @@ body {
     .content-grid {
         grid-template-columns: 1fr;
     }
-
-    /* TRANSICIÓN SUAVE */
-    .stat-card {
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        transition: all 0.7s ease;
-    }
-
-    /* ESTADO NORMAL (AZUL) */
-    .primary-card {
-        border-color: rgba(59, 130, 246, 0.3);
-    }
-
-    /* SUCCESS (VERDE) */
-    .success-card {
-        border-color: #22c55e;
-        box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
-    }
-
-    /* ERROR (ROJO) */
-    .error-card {
-        border-color: #ef4444;
-        box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
-    }
-
-    .card-glow.success {
-        background: rgba(0, 255, 51, 0.2);
-    }
-
-    .card-glow.error {
-        background: rgba(239, 68, 68, 0.2);
-    }
 }
+</style>

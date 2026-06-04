@@ -1,5 +1,8 @@
 <?php
 
+// MÓDULO 8
+use App\Http\Controllers\Api\Modulo8ApiController;
+
 //RUTAS DE LA API REST DE LA APLICACION ANADIR EN EL ORDEN CORRESPONDIENTE PORFAVOR
 
 use Illuminate\Support\Facades\Route;
@@ -78,7 +81,6 @@ Route::middleware('api.key')->group(function () {
 
     Route::get('bitacora/accesos',        [BitacoraApiController::class, 'accesos']);
     Route::get('bitacora/accesos/{id}',   [BitacoraApiController::class, 'acceso']);
-
     Route::get('bitacora/actividad',      [BitacoraApiController::class, 'actividad']);
     Route::get('bitacora/actividad/{id}', [BitacoraApiController::class, 'actividadItem']);
 
@@ -133,13 +135,18 @@ Route::post('pedidos/checkout/cancelar',  [\App\Http\Controllers\Api\CheckoutApi
     Route::post  ('pedidos/{id}/estado',            [PedidoApiController::class, 'cambiarEstado']);
     Route::post  ('pedidos/{id}/confirmar-tarjeta', [PedidoApiController::class, 'confirmarConTarjeta']);
 
-    // ── RECARGAS (US2) ──────────────────────────────────────────────────────────
+    // ── RECARGAS (US2) ────────────────────────────────────────────────────
     Route::get ('recargas',                      [RecargaApiController::class, 'index']);
     Route::post('recargas',                      [RecargaApiController::class, 'store']);
     Route::get ('recargas/{id}',                 [RecargaApiController::class, 'show']);
     Route::get ('recargas/usuario/{usuario_id}', [RecargaApiController::class, 'porUsuario']);
-});
+    // ── MÓDULO 8: Pagos y Recargas ───────────────────────────────────────────
+    Route::get ('modulo8/pagos/{id}/status',          [Modulo8ApiController::class, 'statusPago']);
+    Route::get ('modulo8/pagos/{id}/detalle',         [Modulo8ApiController::class, 'detallePago']);
+    Route::post('modulo8/recargas/iniciar',           [Modulo8ApiController::class, 'iniciarRecarga']);
+    Route::get ('modulo8/usuarios/{usuario_id}/pagos',[Modulo8ApiController::class, 'pagosPorUsuario']);
 
+});
 
 // ── CARRITO / TIENDA (auth) ─────────────────────────────────────────────────
 Route::middleware('auth')->prefix('carrito')->group(function () {
@@ -192,11 +199,11 @@ Route::prefix('rfid')->group(function () {
     Route::post('/auth', [RfidApiController::class, 'auth']);
 
     Route::middleware('api.key')->group(function () {
-        Route::post('/verificar',        [RfidApiController::class, 'verificar']);
-        Route::get ('/usuario/{uid}',    [RfidApiController::class, 'datosUsuario']);
-        Route::get ('/saldo/{uid}',      [RfidApiController::class, 'saldo']);
-        Route::get ('/historial/{uid}',  [RfidApiController::class, 'historial']);
-        Route::get ('/pedidos/{uid}',    [RfidApiController::class, 'pedidosPendientes']);
-        Route::get ('/lecturas/{uid}',   [RfidApiController::class, 'lecturas']);
+        Route::post('/verificar',       [RfidApiController::class, 'verificar']);
+        Route::get ('/usuario/{uid}',   [RfidApiController::class, 'datosUsuario']);
+        Route::get ('/saldo/{uid}',     [RfidApiController::class, 'saldo']);
+        Route::get ('/historial/{uid}', [RfidApiController::class, 'historial']);
+        Route::get ('/pedidos/{uid}',   [RfidApiController::class, 'pedidosPendientes']);
+        Route::get ('/lecturas/{uid}',  [RfidApiController::class, 'lecturas']);
     });
 });

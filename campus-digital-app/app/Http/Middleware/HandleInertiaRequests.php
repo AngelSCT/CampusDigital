@@ -7,21 +7,8 @@ use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that's loaded on the first page visit.
-     *
-     * @see https://inertiajs.com/server-side-setup#root-template
-     * @var string
-     */
     protected $rootView = 'app';
 
-    /**
-     * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
-     * @param  \Illuminate\Http\Request  $request
-     * @return string|null
-     */
     public function version(Request $request): ?string
     {
         // Disable asset version checking in tests to avoid 409 when manifest exists.
@@ -32,33 +19,27 @@ class HandleInertiaRequests extends Middleware
         return parent::version($request);
     }
 
-    /**
-     * Defines the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'nombre' => $request->user()->nombre,
+                    'id'       => $request->user()->id,
+                    'nombre'   => $request->user()->nombre,
                     'apellido' => $request->user()->apellido,
-                    'email' => $request->user()->email,
+                    'email'    => $request->user()->email,
                     'foto_url' => $request->user()->foto_url,
-                    'roles' => $request->user()
-    ->roles()
-    ->select('rol.id', 'rol.nombre')
-    ->get(),
+                    'roles'    => $request->user()
+                                    ->roles()
+                                    ->select('rol.id', 'rol.nombre')
+                                    ->get(),
+                    'saldo'    => $request->user()->saldo?->saldo ?? 0,
                 ] : null,
             ],
             'flash' => [
-                'resultado' => fn () => $request->session()->get('resultado'),
-                'success'   => fn () => $request->session()->get('success'),
-                'error'     => fn () => $request->session()->get('error'),
+                'resultado'   => fn () => $request->session()->get('resultado'),
+                'success'     => fn () => $request->session()->get('success'),
+                'error'       => fn () => $request->session()->get('error'),
                 'scan_result' => fn () => $request->session()->get('scan_result'),
             ],
         ]);

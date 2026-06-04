@@ -76,6 +76,7 @@
                     </div>
                     
                     <div class="hidden sm:ml-4 sm:flex sm:items-center sm:flex-shrink-0">
+                    <div class="hidden sm:ml-6 sm:flex sm:items-center">
                         <div class="ml-3 relative">
                             <button @click="toggleUserMenu" type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-slate-900 transition-all duration-300 group">
                                 <img class="h-8 w-8 rounded-full object-cover ring-2 ring-blue-500/30 group-hover:ring-blue-500/60 transition-all duration-300" :src="userAvatar" :alt="userName">
@@ -84,7 +85,6 @@
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </button>
-                            
                             <transition
                                 enter-active-class="transition ease-out duration-200"
                                 enter-from-class="transform opacity-0 scale-95"
@@ -103,7 +103,7 @@
                                                 {{ rol }}
                                             </span>
                                         </div>
-                                        
+
                                         <!-- Mi Perfil -->
                                         <a href="/perfil" class="block px-4 py-2 text-sm text-white hover:bg-blue-500/10 hover:text-blue-400 flex items-center transition-all duration-200">
                                             <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +151,7 @@
                                             </svg>
                                             Lector[EX!]
                                         </a>
-                                        
+
                                         <!-- Cerrar Sesión -->
                                         <button @click="logout" type="button" class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center border-t border-blue-500/20 transition-all duration-200">
                                             <svg class="w-4 h-4 mr-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,7 +216,6 @@
                             </a>
                         </template>
                     </div>
-                    
                     <div class="pt-4 pb-3 border-t border-blue-500/20">
                         <div class="flex items-center px-4">
                             <div class="flex-shrink-0">
@@ -308,7 +307,7 @@ const userEmail = computed(() => page.props.auth?.user?.email || '');
 const userAvatar = computed(() => {
     const user = page.props.auth?.user;
     if (user?.foto_url) {
-        return `/storage/${user.foto_url}`;  
+        return `/storage/${user.foto_url}`;
     }
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(userName.value)}&background=1E40AF&color=fff`;
 });
@@ -327,6 +326,11 @@ const isEstudiante = computed(() => {
     return userRoles.value.includes('estudiante');
 });
 
+const saldo = computed(() => {
+    return page.props.auth?.user?.saldo ?? 0;
+})
+
+// Methods
 function toggleUserMenu() {
     showUserMenu.value = !showUserMenu.value;
     showMobileMenu.value = false;
@@ -340,7 +344,7 @@ function toggleMobileMenu() {
 function logout() {
     if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
         fetch('/simulador/limpiar-login', { method: 'POST' })
-            .catch(() => {}) 
+            .catch(() => {})
             .finally(() => {
                 router.post('/logout');
             });
