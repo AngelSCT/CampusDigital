@@ -1,25 +1,12 @@
-<template>
+﻿<template>
     <AuthLayout>
         <div class="max-w-7xl mx-auto space-y-6">
 
-            <div class="flex items-start justify-between flex-wrap gap-4">
-                <div>
-                    <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                        Dashboard de Recargas
-                    </h1>
-                    <p class="mt-1 text-sm text-slate-400">Resumen de tu actividad en el monedero universitario</p>
-                </div>
-
-                <!-- Botón Recargar Saldo -->
-                <Link
-                    :href="route('modulo_8.recargar.form')"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-sm font-semibold rounded-xl shadow-lg shadow-cyan-900/30 transition-all"
-                >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Recargar Saldo
-                </Link>
+            <div>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                    Dashboard de Recargas
+                </h1>
+                <p class="mt-1 text-sm text-slate-400">Resumen de tu actividad en el monedero universitario</p>
             </div>
 
             <div class="flex gap-3 flex-wrap">
@@ -56,7 +43,7 @@
                         </svg>
                     </div>
                     <p class="text-3xl font-bold text-white">{{ stats.recargas_periodo }}</p>
-                    <p class="text-xs text-purple-300 mt-1">en {{ periodo }} días</p>
+                    <p class="text-xs text-purple-300 mt-1">en {{ periodo }} dÃ­as</p>
                 </div>
 
                 <div class="bg-gradient-to-br from-green-900/40 to-emerald-900/40 border border-green-500/20 rounded-xl p-6">
@@ -67,7 +54,7 @@
                         </svg>
                     </div>
                     <p class="text-3xl font-bold text-white">{{ stats.exitosas_periodo }}</p>
-                    <p class="text-xs text-green-300 mt-1" v-if="stats.recargas_periodo > 0">{{ stats.ratio_exito }}% éxito</p>
+                    <p class="text-xs text-green-300 mt-1" v-if="stats.recargas_periodo > 0">{{ stats.ratio_exito }}% Ã©xito</p>
                 </div>
 
                 <div class="bg-gradient-to-br from-orange-900/40 to-yellow-900/40 border border-orange-500/20 rounded-xl p-6">
@@ -89,7 +76,7 @@
                             <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                             </svg>
-                            Métodos de Pago
+                            MÃ©todos de Pago
                         </h2>
                     </div>
 
@@ -114,7 +101,7 @@
                             <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            Últimas Recargas
+                            Ãšltimas Recargas
                         </h2>
                     </div>
 
@@ -162,65 +149,13 @@
 
                 <Link :href="route('modulo_8.reportes.conciliacion', { periodo: periodo })" class="p-6 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl hover:border-purple-500 transition group">
                     <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-base font-semibold text-white group-hover:text-purple-400 transition">Conciliación</h3>
+                        <h3 class="text-base font-semibold text-white group-hover:text-purple-400 transition">ConciliaciÃ³n</h3>
                         <svg class="w-5 h-5 text-slate-400 group-hover:text-purple-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
                     </div>
-                    <p class="text-sm text-slate-400">Análisis por período</p>
+                    <p class="text-sm text-slate-400">AnÃ¡lisis por perÃ­odo</p>
                 </Link>
-            </div>
-
-            <!-- Mis Compras (Módulo 4) -->
-            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-                    <h2 class="text-base font-semibold text-white flex items-center gap-2">
-                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                        </svg>
-                        Mis Compras
-                    </h2>
-                    <span class="text-xs text-slate-400">Últimas compras del catálogo universitario</span>
-                </div>
-
-                <div v-if="loadingCompras" class="px-6 py-8 text-center text-slate-400 text-sm">
-                    Cargando compras...
-                </div>
-
-                <div v-else-if="compras.length === 0" class="px-6 py-8 text-center text-slate-400">
-                    <svg class="w-8 h-8 mx-auto mb-2 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                    </svg>
-                    <p class="text-sm">Sin compras registradas</p>
-                </div>
-
-                <div v-else class="divide-y divide-slate-700">
-                    <div
-                        v-for="c in compras"
-                        :key="c.carrito_uuid"
-                        class="px-6 py-4 flex items-center justify-between hover:bg-slate-700/20 transition"
-                    >
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span
-                                    class="text-xs font-semibold px-2 py-0.5 rounded-full"
-                                    :class="c.estado === 'confirmado'
-                                        ? 'bg-green-500/20 text-green-300'
-                                        : 'bg-yellow-500/20 text-yellow-300'"
-                                >
-                                    {{ c.estado }}
-                                </span>
-                                <span class="text-xs text-slate-400">{{ formatDateTime(c.fecha) }}</span>
-                            </div>
-                            <p class="text-xs text-slate-500 font-mono truncate">
-                                {{ c.folio || c.ticket_id || c.carrito_uuid }}
-                            </p>
-                        </div>
-                        <p class="text-sm font-bold text-white font-mono ml-4 whitespace-nowrap">
-                            ${{ formatMonto(c.total) }}
-                        </p>
-                    </div>
-                </div>
             </div>
 
         </div>
@@ -228,9 +163,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
-import { usePage } from '@inertiajs/vue3';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 
 const props = defineProps({
@@ -241,36 +174,12 @@ const props = defineProps({
 });
 
 const periodos = [
-    { value: '7',    label: 'Últimos 7 días' },
-    { value: '30',   label: 'Últimos 30 días' },
-    { value: '90',   label: 'Últimos 90 días' },
+    { value: '7', label: 'Ãšltimos 7 dÃ­as' },
+    { value: '30', label: 'Ãšltimos 30 dÃ­as' },
+    { value: '90', label: 'Ãšltimos 90 dÃ­as' },
     { value: 'todos', label: 'Todo el tiempo' },
 ];
 
-// ── Mis Compras (Módulo 4) ──────────────────────────────────────────
-const compras = ref([]);
-const loadingCompras = ref(true);
-const page = usePage();
-
-onMounted(async () => {
-    try {
-        const userId = page.props.auth.user.id;
-        const res = await fetch(`/api/v1/modulo8/ventas/usuario/${userId}`, {
-            headers: {
-                'X-API-KEY': '4f8a2b1c9d3e7f6a0b5c8d2e1f4a7b3c6d9e2f5a8b1c4d7e0f3a6b9c2d5e8f1a',
-                'Accept': 'application/json',
-            }
-        });
-        const data = await res.json();
-        if (data.ok) compras.value = data.ventas;
-    } catch (e) {
-        console.error('Error cargando compras del Módulo 4:', e);
-    } finally {
-        loadingCompras.value = false;
-    }
-});
-
-// ── Helpers ─────────────────────────────────────────────────────────
 function formatMonto(v) {
     return Number(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
@@ -295,12 +204,12 @@ function labelMetodo(m) {
 
 function iconoMetodo(m) {
     const iconos = {
-        tarjeta: '💳',
-        transferencia: '🏦',
-        efectivo: '💵',
-        billetera_digital: '📱'
+        tarjeta: 'ðŸ’³',
+        transferencia: 'ðŸ¦',
+        efectivo: 'ðŸ’µ',
+        billetera_digital: 'ðŸ“±'
     };
-    return iconos[m] || '💰';
+    return iconos[m] || 'ðŸ’°';
 }
 
 function badgeEstado(estado) {

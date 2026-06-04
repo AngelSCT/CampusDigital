@@ -294,10 +294,10 @@ class WalletService
         }
 
         return Recarga::where('usuario_id', $usuario->id)
-            ->where('estado', 'exitosa')
+            ->where('estado', Recarga::ESTADO_EXITOSO)
             ->orderByDesc('created_at')
             ->get();
-    }
+        }
 
     public function detalleRecarga(int $recargaId): ?array
     {
