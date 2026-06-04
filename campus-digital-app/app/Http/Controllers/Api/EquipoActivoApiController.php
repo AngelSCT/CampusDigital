@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\EquipoActivoResource;
 use App\Models\EquipoActivo;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class EquipoActivoApiController extends Controller
     // GET /api/equipos-activos
     public function index()
     {
-        return response()->json(
+        return EquipoActivoResource::collection(
             EquipoActivo::with(['categoria', 'ubicacion'])->whereNull('deleted_at')->get()
         );
     }
@@ -19,9 +20,9 @@ class EquipoActivoApiController extends Controller
     // GET /api/equipos-activos/{id}
     public function show($id)
     {
-        $equipo = EquipoActivo::with(['categoria', 'ubicacion'])->whereNull('deleted_at')->findOrFail($id);
-
-        return response()->json($equipo);
+        return new EquipoActivoResource(
+            EquipoActivo::with(['categoria', 'ubicacion'])->whereNull('deleted_at')->findOrFail($id)
+        );
     }
 
     // POST /api/equipos-activos
@@ -38,7 +39,7 @@ class EquipoActivoApiController extends Controller
             $request->only(['id_categoria', 'id_ubicacion', 'nombre_equipo', 'estado_actual'])
         );
 
-        return response()->json($equipo->load(['categoria', 'ubicacion']), 201);
+        return (new EquipoActivoResource($equipo->load(['categoria', 'ubicacion'])))->response()->setStatusCode(201);
     }
 
     // PUT /api/equipos-activos/{id}
@@ -57,7 +58,7 @@ class EquipoActivoApiController extends Controller
             $request->only(['id_categoria', 'id_ubicacion', 'nombre_equipo', 'estado_actual'])
         );
 
-        return response()->json($equipo->fresh()->load(['categoria', 'ubicacion']));
+        return new EquipoActivoResource($equipo->fresh()->load(['categoria', 'ubicacion']));
     }
 
     // DELETE /api/equipos-activos/{id}

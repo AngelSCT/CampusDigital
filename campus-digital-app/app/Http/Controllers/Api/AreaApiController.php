@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AreaResource;
 use App\Models\Area;
 use Illuminate\Http\Request;
 
@@ -11,17 +12,13 @@ class AreaApiController extends Controller
     // GET /api/areas
     public function index()
     {
-        return response()->json(
-            Area::whereNull('deleted_at')->get()
-        );
+        return AreaResource::collection(Area::whereNull('deleted_at')->get());
     }
 
     // GET /api/areas/{id}
     public function show($id)
     {
-        $area = Area::whereNull('deleted_at')->findOrFail($id);
-
-        return response()->json($area);
+        return new AreaResource(Area::whereNull('deleted_at')->findOrFail($id));
     }
 
     // POST /api/areas
@@ -33,7 +30,7 @@ class AreaApiController extends Controller
 
         $area = Area::create($request->only(['name_area']));
 
-        return response()->json($area, 201);
+        return (new AreaResource($area))->response()->setStatusCode(201);
     }
 
     // PUT /api/areas/{id}
@@ -47,7 +44,7 @@ class AreaApiController extends Controller
 
         $area->update($request->only(['name_area']));
 
-        return response()->json($area->fresh());
+        return new AreaResource($area->fresh());
     }
 
     // DELETE /api/areas/{id}

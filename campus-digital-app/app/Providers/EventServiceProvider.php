@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Events\Login;
+use App\Events\GiftExpiredOrRejected;
+use App\Listeners\HandleGiftExpiredOrRejected;
 use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Listeners\LogAuthentication;
@@ -25,6 +27,11 @@ class EventServiceProvider extends ServiceProvider
         ],
         Logout::class => [
             [LogAuthentication::class, 'handleLogout'],
+        ],
+
+        // ── Módulo 4.4 Carrito: ciclo de vida del regalo ─────────────────────
+        GiftExpiredOrRejected::class => [
+            HandleGiftExpiredOrRejected::class,
         ],
     ];
 

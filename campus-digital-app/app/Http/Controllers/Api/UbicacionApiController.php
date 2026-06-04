@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UbicacionResource;
 use App\Models\Ubicacion;
 use Illuminate\Http\Request;
 
@@ -11,17 +12,13 @@ class UbicacionApiController extends Controller
     // GET /api/ubicaciones
     public function index()
     {
-        return response()->json(
-            Ubicacion::whereNull('deleted_at')->get()
-        );
+        return UbicacionResource::collection(Ubicacion::whereNull('deleted_at')->get());
     }
 
     // GET /api/ubicaciones/{id}
     public function show($id)
     {
-        $ubicacion = Ubicacion::whereNull('deleted_at')->findOrFail($id);
-
-        return response()->json($ubicacion);
+        return new UbicacionResource(Ubicacion::whereNull('deleted_at')->findOrFail($id));
     }
 
     // POST /api/ubicaciones
@@ -34,7 +31,7 @@ class UbicacionApiController extends Controller
 
         $ubicacion = Ubicacion::create($request->only(['edificio', 'aula_departamento']));
 
-        return response()->json($ubicacion, 201);
+        return (new UbicacionResource($ubicacion))->response()->setStatusCode(201);
     }
 
     // PUT /api/ubicaciones/{id}
@@ -49,7 +46,7 @@ class UbicacionApiController extends Controller
 
         $ubicacion->update($request->only(['edificio', 'aula_departamento']));
 
-        return response()->json($ubicacion->fresh());
+        return new UbicacionResource($ubicacion->fresh());
     }
 
     // DELETE /api/ubicaciones/{id}

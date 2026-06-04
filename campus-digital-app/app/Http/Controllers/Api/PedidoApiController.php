@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PedidoResource;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -23,13 +24,13 @@ class PedidoApiController extends Controller
         if ($request->filled('desde'))       $query->where('created_at', '>=', $request->desde);
         if ($request->filled('hasta'))       $query->where('created_at', '<=', $request->hasta);
 
-        return response()->json($query->orderByDesc('created_at')->paginate($request->get('per_page', 15)));
+        return PedidoResource::collection($query->orderByDesc('created_at')->paginate($request->get('per_page', 15)));
     }
 
     // GET /api/pedidos/{id}
     public function show($id)
     {
-        return response()->json(
+        return new PedidoResource(
             Pedido::with(['usuario', 'operador', 'tarjetaLectura', 'saldoMovimiento'])
                 ->whereNull('deleted_at')
                 ->findOrFail($id)
@@ -58,7 +59,7 @@ class PedidoApiController extends Controller
             'meta_json'    => $request->meta_json ?? [],
         ]);
 
-        return response()->json($pedido->load('usuario'), 201);
+        return (new PedidoResource($pedido->load('usuario')))->response()->setStatusCode(201);
     }
 
     // PUT /api/pedidos/{id}  ← actualizar datos generales
@@ -74,7 +75,7 @@ class PedidoApiController extends Controller
 
         $pedido->update($request->only(['notas', 'descripcion', 'total', 'meta_json']));
 
-        return response()->json($pedido->fresh());
+        return new PedidoResource($pedido->fresh());
     }
 
     // POST /api/pedidos/{id}/estado  ← cambiar estado del pedido
@@ -90,7 +91,7 @@ class PedidoApiController extends Controller
             'operador_usuario_id' => $request->operador_usuario_id ?? $pedido->operador_usuario_id,
         ]);
 
-        return response()->json(['message' => "Pedido actualizado a: {$request->estado}.", 'pedido' => $pedido->fresh()]);
+        return response()->json(['message' => "Pedido actualizado a: {$request->estado}.", 'pedido' => new PedidoResource($pedido->fresh())]);
     }
 
     // POST /api/pedidos/{id}/confirmar-tarjeta  ← confirmar entrega con tarjeta RFID
@@ -108,7 +109,7 @@ class PedidoApiController extends Controller
             'estado'                 => 'entregado',
         ]);
 
-        return response()->json(['message' => 'Entrega confirmada con tarjeta.', 'pedido' => $pedido->fresh()]);
+        return response()->json(['message' => 'Entrega confirmada con tarjeta.', 'pedido' => new PedidoResource($pedido->fresh())]);
     }
 
     // DELETE /api/pedidos/{id}

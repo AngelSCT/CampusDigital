@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PedidoTienda;
 use App\Models\Usuario;
 use App\Models\AccesoBitacora;
 use App\Models\SaldoMonedero;
@@ -231,8 +232,36 @@ class DashboardController extends Controller
     {
         $monedero = SaldoMonedero::where('usuario_id', $user->id)->first();
 
+        // Gasto promedio del estudiante en pedidos confirmados
+        $gastoPromedio = round(
+            (float) PedidoTienda::where('usuario_id', $user->id)->avg('total') ?? 0,
+            2
+        );
+
+        // Producto más comprado por el estudiante
+        $topProducto = DB::table('carrito_items')
+            ->join('productos', 'carrito_items.producto_id', '=', 'productos.id')
+            ->where('carrito_items.usuario_id', $user->id)
+            ->where('carrito_items.guardado_para_despues', false)
+            ->where('carrito_items.en_wishlist', false)
+            ->selectRaw('productos.nombre, productos.categoria, SUM(carrito_items.cantidad) as total_unidades')
+            ->groupBy('productos.id', 'productos.nombre', 'productos.categoria')
+            ->orderByDesc('total_unidades')
+            ->first();
+
+        $totalPedidos = PedidoTienda::where('usuario_id', $user->id)->count();
+
         return Inertia::render('Dashboard/Estudiante', [
             'monedero' => $monedero,
+            'resumenConsumo' => [
+                'gasto_promedio'  => $gastoPromedio,
+                'total_pedidos'   => $totalPedidos,
+                'top_producto'    => $topProducto ? [
+                    'nombre'         => $topProducto->nombre,
+                    'categoria'      => $topProducto->categoria,
+                    'total_unidades' => (int) $topProducto->total_unidades,
+                ] : null,
+            ],
         ]);
     }
 }

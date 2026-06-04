@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class ApiKeyMiddleware
@@ -11,6 +12,9 @@ class ApiKeyMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $apiKey = $request->header('X-API-KEY');
+
+        Log::info('[ApiKey] Header recibido: ' . $apiKey);
+        Log::info('[ApiKey] API_KEYS en .env: ' . env('API_KEYS', '(vacío)'));
 
         if (!$apiKey) {
             return response()->json([

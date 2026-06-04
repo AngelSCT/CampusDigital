@@ -26,6 +26,9 @@ class Usuario extends Authenticatable implements MustVerifyEmail
         'bloqueado',
         'bloqueado_hasta',
         'seguridad_json',
+        'sancion_efectivo_hasta',
+        'tienda',
+        'matricula',
     ];
 
     protected $hidden = [
@@ -36,8 +39,9 @@ class Usuario extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verificado' => 'boolean',
         'bloqueado' => 'boolean',
-        'bloqueado_hasta' => 'datetime',
-        'ultimo_login_at' => 'datetime',
+        'bloqueado_hasta'        => 'datetime',
+        'sancion_efectivo_hasta' => 'datetime',
+        'ultimo_login_at'        => 'datetime',
         'seguridad_json' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -151,6 +155,16 @@ public function archivos()
 public function carpetas()
 {
     return $this->hasMany(\App\Models\ArchivosCarpeta::class, 'usuario_id');
+}
+
+public function carritoItems()
+{
+    return $this->hasMany(CarritoItem::class, 'usuario_id');
+}
+
+public function pedidosTienda()
+{
+    return $this->hasMany(PedidoTienda::class, 'usuario_id');
 }
 
 }

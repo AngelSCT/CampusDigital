@@ -123,6 +123,86 @@
                 </div>
             </div>
 
+            <!-- ── Resumen de Consumo (Módulo 4.4) ──────────────────────────── -->
+            <div class="bg-[#0f172a] border border-emerald-500/20 rounded-xl shadow-xl shadow-emerald-500/5 overflow-hidden">
+                <div class="px-5 py-4 border-b border-emerald-500/10 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-sm font-semibold text-white">Resumen de Consumo</h3>
+                    </div>
+                    <a href="/carrito" class="text-xs text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1">
+                        Ver carrito
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-emerald-500/10">
+
+                    <!-- Gasto promedio -->
+                    <div class="px-5 py-4 flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Gasto Promedio</p>
+                            <p class="text-2xl font-bold text-emerald-400 font-mono">
+                                ${{ resumenConsumo?.gasto_promedio
+                                    ? Number(resumenConsumo.gasto_promedio).toFixed(2)
+                                    : '0.00' }}
+                            </p>
+                            <p class="text-xs text-slate-500 mt-0.5">por pedido</p>
+                        </div>
+                    </div>
+
+                    <!-- Total pedidos -->
+                    <div class="px-5 py-4 flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Pedidos Realizados</p>
+                            <p class="text-2xl font-bold text-white">{{ resumenConsumo?.total_pedidos ?? 0 }}</p>
+                            <p class="text-xs text-slate-500 mt-0.5">histórico</p>
+                        </div>
+                    </div>
+
+                    <!-- Producto más comprado -->
+                    <div class="px-5 py-4 flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Favorito</p>
+                            <p v-if="resumenConsumo?.top_producto"
+                               class="text-sm font-bold text-white truncate">
+                                {{ resumenConsumo.top_producto.nombre }}
+                            </p>
+                            <p v-else class="text-sm text-slate-500 italic">Sin compras aún</p>
+                            <p v-if="resumenConsumo?.top_producto"
+                               class="text-xs text-cyan-400 mt-0.5">
+                                {{ resumenConsumo.top_producto.total_unidades }} unidades
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-blue-500/10 rounded-xl border border-blue-500/20">
                 <div class="px-4 py-5 sm:p-6">
                     <h3 class="text-lg leading-6 font-medium text-white mb-4">Servicios Disponibles</h3>
@@ -210,6 +290,10 @@ import AuthLayout from '@/Layouts/AuthLayout.vue';
 
 const props = defineProps({
     monedero: { type: Object, default: null },
+    resumenConsumo: {
+        type: Object,
+        default: () => ({ gasto_promedio: 0, total_pedidos: 0, top_producto: null }),
+    },
 });
 
 function formatMonto(v) {

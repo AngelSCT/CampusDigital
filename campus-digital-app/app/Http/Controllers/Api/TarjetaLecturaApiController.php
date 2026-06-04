@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TarjetaLecturaResource;
 use App\Models\TarjetaLectura;
 use Illuminate\Http\Request;
 
@@ -24,13 +25,13 @@ class TarjetaLecturaApiController extends Controller
         if ($request->filled('desde'))          $query->where('created_at', '>=', $request->desde);
         if ($request->filled('hasta'))          $query->where('created_at', '<=', $request->hasta);
 
-        return response()->json($query->orderByDesc('created_at')->paginate($request->get('per_page', 20)));
+        return TarjetaLecturaResource::collection($query->orderByDesc('created_at')->paginate($request->get('per_page', 20)));
     }
 
     // GET /api/tarjeta-lecturas/{id}
     public function show($id)
     {
-        return response()->json(
+        return new TarjetaLecturaResource(
             TarjetaLectura::with(['tarjeta.usuario', 'operador', 'pedido'])
                 ->whereNull('deleted_at')
                 ->findOrFail($id)
@@ -66,6 +67,6 @@ class TarjetaLecturaApiController extends Controller
             'meta_json'           => $request->meta_json ?? [],
         ]);
 
-        return response()->json($lectura->load(['tarjeta.usuario', 'operador']), 201);
+        return (new TarjetaLecturaResource($lectura->load(['tarjeta.usuario', 'operador'])))->response()->setStatusCode(201);
     }
 }

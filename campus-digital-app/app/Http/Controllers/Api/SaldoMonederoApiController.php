@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SaldoMonederoResource;
 use App\Models\SaldoMonedero;
 use App\Models\SaldoMovimiento;
 use Illuminate\Http\Request;
@@ -16,13 +17,13 @@ class SaldoMonederoApiController extends Controller
 
         if ($request->filled('usuario_id')) $query->where('usuario_id', $request->usuario_id);
 
-        return response()->json($query->paginate($request->get('per_page', 15)));
+        return SaldoMonederoResource::collection($query->paginate($request->get('per_page', 15)));
     }
 
     // GET /api/saldo-monederos/{id}
     public function show($id)
     {
-        return response()->json(
+        return new SaldoMonederoResource(
             SaldoMonedero::with('usuario')->whereNull('deleted_at')->findOrFail($id)
         );
     }
@@ -39,7 +40,7 @@ class SaldoMonederoApiController extends Controller
             return response()->json(['message' => 'El usuario no tiene monedero registrado.'], 404);
         }
 
-        return response()->json($monedero);
+        return new SaldoMonederoResource($monedero);
     }
 
     // POST /api/saldo-monederos  ← crear monedero para un usuario nuevo
@@ -55,6 +56,6 @@ class SaldoMonederoApiController extends Controller
             'saldo_retenido'   => 0.00,
         ]);
 
-        return response()->json($monedero->load('usuario'), 201);
+        return (new SaldoMonederoResource($monedero->load('usuario')))->response()->setStatusCode(201);
     }
 }

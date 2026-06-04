@@ -11,49 +11,64 @@ class UsuariosPruebaSeeder extends Seeder
 {
     public function run(): void
     {
-        $rolAdmin = Rol::where('nombre', 'administrador')->first();
+        $rolAdmin     = Rol::where('nombre', 'administrador')->first();
         $rolProveedor = Rol::where('nombre', 'proveedor_area')->first();
         $rolEstudiante = Rol::where('nombre', 'estudiante')->first();
 
-        $admin = Usuario::create([
-            'nombre' => 'Admin',
-            'apellido' => 'Sistema',
-            'email' => 'admin@campusdigital.com',
-            'telefono' => '1234567890',
-            'password_hash' => Hash::make('password'),
-            'email_verificado' => true,
-        ]);
-        $admin->roles()->attach($rolAdmin->id);
-        $admin->perfil()->create([]);
+        // ── Admin ─────────────────────────────────────────────────────────────
+        $admin = Usuario::updateOrCreate(
+            ['email' => 'admin@campusdigital.com'],
+            [
+                'nombre'           => 'Admin',
+                'apellido'         => 'Sistema',
+                'telefono'         => '1234567890',
+                'password_hash'    => Hash::make('password'),
+                'email_verificado' => true,
+                'tienda'           => null,
+                'matricula'        => '00000001',
+            ]
+        );
+        $admin->roles()->syncWithoutDetaching([$rolAdmin->id]);
+        $admin->perfil()->firstOrCreate([]);
 
-        $proveedor = Usuario::create([
-            'nombre' => 'Proveedor',
-            'apellido' => 'Cafetería',
-            'email' => 'proveedor@campusdigital.com',
-            'telefono' => '0987654321',
-            'password_hash' => Hash::make('password'),
-            'email_verificado' => true,
-        ]);
-        $proveedor->roles()->attach($rolProveedor->id);
-        $proveedor->perfil()->create([]);
+        // ── Proveedor Cafetería ───────────────────────────────────────────────
+        $proveedor = Usuario::updateOrCreate(
+            ['email' => 'proveedor@campusdigital.com'],
+            [
+                'nombre'           => 'Proveedor',
+                'apellido'         => 'Cafetería',
+                'telefono'         => '0987654321',
+                'password_hash'    => Hash::make('password'),
+                'email_verificado' => true,
+                'tienda'           => 'Cafetería',
+                'matricula'        => '99999999',
+            ]
+        );
+        $proveedor->roles()->syncWithoutDetaching([$rolProveedor->id]);
+        $proveedor->perfil()->firstOrCreate([]);
 
-        $estudiante = Usuario::create([
-            'nombre' => 'Juan',
-            'apellido' => 'Pérez',
-            'email' => 'estudiante@campusdigital.com',
-            'telefono' => '5555555555',
-            'password_hash' => Hash::make('password'),
-            'email_verificado' => true,
-        ]);
-        $estudiante->roles()->attach($rolEstudiante->id);
-        $estudiante->perfil()->create([
-            'fecha_nacimiento' => '2000-01-15',
-            'genero' => 'masculino',
-        ]);
+        // ── Estudiante ────────────────────────────────────────────────────────
+        $estudiante = Usuario::updateOrCreate(
+            ['email' => 'estudiante@campusdigital.com'],
+            [
+                'nombre'           => 'Juan',
+                'apellido'         => 'Pérez',
+                'telefono'         => '5555555555',
+                'password_hash'    => Hash::make('password'),
+                'email_verificado' => true,
+                'tienda'           => null,
+                'matricula'        => '20260001',
+            ]
+        );
+        $estudiante->roles()->syncWithoutDetaching([$rolEstudiante->id]);
+        $estudiante->perfil()->firstOrCreate(
+            [],
+            ['fecha_nacimiento' => '2000-01-15', 'genero' => 'masculino']
+        );
 
-        $this->command->info('Usuarios de prueba creados:');
-        $this->command->info('Admin: admin@campusdigital.com / password');
-        $this->command->info('Proveedor: proveedor@campusdigital.com / password');
-        $this->command->info('Estudiante: estudiante@campusdigital.com / password');
+        $this->command->info('Usuarios de prueba listos (idempotente):');
+        $this->command->info('  Admin:      admin@campusdigital.com / password');
+        $this->command->info('  Proveedor:  proveedor@campusdigital.com / password  [tienda: Cafetería]');
+        $this->command->info('  Estudiante: estudiante@campusdigital.com / password');
     }
 }

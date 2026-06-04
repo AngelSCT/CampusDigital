@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PermisoResource;
 use App\Models\Permiso;
 use Illuminate\Http\Request;
 
@@ -11,17 +12,13 @@ class PermisoApiController extends Controller
     // GET /api/permisos
     public function index()
     {
-        return response()->json(
-            Permiso::whereNull('deleted_at')->get()
-        );
+        return PermisoResource::collection(Permiso::whereNull('deleted_at')->get());
     }
 
     // GET /api/permisos/{id}
     public function show($id)
     {
-        return response()->json(
-            Permiso::whereNull('deleted_at')->findOrFail($id)
-        );
+        return new PermisoResource(Permiso::whereNull('deleted_at')->findOrFail($id));
     }
 
     // POST /api/permisos
@@ -35,7 +32,7 @@ class PermisoApiController extends Controller
 
         $permiso = Permiso::create($request->only(['clave', 'descripcion', 'activo']));
 
-        return response()->json($permiso, 201);
+        return (new PermisoResource($permiso))->response()->setStatusCode(201);
     }
 
     // PUT /api/permisos/{id}
@@ -51,7 +48,7 @@ class PermisoApiController extends Controller
 
         $permiso->update($request->only(['clave', 'descripcion', 'activo']));
 
-        return response()->json($permiso->fresh());
+        return new PermisoResource($permiso->fresh());
     }
 
     // DELETE /api/permisos/{id}
