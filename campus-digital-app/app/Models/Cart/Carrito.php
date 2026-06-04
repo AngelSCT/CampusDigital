@@ -36,6 +36,7 @@ class Carrito extends Model
     const ESTADO_ABIERTO                           = 'abierto';
     const ESTADO_PROCESANDO_CHECKOUT               = 'procesando_checkout';
     const ESTADO_CONFIRMADO                        = 'confirmado';
+    const ESTADO_CONFIRMADO_REGALO_ESCROW          = 'confirmado_regalo_escrow'; // saldo retenido, pendiente aceptación
     const ESTADO_CANCELADO                         = 'cancelado';
     const ESTADO_EXPIRADO                          = 'expirado';
     const ESTADO_CONFIRMADO_PENDIENTE_CONCILIACION = 'confirmado_pendiente_conciliacion';
@@ -44,6 +45,7 @@ class Carrito extends Model
     /** Estados en los que no se pueden realizar operaciones sobre el carrito. */
     const ESTADOS_TERMINALES = [
         self::ESTADO_CONFIRMADO,
+        self::ESTADO_CONFIRMADO_REGALO_ESCROW,
         self::ESTADO_CANCELADO,
         self::ESTADO_EXPIRADO,
         self::ESTADO_CONFIRMADO_PENDIENTE_CONCILIACION,

@@ -209,11 +209,19 @@ class CheckoutService
     /**
      * Path con reserva de Saldo confirmada.
      *
+     * Si los ítems tienen es_regalo=true → escrow: saldo queda retenido hasta
+     * que el destinatario acepte o rechace vía CartController::aceptarRegaloBeta/rechazarRegaloBeta.
+     *
      * TX2 (BD): assertCheckoutInProgress → confirmarDirecto → crearDesdeCarrito → Bitacora
      * HTTP post-commit: confirmar(reservaId) → si falla → compensarPostCommit
      */
     private function confirmarConReserva(Carrito $carrito, array $data, ?string $reservaId): Carrito
     {
+        // ── Path regalo (escrow): no confirmar saldo, no crear Pedido todavía ─
+        if ($this->carritoTieneRegalo($carrito)) {
+            return $this->confirmarEscrowDirecto($carrito, $data, $reservaId);
+        }
+
         $transaccionCompletada = false;
 
         try {
@@ -391,5 +399,76 @@ class CheckoutService
         try {
             $carrito->update(['estado' => Carrito::ESTADO_ABIERTO]);
         } catch (\Throwable) {}
+    }
+
+    // ─── Soporte de regalo (escrow) ───────────────────────────────────────────
+
+    /**
+     * Retorna true si algún ítem activo del carrito tiene es_regalo=true en metadata.
+     * Se carga desde la BD para no depender del estado del objeto en memoria.
+     */
+    private function carritoTieneRegalo(Carrito $carrito): bool
+    {
+        $items = ItemCarrito::where('carrito_id', $carrito->id)
+            ->where('estado_item', ItemCarrito::ESTADO_ACTIVO)
+            ->get(['metadata']);
+
+        return $items->some(fn($i) => $i->metadata['es_regalo'] ?? false);
+    }
+
+    /**
+     * Confirma el carrito en modo escrow: saldo queda RETENIDO (reservar ya lo hizo),
+     * el Pedido se crea cuando el destinatario acepte.
+     *
+     * Guarda reserva_id + destinatario_id en metadata para que el controlador
+     * de aceptar/rechazar pueda actuar sobre ellos.
+     */
+    private function confirmarEscrowDirecto(Carrito $carrito, array $data, ?string $reservaId): Carrito
+    {
+        // Obtener destinatario_id del primer ítem regalo
+        $items = ItemCarrito::where('carrito_id', $carrito->id)
+            ->where('estado_item', ItemCarrito::ESTADO_ACTIVO)
+            ->get(['metadata']);
+
+        $destinatarioId = null;
+        $mensaje        = null;
+        foreach ($items as $item) {
+            if ($item->metadata['es_regalo'] ?? false) {
+                $destinatarioId = $item->metadata['destinatario_id'] ?? null;
+                $mensaje        = $item->metadata['mensaje'] ?? null;
+                break;
+            }
+        }
+
+        DB::transaction(function () use ($carrito, $data, $reservaId, $destinatarioId, $mensaje) {
+            $carritoFresh = Carrito::where('id', $carrito->id)->lockForUpdate()->firstOrFail();
+            $this->carritoService->assertCheckoutInProgress($carritoFresh);
+
+            $carritoFresh->update([
+                'estado'       => Carrito::ESTADO_CONFIRMADO_REGALO_ESCROW,
+                'confirmed_at' => now(),
+                'metadata'     => array_merge($carritoFresh->metadata ?? [], [
+                    'metadata_checkout' => $data['metadata_checkout'] ?? null,
+                    'regalo_escrow'     => [
+                        'reserva_id'     => $reservaId,
+                        'destinatario_id'=> (string) $destinatarioId,
+                        'mensaje'        => $mensaje,
+                    ],
+                ]),
+            ]);
+
+            Bitacora::create([
+                'accion'       => 'carrito.regalo_escrow',
+                'modulo_id'    => $carritoFresh->modulo_id,
+                'carrito_uuid' => $carritoFresh->uuid,
+                'payload'      => [
+                    'total'           => $carritoFresh->total,
+                    'destinatario_id' => $destinatarioId,
+                    'reserva_id'      => $reservaId,
+                ],
+            ]);
+        });
+
+        return $carrito->fresh();
     }
 }

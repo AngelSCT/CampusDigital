@@ -186,10 +186,29 @@ class CartController extends Controller
         if ($carrito->usuario_ref !== strval(Auth::id())) {
             abort(403);
         }
-        $metadata              = $item->metadata ?? [];
-        $metadata['es_regalo'] = !($metadata['es_regalo'] ?? false);
+
+        $data = $request->validate([
+            'es_regalo'       => ['required', 'boolean'],
+            'destinatario_id' => ['nullable', 'integer'],
+            'mensaje'         => ['nullable', 'string', 'max:200'],
+        ]);
+
+        $metadata = $item->metadata ?? [];
+        $metadata['es_regalo'] = $data['es_regalo'];
+
+        if ($data['es_regalo']) {
+            $metadata['destinatario_id'] = $data['destinatario_id'] ?? null;
+            $metadata['mensaje']         = $data['mensaje'] ?? null;
+        } else {
+            unset($metadata['destinatario_id'], $metadata['mensaje']);
+        }
+
         $item->update(['metadata' => $metadata]);
-        return response()->json(['es_regalo' => $metadata['es_regalo']]);
+
+        return response()->json([
+            'es_regalo'       => $metadata['es_regalo'],
+            'destinatario_id' => $metadata['destinatario_id'] ?? null,
+        ]);
     }
 
     // -------------------------------------------------------------------------
@@ -227,15 +246,99 @@ class CartController extends Controller
     {
         $usuario = $request->user();
 
+        // Legacy: PedidoTienda en escrow
         $pedidos = PedidoTienda::with('detalles.producto', 'usuario')
             ->where('destinatario_id', $usuario->id)
             ->whereIn('estado', ['en_escrow', 'pendiente', 'entregado'])
             ->orderByDesc('created_at')
             ->get();
 
+        // Nuevo sistema: carritos en confirmado_regalo_escrow cuyo destinatario es el usuario
+        $regalosCarrito = \App\Models\Cart\Carrito::with('itemsActivos.categoria', 'modulo')
+            ->where('estado', \App\Models\Cart\Carrito::ESTADO_CONFIRMADO_REGALO_ESCROW)
+            ->get()
+            ->filter(fn($c) =>
+                ($c->metadata['regalo_escrow']['destinatario_id'] ?? null) === strval($usuario->id)
+            )
+            ->map(fn($c) => [
+                'uuid'          => (string) $c->uuid,
+                'remitente_ref' => $c->usuario_ref,
+                'modulo'        => $c->modulo?->slug ?? '—',
+                'total'         => (float) $c->total,
+                'mensaje'       => $c->metadata['regalo_escrow']['mensaje'] ?? null,
+                'confirmed_at'  => $c->confirmed_at?->toISOString(),
+                'items'         => $c->itemsActivos->map(fn($i) => [
+                    'nombre'   => $i->nombre,
+                    'cantidad' => $i->cantidad,
+                    'precio'   => (float) $i->precio_unitario,
+                ])->toArray(),
+            ])
+            ->values();
+
         return Inertia::render('Carrito/MisRegalos', [
-            'pedidos' => $pedidos,
+            'pedidos'         => $pedidos,
+            'regalos_carrito' => $regalosCarrito,
         ]);
+    }
+
+    // ─── Aceptar/Rechazar regalo del nuevo sistema de carrito ────────────────
+
+    public function aceptarRegaloBeta(Request $request, string $uuid): \Illuminate\Http\RedirectResponse
+    {
+        $carrito = \App\Models\Cart\Carrito::where('uuid', $uuid)
+            ->where('estado', \App\Models\Cart\Carrito::ESTADO_CONFIRMADO_REGALO_ESCROW)
+            ->firstOrFail();
+
+        if (($carrito->metadata['regalo_escrow']['destinatario_id'] ?? null) !== strval(Auth::id())) {
+            abort(403);
+        }
+
+        $reservaId   = $carrito->metadata['regalo_escrow']['reserva_id'] ?? null;
+        $saldoClient = app(\App\Modules\Cart\Services\SaldoClient::class);
+
+        // Confirmar el cargo de saldo retenido
+        if ($reservaId) {
+            $ok = $saldoClient->confirmar($reservaId, $carrito->uuid);
+            if (!$ok) {
+                return back()->withErrors(['error' => 'No se pudo confirmar el cargo de saldo. Intenta de nuevo.']);
+            }
+        }
+
+        // Crear Pedido en M4.5
+        try {
+            app(\App\Modules\Cart\Contracts\PedidoCreatorInterface::class)->crearDesdeCarrito($carrito);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('[Gift] Pedido creation failed after saldo confirmed', [
+                'carrito_uuid' => $carrito->uuid, 'error' => $e->getMessage(),
+            ]);
+        }
+
+        $carrito->update(['estado' => \App\Models\Cart\Carrito::ESTADO_CONFIRMADO]);
+
+        return back()->with('success', '¡Regalo aceptado! El cargo fue procesado correctamente.');
+    }
+
+    public function rechazarRegaloBeta(Request $request, string $uuid): \Illuminate\Http\RedirectResponse
+    {
+        $carrito = \App\Models\Cart\Carrito::where('uuid', $uuid)
+            ->where('estado', \App\Models\Cart\Carrito::ESTADO_CONFIRMADO_REGALO_ESCROW)
+            ->firstOrFail();
+
+        if (($carrito->metadata['regalo_escrow']['destinatario_id'] ?? null) !== strval(Auth::id())) {
+            abort(403);
+        }
+
+        $reservaId   = $carrito->metadata['regalo_escrow']['reserva_id'] ?? null;
+        $saldoClient = app(\App\Modules\Cart\Services\SaldoClient::class);
+
+        // Liberar la retención → saldo vuelve al remitente
+        if ($reservaId) {
+            $saldoClient->liberar($reservaId);
+        }
+
+        $carrito->update(['estado' => \App\Models\Cart\Carrito::ESTADO_CANCELADO]);
+
+        return back()->with('success', 'Regalo rechazado. El saldo del remitente ha sido devuelto.');
     }
 
     // -------------------------------------------------------------------------

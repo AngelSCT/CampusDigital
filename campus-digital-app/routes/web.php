@@ -240,6 +240,9 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/carrito/{item}/mover-al-carrito',      [CartController::class, 'moverAlCarrito'])->name('carrito.mover');
     Route::patch('/carrito/{itemId}/regalo',              [CartController::class, 'marcarRegalo'])->name('carrito.regalo');
     Route::post ('/carrito/{item}/rechazar-regalo',       [CartController::class, 'rechazarRegalo'])->name('carrito.rechazar-regalo');
+    // ── Nuevo sistema: aceptar/rechazar regalo de cart_carritos ──────────────
+    Route::post ('/carrito/cart-regalos/{uuid}/aceptar', [CartController::class, 'aceptarRegaloBeta'])->name('carrito.cart-regalo.aceptar');
+    Route::post ('/carrito/cart-regalos/{uuid}/rechazar',[CartController::class, 'rechazarRegaloBeta'])->name('carrito.cart-regalo.rechazar');
     Route::post ('/carrito/pedido/{pedido}/cancelar-gracia', [CartController::class, 'cancelarConGracia'])->name('carrito.cancelar-gracia');
     Route::post ('/carrito/admin/pedidos-expirados',         [CartController::class, 'procesarPedidosExpirados'])->name('carrito.pedidos-expirados');
 });
@@ -590,11 +593,16 @@ Route::middleware(['auth', 'role.cart.admin'])
         Route::post('solicitudes/{solicitud}/aprobar',         [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'aprobar']) ->name('solicitudes.aprobar');
         Route::post('solicitudes/{solicitud}/rechazar',        [\App\Http\Controllers\Admin\Cart\SolicitudController::class,   'rechazar'])->name('solicitudes.rechazar');
         Route::get('solicitudes/{folio}/token',                [\App\Http\Controllers\Admin\Cart\TokenEntregaController::class,'show'])    ->name('token.show');
-        Route::get('modulos',                                  [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'index'])   ->name('modulos.index');
-        Route::get('modulos/{modulo}',                         [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'show'])    ->name('modulos.show');
-        Route::post('modulos/{modulo}/revocar',                [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'revocarToken'])  ->name('modulos.revocar');
-        Route::post('modulos/{modulo}/forzar-refresh',         [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'forzarRefresh']) ->name('modulos.forzar-refresh');
-        Route::get('bitacora',                                 [\App\Http\Controllers\Admin\Cart\BitacoraController::class,   'index'])   ->name('bitacora.index');
+
+        Route::get('modulos',                                  [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'index'])              ->name('modulos.index');
+        Route::get('modulos/{modulo}',                         [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'show'])               ->name('modulos.show');
+        Route::post('modulos/{modulo}/revocar',                [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'revocarToken'])        ->name('modulos.revocar');
+        Route::post('modulos/{modulo}/forzar-refresh',         [\App\Http\Controllers\Admin\Cart\ModulosController::class,    'forzarRefresh'])       ->name('modulos.forzar-refresh');
+        Route::get('bitacora',                                 [\App\Http\Controllers\Admin\Cart\BitacoraController::class,      'index'])   ->name('bitacora.index');
+        Route::get('dashboard',                                [\App\Http\Controllers\Admin\Cart\CartDashboardController::class,  'index'])   ->name('dashboard');
+        Route::get('reportes/consumos-por-periodo',            [\App\Http\Controllers\Admin\Cart\CartReportController::class,      'consumosPorPeriodo'])   ->name('reportes.consumos');
+        Route::get('reportes/carritos-abandonados',            [\App\Http\Controllers\Admin\Cart\CartReportController::class,      'carritosAbandonados']) ->name('reportes.abandonados');
+        Route::get('reportes/consumo-por-categoria',           [\App\Http\Controllers\Admin\Cart\CartReportController::class,      'consumoPorCategoria']) ->name('reportes.categorias');
     });
 
 // ── DEMO — Módulo Biblioteca ──────────────────────────────────────────────────
