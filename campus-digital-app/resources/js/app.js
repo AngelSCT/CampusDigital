@@ -175,6 +175,15 @@ window.route = (name, params) => {
         "admin.tickets.show": "/admin/tickets/:id",
         "admin.tickets.update": "/admin/tickets/:id",
         "admin.tickets.destroy": "/admin/tickets/:id",
+        "admin.tickets.generar-cobro": "/admin/tickets/:id/generar-cobro",
+        "admin.tickets.confirmar-pago": "/admin/tickets/:id/confirmar-pago",
+
+        //RUTAS DE GASTOS TICKET
+        "admin.gastos-ticket.index": "/admin/gastos-ticket",
+        "admin.gastos-ticket.store": "/admin/gastos-ticket",
+        "admin.gastos-ticket.show": "/admin/gastos-ticket/:id",
+        "admin.gastos-ticket.update": "/admin/gastos-ticket/:id",
+        "admin.gastos-ticket.destroy": "/admin/gastos-ticket/:id",
 
         //RUTAS DE MANTENIMIENTOS PREVENTIVOS
         "admin.mantenimientos-preventivos.index":

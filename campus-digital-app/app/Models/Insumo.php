@@ -17,12 +17,14 @@ class Insumo extends Model
     protected $fillable = [
         'nombre_insumo',
         'stock_actual',
+        'precio_unitario',
     ];
 
     protected $casts = [
-        'stock_actual' => 'integer',
-        'created_at'   => 'datetime',
-        'updated_at'   => 'datetime',
-        'deleted_at'   => 'datetime',
+        'stock_actual'    => 'integer',
+        'created_at'      => 'datetime',
+        'updated_at'      => 'datetime',
+        'deleted_at'      => 'datetime',
+        'precio_unitario' => 'decimal:2',
     ];
 }

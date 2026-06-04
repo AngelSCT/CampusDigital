@@ -21,6 +21,10 @@ class Ticket extends Model
         'estado',
         'prioridad',
         'fecha_creacion',
+        'costo_total',
+        'carrito_uuid',
+        'estado_pago',
+        'fecha_pago',
     ];
 
     protected $casts = [
@@ -31,7 +35,14 @@ class Ticket extends Model
         'created_at'             => 'datetime',
         'updated_at'             => 'datetime',
         'deleted_at'             => 'datetime',
+        'costo_total'            => 'decimal:2',
+        'fecha_pago'             => 'datetime',
     ];
+
+    const PAGO_SIN_COBRO  = 'sin_cobro';
+    const PAGO_PENDIENTE  = 'pendiente_pago';
+    const PAGO_PAGADO     = 'pagado';
+    const PAGO_CANCELADO  = 'cancelado';
 
     public function usuarioSolicitante()
     {
@@ -46,5 +57,32 @@ class Ticket extends Model
     public function equipo()
     {
         return $this->belongsTo(EquipoActivo::class, 'id_equipo', 'id_equipo');
+    }
+
+    public function gastos()
+    {
+        return $this->hasMany(GastoTicket::class, 'id_ticket', 'id_ticket');
+    }
+
+    public function asignaciones()
+    {
+        return $this->hasMany(AsignacionTecnica::class, 'id_ticket', 'id_ticket');
+    }
+
+    public function historial()
+    {
+        return $this->hasMany(HistorialTicket::class, 'id_ticket', 'id_ticket');
+    }
+
+    public function calcularCostoTotal()
+    {
+        $this->load('gastos.insumo');
+        $total = 0;
+        foreach ($this->gastos as $gasto) {
+            $total += $gasto->cantidad * ($gasto->insumo->precio_unitario ?? 0);
+        }
+        $this->costo_total = $total;
+        $this->save();
+        return $total;
     }
 }

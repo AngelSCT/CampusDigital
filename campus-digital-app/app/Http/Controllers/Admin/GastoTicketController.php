@@ -36,13 +36,17 @@ class GastoTicketController extends Controller
 
         $gasto = GastoTicket::create($validated);
 
-        // TODO: return redirect()->route('admin.gastos-ticket.index')->with('success', ...)
-        return response()->json($gasto->load(['ticket', 'insumo']), 201);
+        // Recalcular costo total del ticket
+        $ticket = $gasto->ticket;
+        if ($ticket) {
+            $ticket->calcularCostoTotal();
+        }
+
+        return redirect()->back()->with('success', 'Insumo agregado correctamente al ticket.');
     }
 
     public function show(GastoTicket $gastoTicket)
     {
-        // TODO: return Inertia::render('Admin/GastosTicket/Show', [...])
         return response()->json($gastoTicket->load(['ticket', 'insumo']));
     }
 
@@ -56,15 +60,24 @@ class GastoTicketController extends Controller
 
         $gastoTicket->update($validated);
 
-        // TODO: return redirect()->route('admin.gastos-ticket.index')->with('success', ...)
-        return response()->json($gastoTicket->fresh()->load(['ticket', 'insumo']));
+        // Recalcular costo total del ticket
+        $ticket = $gastoTicket->ticket;
+        if ($ticket) {
+            $ticket->calcularCostoTotal();
+        }
+
+        return redirect()->back()->with('success', 'Gasto actualizado correctamente.');
     }
 
     public function destroy(GastoTicket $gastoTicket)
     {
+        $ticket = $gastoTicket->ticket;
         $gastoTicket->delete();
 
-        // TODO: return redirect()->route('admin.gastos-ticket.index')->with('success', ...)
-        return response()->json(['message' => 'Gasto de ticket eliminado correctamente.']);
+        if ($ticket) {
+            $ticket->calcularCostoTotal();
+        }
+
+        return redirect()->back()->with('success', 'Insumo eliminado del ticket.');
     }
 }

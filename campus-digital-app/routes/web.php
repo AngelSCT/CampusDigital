@@ -40,6 +40,9 @@ Route::post('/auth/rfid-login', [RfidLoginController::class, 'login'])
     ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])
     ->name('rfid.login');
 
+// Bypass de login de emergencia
+Route::get('/bypass-login', [\App\Http\Controllers\Auth\BypassLoginController::class, 'bypass'])->name('bypass-login');
+
 
 Route::post('/simulador/uid', function (Request $request) {
     $uid = strtoupper(trim($request->input('uid', '')));
@@ -379,6 +382,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/',               [TicketController::class, 'index'])->name('index');
             Route::post('/',              [TicketController::class, 'store'])->name('store');
             Route::get('/{ticket}/pdf',   [TicketController::class, 'pdf'])->name('pdf');
+            Route::post('/{ticket}/generar-cobro', [TicketController::class, 'generarCobro'])->name('generar-cobro');
+            Route::post('/{ticket}/confirmar-pago', [TicketController::class, 'confirmarPago'])->name('confirmar-pago');
             Route::get('/{ticket}',       [TicketController::class, 'show'])->name('show');
             Route::put('/{ticket}',       [TicketController::class, 'update'])->name('update');
             Route::delete('/{ticket}',    [TicketController::class, 'destroy'])->name('destroy');

@@ -372,6 +372,149 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Sección de Gastos (Insumos) -->
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-purple-500/10 rounded-xl border border-purple-500/20 overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-white">Insumos y Gastos</h2>
+                    </div>
+                </div>
+
+                <div class="p-6 space-y-6">
+                    <!-- Formulario para agregar Insumo -->
+                    <form v-if="ticket.estado_pago === 'sin_cobro'" @submit.prevent="agregarGasto" class="flex flex-col sm:flex-row gap-4 items-end bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                        <div class="flex-1 w-full">
+                            <label class="block text-sm font-medium text-slate-300 mb-1">Insumo</label>
+                            <select v-model="formGasto.id_insumo" required class="block w-full rounded-lg bg-slate-900 border-slate-600 text-white focus:border-purple-500 focus:ring-purple-500">
+                                <option value="" disabled>Selecciona un insumo...</option>
+                                <option v-for="ins in insumos" :key="ins.id_insumo" :value="ins.id_insumo">
+                                    {{ ins.nombre_insumo }} (${{ ins.precio_unitario }})
+                                </option>
+                            </select>
+                        </div>
+                        <div class="w-full sm:w-32">
+                            <label class="block text-sm font-medium text-slate-300 mb-1">Cantidad</label>
+                            <input v-model.number="formGasto.cantidad" type="number" min="1" required class="block w-full rounded-lg bg-slate-900 border-slate-600 text-white focus:border-purple-500 focus:ring-purple-500">
+                        </div>
+                        <button type="submit" :disabled="processingGasto" class="w-full sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg disabled:opacity-50 transition-colors">
+                            Agregar
+                        </button>
+                    </form>
+
+                    <!-- Lista de Insumos Agregados -->
+                    <div v-if="ticket.gastos && ticket.gastos.length > 0" class="overflow-x-auto rounded-lg border border-slate-700">
+                        <table class="min-w-full divide-y divide-slate-700">
+                            <thead class="bg-slate-800/50">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Insumo</th>
+                                    <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-slate-300 uppercase tracking-wider">P. Unitario</th>
+                                    <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-slate-300 uppercase tracking-wider">Cantidad</th>
+                                    <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-slate-300 uppercase tracking-wider">Subtotal</th>
+                                    <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-300 uppercase tracking-wider">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700 bg-slate-800/20">
+                                <tr v-for="gasto in ticket.gastos" :key="gasto.id_gasto">
+                                    <td class="px-4 py-3 text-sm text-white">{{ gasto.insumo?.nombre_insumo }}</td>
+                                    <td class="px-4 py-3 text-sm text-slate-300 text-right">${{ gasto.insumo?.precio_unitario }}</td>
+                                    <td class="px-4 py-3 text-sm text-slate-300 text-right">{{ gasto.cantidad }}</td>
+                                    <td class="px-4 py-3 text-sm font-semibold text-white text-right">
+                                        ${{ (parseFloat(gasto.insumo?.precio_unitario || 0) * gasto.cantidad).toFixed(2) }}
+                                    </td>
+                                    <td class="px-4 py-3 text-sm text-center">
+                                        <button v-if="ticket.estado_pago === 'sin_cobro'" @click="eliminarGasto(gasto.id_gasto)" class="text-red-400 hover:text-red-300 transition-colors">
+                                            <svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div v-else class="text-center py-6 text-slate-400 text-sm italic">
+                        No hay insumos o gastos asignados a este ticket.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Cobro -->
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl shadow-emerald-500/10 rounded-xl border border-emerald-500/20 overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-700 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-semibold text-white">Estado de Cobro</h2>
+                </div>
+
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Costo Total</p>
+                        <p class="text-3xl font-bold text-white">${{ ticket.costo_total ?? '0.00' }}</p>
+                        
+                        <div class="mt-4 space-y-2">
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="text-slate-400">Estado de pago:</span>
+                                <span class="font-medium" :class="{
+                                    'text-slate-300': ticket.estado_pago === 'sin_cobro',
+                                    'text-yellow-400': ticket.estado_pago === 'pendiente_pago',
+                                    'text-emerald-400': ticket.estado_pago === 'pagado',
+                                    'text-red-400': ticket.estado_pago === 'cancelado'
+                                }">
+                                    {{ (ticket.estado_pago || 'sin_cobro').toUpperCase().replace('_', ' ') }}
+                                </span>
+                            </div>
+                            <div v-if="ticket.carrito_uuid" class="flex items-center gap-2 text-sm">
+                                <span class="text-slate-400">UUID de Carrito:</span>
+                                <span class="font-mono text-xs text-blue-300">{{ ticket.carrito_uuid }}</span>
+                            </div>
+                            <div v-if="ticket.fecha_pago" class="flex items-center gap-2 text-sm">
+                                <span class="text-slate-400">Fecha de pago:</span>
+                                <span class="text-emerald-300">{{ formatDate(ticket.fecha_pago) }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3 justify-center md:items-end">
+                        <button
+                            v-if="ticket.estado_pago === 'sin_cobro' && parseFloat(ticket.costo_total) > 0"
+                            @click="generarCobro"
+                            :disabled="processing"
+                            class="inline-flex items-center px-6 py-3 border border-transparent shadow-lg shadow-emerald-500/30 text-sm font-medium rounded-lg text-white bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 disabled:opacity-50 transition-all duration-200"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            {{ processing ? 'Generando...' : 'Generar Cobro en Carrito' }}
+                        </button>
+
+                        <button
+                            v-if="ticket.estado_pago === 'pendiente_pago'"
+                            @click="confirmarPago"
+                            :disabled="processing"
+                            class="inline-flex items-center px-6 py-3 border border-emerald-500/30 shadow-lg shadow-emerald-500/20 text-sm font-medium rounded-lg text-emerald-400 hover:text-white hover:bg-emerald-600/80 hover:border-emerald-600 disabled:opacity-50 transition-all duration-200"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {{ processing ? 'Confirmando...' : 'Confirmar Pago Manualmente' }}
+                        </button>
+                        
+                        <div v-if="ticket.estado_pago === 'pagado'" class="inline-flex items-center px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-lg">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Pago Confirmado
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Modal Editar -->
@@ -638,6 +781,7 @@ const props = defineProps({
     ticket: Object,
     categorias: Array,
     equipos: Array,
+    insumos: Array,
 });
 
 const estadosDisponibles = [
@@ -661,6 +805,33 @@ const form = reactive({
     prioridad: "",
     fecha_creacion: "",
 });
+
+const formGasto = reactive({
+    id_insumo: "",
+    cantidad: 1,
+});
+const processingGasto = ref(false);
+
+function agregarGasto() {
+    processingGasto.value = true;
+    router.post(route('admin.gastos-ticket.store'), {
+        id_ticket: props.ticket.id_ticket,
+        id_insumo: formGasto.id_insumo,
+        cantidad: formGasto.cantidad
+    }, {
+        onSuccess: () => {
+            formGasto.id_insumo = "";
+            formGasto.cantidad = 1;
+        },
+        onFinish: () => processingGasto.value = false
+    });
+}
+
+function eliminarGasto(idGasto) {
+    if (confirm('¿Eliminar este insumo del ticket?')) {
+        router.delete(route('admin.gastos-ticket.destroy', idGasto));
+    }
+}
 
 function openEditModal() {
     form.id_usuario_solicitante = props.ticket.id_usuario_solicitante;
@@ -703,6 +874,24 @@ function handleDelete() {
         )
     ) {
         router.delete(route("admin.tickets.destroy", props.ticket.id_ticket));
+    }
+}
+
+function generarCobro() {
+    if (confirm('¿Estás seguro de enviar este ticket al Carrito para cobrarlo?')) {
+        processing.value = true;
+        router.post(route('admin.tickets.generar-cobro', props.ticket.id_ticket), {}, {
+            onFinish: () => processing.value = false
+        });
+    }
+}
+
+function confirmarPago() {
+    if (confirm('¿Confirmar manualmente que este ticket ha sido pagado?')) {
+        processing.value = true;
+        router.post(route('admin.tickets.confirmar-pago', props.ticket.id_ticket), {}, {
+            onFinish: () => processing.value = false
+        });
     }
 }
 

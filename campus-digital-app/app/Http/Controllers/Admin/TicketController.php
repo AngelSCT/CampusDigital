@@ -11,6 +11,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Area;
+use App\Services\TicketCartClient;
+use App\Services\TicketApiClient;
+use App\Models\HistorialTicket;
 
 class TicketController extends Controller
 {
@@ -89,15 +92,17 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
-        $ticket->load(['usuarioSolicitante', 'categoria.area', 'equipo']);
+        $ticket->load(['usuarioSolicitante', 'categoria.area', 'equipo', 'gastos.insumo']);
 
         $categorias = CategoriaTicket::orderBy('nombre_categoria')->get(['id_categoria', 'nombre_categoria']);
         $equipos    = EquipoActivo::orderBy('nombre_equipo')->get(['id_equipo', 'nombre_equipo']);
+        $insumos    = \App\Models\Insumo::orderBy('nombre_insumo')->get(['id_insumo', 'nombre_insumo', 'precio_unitario']);
 
         return Inertia::render('Admin/Tickets/Show', [
             'ticket'     => $ticket,
             'categorias' => $categorias,
             'equipos'    => $equipos,
+            'insumos'    => $insumos,
         ]);
     }
 
@@ -138,5 +143,72 @@ class TicketController extends Controller
         ]);
 
         return $pdf->download("ticket-{$ticket->id_ticket}.pdf");
+    }
+
+    public function generarCobro(Ticket $ticket, TicketCartClient $cartClient, TicketApiClient $apiClient)
+    {
+        $ticket->load(['usuarioSolicitante', 'gastos.insumo']);
+
+        if (!$ticket->usuarioSolicitante) {
+            return redirect()->back()->withErrors('El ticket no tiene un solicitante asignado.');
+        }
+
+        $costoTotal = $ticket->calcularCostoTotal();
+
+        if ($costoTotal <= 0) {
+            return redirect()->back()->withErrors('El ticket no tiene gastos o insumos con costo.');
+        }
+
+        // 1. Crear carrito
+        $cartResult = $cartClient->crearCarrito((string) $ticket->usuarioSolicitante->id, $ticket->id_ticket);
+
+        if (!$cartResult || !isset($cartResult['carrito_uuid'])) {
+            return redirect()->back()->withErrors('Error al comunicarse con el módulo de Carrito (Crear).');
+        }
+
+        $uuid = $cartResult['carrito_uuid'];
+
+        // 2. Agregar el ítem
+        $itemResult = $cartClient->agregarItemMantenimiento(
+            $uuid,
+            $ticket->id_ticket,
+            "Mantenimiento - Ticket #{$ticket->id_ticket}",
+            $costoTotal
+        );
+
+        if (!$itemResult) {
+            return redirect()->back()->withErrors('Error al comunicarse con el módulo de Carrito (Agregar Ítem).');
+        }
+
+        // 3. Actualizar el ticket
+        $ticket->update([
+            'carrito_uuid' => $uuid,
+            'estado_pago'  => Ticket::PAGO_PENDIENTE,
+        ]);
+
+        HistorialTicket::create([
+            'id_ticket'    => $ticket->id_ticket,
+            'id_usuario'   => auth()->id() ?? $ticket->id_usuario_solicitante,
+            'estado_nuevo' => 'Generó cobro en carrito: ' . $uuid,
+        ]);
+
+        return redirect()->route('admin.tickets.show', $ticket->id_ticket)->with('success', 'Cobro generado en el carrito exitosamente.');
+    }
+
+    public function confirmarPago(Ticket $ticket, Request $request)
+    {
+        // Esto normalmente se llamaría vía API, pero si el admin lo fuerza manualmente:
+        $ticket->update([
+            'estado_pago' => Ticket::PAGO_PAGADO,
+            'fecha_pago'  => now(),
+        ]);
+
+        HistorialTicket::create([
+            'id_ticket'    => $ticket->id_ticket,
+            'id_usuario'   => auth()->id(),
+            'estado_nuevo' => 'Pago confirmado manualmente',
+        ]);
+
+        return redirect()->back()->with('success', 'Pago confirmado.');
     }
 }

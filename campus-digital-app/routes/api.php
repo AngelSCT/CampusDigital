@@ -50,7 +50,11 @@ Route::middleware('api.key')->group(function () {
     Route::apiResource('ubicaciones', UbicacionApiController::class);
     Route::apiResource('equipos-activos', EquipoActivoApiController::class);
     Route::apiResource('mantenimientos-preventivos', MantenimientoPreventivoApiController::class);
+    
     Route::apiResource('tickets', TicketApiController::class);
+    Route::post('tickets/{id}/generar-cobro', [TicketApiController::class, 'generarCobro']);
+    Route::post('tickets/{id}/confirmar-pago', [TicketApiController::class, 'confirmarPago']);
+    
     Route::apiResource('asignaciones-tecnicas', AsignacionTecnicaApiController::class);
     Route::apiResource('insumos', InsumoApiController::class);
     Route::apiResource('gastos-ticket', GastoTicketApiController::class);

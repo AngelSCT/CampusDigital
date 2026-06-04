@@ -198,6 +198,43 @@
         </tr>
     </table>
 
+    @if($ticket->estado_pago === 'pagado')
+    <div class="section-title" style="margin-top: 30px;">Comprobante de Pago</div>
+    <div class="info-box" style="background: #ecfdf5; border-left-color: #10b981;">
+        <p><strong>Estado de Pago:</strong> Pagado</p>
+        <p><strong>Fecha de Pago:</strong> {{ $ticket->fecha_pago ? \Carbon\Carbon::parse($ticket->fecha_pago)->locale('es')->isoFormat('D [de] MMMM [de] YYYY, HH:mm') : '—' }}</p>
+        <p><strong>Total Cobrado:</strong> ${{ number_format($ticket->costo_total, 2) }}</p>
+        <p><strong>UUID Carrito:</strong> {{ $ticket->carrito_uuid }}</p>
+    </div>
+
+    <table class="grid" style="margin-top: 10px;">
+        <thead>
+            <tr>
+                <th style="text-align: left; padding: 5px; border-bottom: 1px solid #ccc; font-size: 9px;">Concepto</th>
+                <th style="text-align: center; padding: 5px; border-bottom: 1px solid #ccc; font-size: 9px;">Cant.</th>
+                <th style="text-align: right; padding: 5px; border-bottom: 1px solid #ccc; font-size: 9px;">P.U.</th>
+                <th style="text-align: right; padding: 5px; border-bottom: 1px solid #ccc; font-size: 9px;">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($ticket->gastos as $gasto)
+            <tr>
+                <td style="padding: 5px; border-bottom: 1px solid #eee; font-size: 10px;">{{ $gasto->insumo->nombre_insumo ?? 'Servicio/Insumo' }}</td>
+                <td style="text-align: center; padding: 5px; border-bottom: 1px solid #eee; font-size: 10px;">{{ $gasto->cantidad }}</td>
+                <td style="text-align: right; padding: 5px; border-bottom: 1px solid #eee; font-size: 10px;">${{ number_format($gasto->insumo->precio_unitario ?? 0, 2) }}</td>
+                <td style="text-align: right; padding: 5px; border-bottom: 1px solid #eee; font-size: 10px;">${{ number_format($gasto->cantidad * ($gasto->insumo->precio_unitario ?? 0), 2) }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3" style="text-align: right; padding: 5px; font-size: 11px;">Total:</th>
+                <th style="text-align: right; padding: 5px; font-size: 11px;">${{ number_format($ticket->costo_total, 2) }}</th>
+            </tr>
+        </tfoot>
+    </table>
+    @endif
+
     <div class="footer">
         <p>Documento generado automáticamente por el Sistema de Gestión Campus Digital</p>
     </div>

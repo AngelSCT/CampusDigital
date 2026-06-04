@@ -41,6 +41,11 @@ class GastoTicketApiController extends Controller
             $request->only(['id_ticket', 'id_insumo', 'cantidad'])
         );
 
+        // Recalcular el costo total del ticket
+        if ($gasto->ticket) {
+            $gasto->ticket->calcularCostoTotal();
+        }
+
         return (new GastoTicketResource($gasto->load(['ticket', 'insumo'])))->response()->setStatusCode(201);
     }
 
@@ -59,6 +64,11 @@ class GastoTicketApiController extends Controller
             $request->only(['id_ticket', 'id_insumo', 'cantidad'])
         );
 
+        // Recalcular el costo total del ticket
+        if ($gasto->ticket) {
+            $gasto->ticket->calcularCostoTotal();
+        }
+
         return new GastoTicketResource($gasto->fresh()->load(['ticket', 'insumo']));
     }
 
@@ -66,7 +76,13 @@ class GastoTicketApiController extends Controller
     public function destroy($id)
     {
         $gasto = GastoTicket::whereNull('deleted_at')->findOrFail($id);
+        $ticket = $gasto->ticket;
         $gasto->delete();
+
+        // Recalcular el costo total del ticket
+        if ($ticket) {
+            $ticket->calcularCostoTotal();
+        }
 
         return response()->json(['message' => 'Gasto de ticket eliminado correctamente.']);
     }
