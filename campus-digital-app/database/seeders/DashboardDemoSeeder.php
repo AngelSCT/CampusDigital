@@ -23,6 +23,11 @@ class DashboardDemoSeeder extends Seeder
 
     public function run(): void
     {
+        if (DB::table('usuario')->where('email', 'admin@campus.edu.mx')->exists()) {
+            $this->command->warn('DashboardDemoSeeder ya ejecutado anteriormente — omitiendo.');
+            return;
+        }
+
         $this->command->info('Iniciando DashboardDemoSeeder...');
 
         $this->command->info('Creando roles y permisos base...');

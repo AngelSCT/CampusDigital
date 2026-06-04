@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Modules\Cart\Contracts\PedidoCreatorInterface;
-use App\Modules\Cart\Services\EloquentPedidoCreator;
+use App\Modules\Cart\Services\NullPedidoCreator;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(PedidoCreatorInterface::class, EloquentPedidoCreator::class);
+        $this->app->bind(PedidoCreatorInterface::class, NullPedidoCreator::class);
     }
 
     /**

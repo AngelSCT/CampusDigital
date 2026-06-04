@@ -3,44 +3,53 @@
 namespace App\Http\Controllers\Demo\Biblioteca;
 
 use App\Http\Controllers\Controller;
-use App\Modules\Cart\Exceptions\Client\CartApiUnavailableException;
-use App\Modules\Cart\Exceptions\Client\CartScopeException;
-use App\Modules\Cart\Exceptions\Client\CartValidationException;
-use App\Modules\Cart\Exceptions\Client\InsufficientFundsException;
-use App\Modules\Cart\Exceptions\Client\ModuleTokenExpiredException;
-use App\Modules\Cart\Exceptions\Client\SaldoUnavailableForClientException;
-use App\Modules\Cart\Support\ConsumesCartApi;
+use App\Models\Cart\ModuloCliente;
+use App\Modules\Cart\Exceptions\CartBusinessException;
+use App\Modules\Cart\Exceptions\CartOwnershipException;
+use App\Modules\Cart\Exceptions\CartStateException;
+use App\Modules\Cart\Exceptions\CheckoutRevertidoException;
+use App\Modules\Cart\Exceptions\SaldoInsufficientFundsException;
+use App\Modules\Cart\Exceptions\SaldoUnavailableException;
+use App\Modules\Cart\Exceptions\ScopeDeniedException;
+use App\Modules\Cart\Services\CarritoService;
+use App\Modules\Cart\Services\CheckoutService;
+use App\Modules\Cart\Services\ItemService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 /**
  * Demo: Módulo Biblioteca embebiendo el Módulo Carrito.
  *
- * Las rutas /cart-proxy/* son el proxy que interpone el JWT de módulo.
- * El navegador nunca ve el token; solo recibe los datos del carrito.
+ * Las rutas /cart-proxy/* actúan como proxy local sin HTTP —
+ * llaman a los servicios del Carrito directamente para evitar
+ * el deadlock del servidor de desarrollo (self-HTTP-call).
  */
 class PrestamoController extends Controller
 {
-    use ConsumesCartApi;
+    public function __construct(
+        private readonly CarritoService  $carritoService,
+        private readonly ItemService     $itemService,
+        private readonly CheckoutService $checkoutService,
+    ) {}
 
-    // ─── Token override — lee BIBLIOTECA_CART_TOKEN en lugar del genérico ────
-
-    protected function cartAccessTokenValue(): string
+    private function getModulo(): ModuloCliente
     {
-        return static::$_cartAccessToken
-            ?? (string) config('services.cart.biblioteca_token', '');
+        return ModuloCliente::where('slug', 'biblioteca-demo')->firstOrFail();
     }
 
-    protected function cartRefreshTokenValue(): string
+    private function jwtPayload(): array
     {
-        return static::$_cartRefreshToken
-            ?? (string) config('services.cart.biblioteca_refresh_token', '');
+        $modulo = $this->getModulo();
+        return [
+            'sub'                    => (string) $modulo->id,
+            'categorias_autorizadas' => $modulo->categorias_autorizadas,
+        ];
     }
 
-    /** Página principal del catálogo de préstamos. */
     public function index(): Response
     {
         return Inertia::render('Demo/Biblioteca/Prestamo');
@@ -50,64 +59,137 @@ class PrestamoController extends Controller
 
     public function proxyCreateCart(Request $request): JsonResponse
     {
-        return $this->proxyCall(fn() => $this->createCart(
-            usuarioRef:      (string) $request->input('usuario_ref', 'anonimo'),
-            requiereSaldo:   (bool)   $request->input('requiere_saldo', false),
-            expiraEnMinutos: (int)    $request->input('expira_en_minutos', 30),
-            metadata:        (array)  ($request->input('metadata') ?? []),
-        ), 201);
+        try {
+            $modulo  = $this->getModulo();
+            $carrito = $this->carritoService->crear($modulo, $request->validate([
+                'usuario_ref'       => 'required|string|max:120',
+                'requiere_saldo'    => 'nullable|boolean',
+                'expira_en_minutos' => 'nullable|integer|min:1',
+                'metadata'          => 'nullable|array',
+            ]));
+            return response()->json($this->carritoService->toArray($carrito), 201);
+        } catch (\Throwable $e) {
+            return $this->errorResponse($e);
+        }
     }
 
     public function proxyGetCart(Request $request, string $uuid): JsonResponse
     {
-        return $this->proxyCall(fn() => $this->getCart($uuid));
+        try {
+            $modulo  = $this->getModulo();
+            $carrito = $this->carritoService->obtenerPorUuid($uuid, $modulo);
+            return response()->json($this->carritoService->toArray($carrito));
+        } catch (\Throwable $e) {
+            return $this->errorResponse($e);
+        }
     }
 
     public function proxyAddItem(Request $request, string $uuid): JsonResponse
     {
-        return $this->proxyCall(fn() => $this->addItem($uuid, $request->all()), 201);
+        try {
+            $modulo     = $this->getModulo();
+            $jwtPayload = $this->jwtPayload();
+            $carrito    = $this->carritoService->obtenerPorUuid($uuid, $modulo);
+            $result     = $this->itemService->agregar($carrito, $modulo, $jwtPayload, $request->all());
+            $status     = $result['accion'] === 'creado' ? 201 : 200;
+            return response()->json($result, $status);
+        } catch (\Throwable $e) {
+            return $this->errorResponse($e);
+        }
     }
 
     public function proxyRemoveItem(Request $request, string $uuid, int $itemId): JsonResponse
     {
-        return $this->proxyCall(fn() => $this->removeItem($uuid, $itemId));
+        try {
+            $modulo  = $this->getModulo();
+            $carrito = $this->carritoService->obtenerPorUuid($uuid, $modulo);
+            $total   = $this->itemService->remover($carrito, $itemId);
+            return response()->json(['mensaje' => 'Ítem removido.', 'total_actualizado' => $total]);
+        } catch (\Throwable $e) {
+            return $this->errorResponse($e);
+        }
     }
 
     public function proxyCheckout(Request $request, string $uuid): JsonResponse
     {
-        return $this->proxyCall(fn() => $this->checkout($uuid, $request->input('metadata_checkout', [])));
+        try {
+            $modulo  = $this->getModulo();
+            $carrito = $this->carritoService->obtenerPorUuid($uuid, $modulo);
+            $carrito = $this->checkoutService->confirmar($carrito, [
+                'metadata_checkout' => $request->input('metadata_checkout', []),
+            ]);
+
+            $data = [
+                'carrito_uuid' => $carrito->uuid,
+                'estado'       => $carrito->estado,
+                'total'        => $carrito->total,
+                'confirmed_at' => $carrito->confirmed_at?->toISOString(),
+            ];
+
+            if ($carrito->estado === \App\Models\Cart\Carrito::ESTADO_CONFIRMADO_PENDIENTE_CONCILIACION) {
+                $data['aviso'] = 'Cargo pendiente de procesamiento por el módulo de Saldo';
+            }
+
+            return response()->json($data);
+        } catch (\Throwable $e) {
+            return $this->errorResponse($e);
+        }
     }
 
     public function proxyCancel(Request $request, string $uuid): JsonResponse
     {
-        return $this->proxyCall(fn() => $this->cancel($uuid));
+        try {
+            $modulo  = $this->getModulo();
+            $carrito = $this->carritoService->obtenerPorUuid($uuid, $modulo);
+            $carrito = $this->carritoService->cancelar($carrito);
+            return response()->json(['estado' => $carrito->estado]);
+        } catch (\Throwable $e) {
+            return $this->errorResponse($e);
+        }
     }
 
-    // ─── Helper ───────────────────────────────────────────────────────────────
+    // ─── Error handler ───────────────────────────────────────────────────────
 
-    private function proxyCall(callable $fn, int $successStatus = 200): JsonResponse
+    /**
+     * Renderiza una excepción del dominio como respuesta JSON estructurada.
+     * Se auto-registra como callable desde el inline handler de cada ruta.
+     */
+    private function errorResponse(\Throwable $e): JsonResponse
     {
-        try {
-            return response()->json($fn(), $successStatus);
-        } catch (ModuleTokenExpiredException $e) {
-            return response()->json(['error' => 'TOKEN_MODULO_EXPIRADO', 'message' => $e->getMessage()], 503);
-        } catch (CartApiUnavailableException $e) {
-            Log::error('demo.biblioteca.cart_unavailable', [
-                'endpoint' => request()->path(),
-                'detail'   => $e->getMessage(),
-            ]);
-            return response()->json([
-                'error'   => 'CART_NO_DISPONIBLE',
-                'message' => 'No pudimos conectar con el servicio de carrito. Intenta de nuevo en unos segundos.',
-            ], 503);
-        } catch (CartValidationException $e) {
-            return response()->json(['error' => 'VALIDACION', 'message' => $e->getMessage(), 'errors' => $e->errors], 422);
-        } catch (CartScopeException $e) {
-            return response()->json(['error' => 'SCOPE', 'message' => $e->getMessage()], 403);
-        } catch (InsufficientFundsException $e) {
-            return response()->json(['error' => 'SALDO_INSUFICIENTE', 'message' => $e->getMessage()], 402);
-        } catch (SaldoUnavailableForClientException $e) {
-            return response()->json(['error' => 'SALDO_NO_DISPONIBLE', 'message' => $e->getMessage()], 503);
-        }
+        return match (true) {
+            $e instanceof ModelNotFoundException => response()->json(
+                ['mensaje' => 'Recurso no encontrado.'], 404
+            ),
+            $e instanceof ValidationException => response()->json(
+                ['error' => 'VALIDATION_ERROR', 'message' => 'Datos inválidos.', 'errors' => $e->errors()], 422
+            ),
+            $e instanceof CartOwnershipException => response()->json(
+                ['error' => 'OWNERSHIP_DENIED', 'mensaje' => $e->getMessage()], 403
+            ),
+            $e instanceof ScopeDeniedException => response()->json(
+                ['error' => 'SCOPE_DENIED', 'mensaje' => 'El módulo no está autorizado para esta categoría.'], 403
+            ),
+            $e instanceof CartStateException => response()->json(
+                ['error' => 'CART_STATE_ERROR', 'mensaje' => $e->getMessage()], 409
+            ),
+            $e instanceof CartBusinessException => response()->json(
+                ['error' => 'BUSINESS_RULE_VIOLATION', 'mensaje' => $e->getMessage()], 422
+            ),
+            $e instanceof CheckoutRevertidoException => response()->json(
+                ['error' => 'CHECKOUT_REVERTIDO', 'mensaje' => $e->getMessage()], 409
+            ),
+            $e instanceof SaldoInsufficientFundsException => response()->json(
+                ['error' => 'SALDO_INSUFICIENTE', 'mensaje' => $e->getMessage()], 402
+            ),
+            $e instanceof SaldoUnavailableException => response()->json(
+                ['error' => 'SALDO_NO_DISPONIBLE', 'mensaje' => $e->getMessage()], 503
+            ),
+            $e instanceof \RuntimeException => response()->json(
+                ['error' => 'ERROR_DEMO', 'mensaje' => $e->getMessage()], 400
+            ),
+            default => response()->json(
+                ['error' => 'ERROR_INTERNO', 'mensaje' => 'Ocurrió un error inesperado.'], 500
+            ),
+        };
     }
 }
