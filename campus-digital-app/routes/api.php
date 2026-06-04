@@ -64,6 +64,8 @@ use App\Http\Controllers\Api\MovimientoApiController;
 
 // ── INTEGRACIÓN 4.3 → 4.9 ────────────────────────────────────────────────────
 use App\Http\Controllers\Api\CatalogoIntegracionApiController;
+// ENDPOINTS INTERNOS — Módulo 4.4 Carrito/Checkout
+use App\Http\Controllers\Api\Internal\SaldoInternalApiController;
 
 Route::middleware('api.key')->group(function () {
 
@@ -157,6 +159,7 @@ Route::post  ('pedidos/{id}/cancelar',          [PedidoApiController::class, 'ca
 Route::post  ('pedidos/{id}/confirmar-tarjeta', [PedidoApiController::class, 'confirmarConTarjeta'])->whereNumber('id');
 
 // ── CHECKOUT (M4.4 y consumidores externos) ──
+
 Route::post('pedidos/checkout',           [\App\Http\Controllers\Api\CheckoutApiController::class, 'checkout']);
 Route::post('pedidos/checkout/cancelar',  [\App\Http\Controllers\Api\CheckoutApiController::class, 'cancelar']);
     Route::get   ('pedidos',                        [PedidoApiController::class, 'index']);
@@ -170,6 +173,7 @@ Route::post('pedidos/checkout/cancelar',  [\App\Http\Controllers\Api\CheckoutApi
     // ── RECARGAS (US2) ────────────────────────────────────────────────────
     Route::get ('recargas',                      [RecargaApiController::class, 'index']);
     Route::post('recargas',                      [RecargaApiController::class, 'store']);
+    Route::get ('recargas/usuario/{usuario_id}', [RecargaApiController::class, 'porUsuario']); // ANTES de /{id}
     Route::get ('recargas/{id}',                 [RecargaApiController::class, 'show']);
     Route::get ('recargas/usuario/{usuario_id}', [RecargaApiController::class, 'porUsuario']);
     // ── MÓDULO 8: Pagos y Recargas ───────────────────────────────────────────
@@ -271,3 +275,46 @@ Route::prefix('rfid')->group(function () {
         Route::get ('/lecturas/{uid}',  [RfidApiController::class, 'lecturas']);
     });
 });
+
+// ── MÓDULO 4.2: MONEDERO DIGITAL (ADMIN) ──────────────────────────────────────
+Route::prefix('admin/monedero')->middleware(['auth:sanctum', 'admin:administrador'])->group(function () {
+    // Analytics
+    Route::get('analytics/dashboard',       [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'dashboard']);
+    Route::get('analytics/top-usuarios',    [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'topUsuarios']);
+    Route::get('analytics/movimientos-modulo', [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'movimientosPorModulo']);
+    Route::get('analytics/timeseries',      [App\Http\Controllers\Api\Admin\MonederoAnalyticsApiController::class, 'timeseriesData']);
+
+    // Reportes
+    Route::get('reportes/estado-cuenta',    [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'estadoCuenta']);
+    Route::get('reportes/movimientos',      [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'movimientos']);
+    Route::get('reportes/uso-categoria',    [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'usoCategoria']);
+
+    // Exportes
+    Route::get('exportes/estado-cuenta/pdf', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportEstadoCuentaPDF']);
+    Route::get('exportes/estado-cuenta/csv', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportEstadoCuentaCSV']);
+    Route::get('exportes/movimientos/pdf',   [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportMovimientosPDF']);
+    Route::get('exportes/movimientos/csv',   [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportMovimientosCSV']);
+    Route::get('exportes/uso-categoria/pdf', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportUsoCategoriaPDF']);
+    Route::get('exportes/uso-categoria/csv', [App\Http\Controllers\Api\Admin\MonederoReportesApiController::class, 'exportUsoCategoriaCSV']);
+
+    // Reglas (CRUD)
+    Route::apiResource('reglas', App\Http\Controllers\Api\Admin\MonederoReglasApiController::class);
+});
+
+// ── MÓDULO 4.4 CARRITO — Endpoints internos de Saldo (X-Internal-Token) ──────
+//
+// Llamados por SaldoClient del módulo 4.4 (Carrito/Checkout).
+// Requieren el header X-Internal-Token con el secreto compartido.
+// NO están bajo 'api.key' ni 'auth:sanctum' — usan su propio middleware.
+//
+// Configurar en .env (ambos módulos deben tener el mismo valor):
+//   CART_SALDO_INTERNAL_TOKEN=tu_secreto_de_256_bits
+//
+Route::prefix('internal/saldo')
+    ->middleware('internal.token')
+    ->group(function () {
+        Route::post('reservar',                          [SaldoInternalApiController::class, 'reservar']);
+        Route::post('confirmar/{reserva_id}',            [SaldoInternalApiController::class, 'confirmar']);
+        Route::post('liberar/{reserva_id}',              [SaldoInternalApiController::class, 'liberar']);
+        Route::post('cargo-forzoso',                     [SaldoInternalApiController::class, 'cargoForzoso']);
+    });

@@ -31,15 +31,13 @@ const props = defineProps({
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-white truncate">Saldo Disponible</dt>
-                                    <div class="stat-value-section">
-                <div class="stat-number">${{$props.saldo.saldo }}</div>
-            </div>
+                                    <dd class="text-3xl font-semibold text-white">${{ formatMonto(monedero?.saldo_disponible ?? 0) }}</dd>
                                 </dl>
                             </div>
                         </div>
                     </div>
                     <div class="bg-slate-900/50 px-5 py-3 border-t border-green-500/20">
-                        <a href="route('monedero.recargas')" class="text-sm text-green-400 hover:text-green-300 transition-colors duration-200 flex items-center">
+                        <a href="/monedero/recargas" class="text-sm text-green-400 hover:text-green-300 transition-colors duration-200 flex items-center">
                             Recargar saldo 
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -333,10 +331,15 @@ const props = defineProps({
 <script setup>
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 
-defineProps({
+const props = defineProps({
+    monedero: { type: Object, default: null },
     resumenConsumo: {
         type: Object,
         default: () => ({ gasto_promedio: 0, total_pedidos: 0, top_producto: null }),
     },
 });
+
+function formatMonto(v) {
+    return Number(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
 </script>

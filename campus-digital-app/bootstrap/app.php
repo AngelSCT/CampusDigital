@@ -27,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth/rfid-login',
         ]);
 
+        $middleware->api(prepend: [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]);
+
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
@@ -35,8 +39,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'            => \App\Http\Middleware\CheckRole::class,
             'permission'      => \App\Http\Middleware\CheckPermission::class,
             'api.key'         => \App\Http\Middleware\ApiKeyMiddleware::class,
+            'internal.token'  => \App\Http\Middleware\InternalTokenMiddleware::class,
             'auth.module.jwt'  => \App\Http\Middleware\AuthModuleJwt::class,
             'role.cart.admin' => \App\Http\Middleware\EnsureCartAdminRole::class,
+            'admin'           => \App\Http\Middleware\CheckRole::class,
         ]);
 
     })

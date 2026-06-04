@@ -13,6 +13,32 @@ use Illuminate\Support\Facades\Http;
 
 class RecargaController extends Controller
 {
+    // Muestra la página de saldo / estado de cuenta del estudiante
+    public function miSaldo()
+    {
+        $usuario  = Auth::user();
+        $monedero = SaldoMonedero::where('usuario_id', $usuario->id)->first();
+
+        $movimientos = SaldoMovimiento::where('usuario_id', $usuario->id)
+            ->whereNull('deleted_at')
+            ->orderByDesc('created_at')
+            ->limit(15)
+            ->get();
+
+        $resumen = [
+            'saldo_actual'  => $monedero?->saldo_disponible ?? 0,
+            'total_abonos'  => $movimientos->where('tipo', 'abono')->sum('monto'),
+            'total_cargos'  => $movimientos->where('tipo', 'cargo')->sum('monto'),
+            'cantidad'      => $movimientos->count(),
+        ];
+
+        return inertia('Monedero/MiSaldo', [
+            'monedero'   => $monedero,
+            'movimientos'=> $movimientos,
+            'resumen'    => $resumen,
+        ]);
+    }
+
     // Muestra la página de recargas con el historial del usuario
     public function index()
     {
@@ -85,7 +111,10 @@ class RecargaController extends Controller
         }
     } catch (\Exception $e) {
         return redirect()->route('monedero.recargas')
-            ->with('error', 'Error al procesar la recarga: ' . $e->getMessage());
+            ->with($estado === 'exitoso' ? 'success' : 'error',
+                   $estado === 'exitoso'
+                       ? 'Recarga de $' . $request->monto . ' realizada exitosamente.'
+                       : 'El pago no fue autorizado. No se acreditó saldo.');
     }
 }
 

@@ -6,6 +6,7 @@ use App\Models\PedidoTienda;
 use App\Models\Usuario;
 use App\Models\AccesoBitacora;
 use App\Services\WalletService;
+use App\Models\SaldoMonedero;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -347,6 +348,8 @@ class DashboardController extends Controller
 
     private function dashboardEstudiante($user)
     {
+        $monedero = SaldoMonedero::where('usuario_id', $user->id)->first();
+
         // Gasto promedio del estudiante en pedidos confirmados
         $gastoPromedio = round(
             (float) PedidoTienda::where('usuario_id', $user->id)->avg('total') ?? 0,
@@ -367,6 +370,7 @@ class DashboardController extends Controller
         $totalPedidos = PedidoTienda::where('usuario_id', $user->id)->count();
 
         return Inertia::render('Dashboard/Estudiante', [
+            'monedero' => $monedero,
             'resumenConsumo' => [
                 'gasto_promedio'  => $gastoPromedio,
                 'total_pedidos'   => $totalPedidos,

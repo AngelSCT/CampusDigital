@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-[#F8FAFC] font-sans text-gray-900 antialiased;
+    }
+}
+
+@layer components {
+    /* ── Sidebar ──────────────────────────────────── */
+    .sidebar {
+        @apply fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-100 flex flex-col z-40 shadow-sm;
+    }
+
+    .sidebar-logo {
+        @apply flex items-center gap-3 px-6 py-5 border-b border-gray-100;
+    }
+
+    .sidebar-logo-icon {
+        @apply w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center;
+    }
+
+    .nav-item {
+        @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-150 cursor-pointer;
+    }
+
+    .nav-item.active {
+        @apply bg-blue-50 text-blue-700;
+    }
+
+    .nav-item svg {
+        @apply w-5 h-5;
+    }
+
+    /* ── Cards ──────────────────────────────────── */
+    .card {
+        @apply bg-white rounded-xl border border-gray-100 shadow-sm;
+    }
+
+    .card-p {
+        @apply bg-white rounded-xl border border-gray-100 shadow-sm p-5;
+    }
+
+    /* ── Balance Card ──────────────────────────── */
+    .balance-card {
+        @apply relative overflow-hidden rounded-2xl p-6 text-white;
+        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+    }
+
+    .balance-card::before {
+        content: '';
+        @apply absolute top-0 right-0 w-40 h-40 rounded-full opacity-10;
+        background: white;
+        transform: translate(30%, -30%);
+    }
+
+    .balance-card::after {
+        content: '';
+        @apply absolute bottom-0 left-0 w-32 h-32 rounded-full opacity-10;
+        background: white;
+        transform: translate(-30%, 30%);
+    }
+
+    /* ── Quick Action Buttons ────────────────── */
+    .quick-action {
+        @apply flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-100 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer text-center;
+    }
+
+    .quick-action-icon {
+        @apply w-12 h-12 rounded-xl flex items-center justify-center;
+    }
+
+    /* ── Stat Cards ──────────────────────────── */
+    .stat-card {
+        @apply bg-white rounded-xl border border-gray-100 p-5 flex items-center gap-4 shadow-sm;
+    }
+
+    .stat-icon {
+        @apply w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0;
+    }
+
+    /* ── Movement Item ───────────────────────── */
+    .movement-item {
+        @apply flex items-center justify-between py-3.5 border-b border-gray-50 last:border-0 hover:bg-gray-50 px-2 rounded-lg transition-colors;
+    }
+
+    .movement-icon {
+        @apply w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0;
+    }
+
+    /* ── Form Inputs ─────────────────────────── */
+    .form-input {
+        @apply w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all;
+    }
+
+    .form-label {
+        @apply block text-sm font-medium text-gray-700 mb-1.5;
+    }
+
+    /* ── Buttons ─────────────────────────────── */
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold rounded-xl transition-all duration-150 shadow-sm;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-3 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 text-sm font-semibold rounded-xl border border-gray-200 transition-all duration-150;
+    }
+
+    .btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm font-medium rounded-xl transition-all duration-150;
+    }
+
+    /* ── Badge ──────────────────────────────── */
+    .badge {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    }
+
+    .badge-green  { @apply badge bg-green-50 text-green-700; }
+    .badge-red    { @apply badge bg-red-50 text-red-700; }
+    .badge-blue   { @apply badge bg-blue-50 text-blue-700; }
+    .badge-yellow { @apply badge bg-yellow-50 text-yellow-700; }
+
+    /* ── Mobile Bottom Nav ───────────────────── */
+    .mobile-nav {
+        @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex items-center justify-around px-4 py-2 z-40 md:hidden;
+    }
+
+    .mobile-nav-item {
+        @apply flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-xs text-gray-500 hover:text-gray-900 transition-colors;
+    }
+
+    .mobile-nav-item.active {
+        @apply text-blue-600;
+    }
+
+    /* ── Recharge Amount Buttons ─────────────── */
+    .amount-btn {
+        @apply py-3 px-4 rounded-xl border-2 border-gray-200 text-sm font-semibold text-gray-700 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all cursor-pointer;
+    }
+
+    .amount-btn.selected {
+        @apply border-blue-600 text-blue-600 bg-blue-50;
+    }
+
+    /* ── Avatar ──────────────────────────────── */
+    .avatar {
+        @apply w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0;
+    }
+}
+
+/* ── Animations ──────────────────────────────────── */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.25s ease-out;
+}
+
+/* ── Scrollbar ──────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
