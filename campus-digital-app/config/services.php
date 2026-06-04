@@ -2,18 +2,6 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Third Party Services
-    |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Mailgun, Postmark, AWS and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
-    */
-
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],
@@ -35,18 +23,15 @@ return [
         ],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Módulo 2 — API REST (Recargas, Saldo, Pedidos)
-    |--------------------------------------------------------------------------
-    |
-    | MODULO2_API_URL  → URL base del servidor del Módulo 2
-    | MODULO2_API_KEY  → Clave para el header X-API-KEY
-    |
-    */
     'modulo2_api' => [
         'base_url' => env('MODULO2_API_URL', 'http://localhost:8001'),
         'api_key'  => env('MODULO2_API_KEY', ''),
+    ],
+
+    'modulo4_cart' => [
+        'base_url'      => env('MODULO4_CART_URL', 'http://localhost:8002'),
+        'access_token'  => env('MODULO4_CART_TOKEN', ''),
+        'refresh_token' => env('MODULO4_CART_REFRESH_TOKEN', ''),
     ],
 
 ];

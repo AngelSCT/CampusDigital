@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\PedidoApiController;
 
 // MODULO RECARGAS (US2)
 use App\Http\Controllers\Api\RecargaApiController;
+use App\Http\Controllers\Api\ComprobanteApiController;
 
 // RUTAS EXTRA CON UID Y EL PIN
 use App\Http\Controllers\Api\RfidApiController;
@@ -120,6 +121,24 @@ Route::middleware('api.key')->group(function () {
     Route::get ('modulo8/pagos/{id}/detalle',         [Modulo8ApiController::class, 'detallePago']);
     Route::post('modulo8/recargas/iniciar',           [Modulo8ApiController::class, 'iniciarRecarga']);
     Route::get ('modulo8/usuarios/{usuario_id}/pagos',[Modulo8ApiController::class, 'pagosPorUsuario']);
+
+    Route::post('modulo8/comprobantes/generar',                    [ComprobanteApiController::class, 'generarTicket']);
+
+    // Status simple de una venta (para Módulo 4 y otros)
+    // Responde: { ok, carrito_uuid, ticket_id, folio, estado, confirmado, total, fecha }
+    Route::get ('modulo8/ventas/{carrito_uuid}/status',            [ComprobanteApiController::class, 'statusVenta']);
+
+    // Detalle completo de una venta con items y totales
+    // Responde: { ok, venta: { ...todos los campos... } }
+    Route::get ('modulo8/ventas/{carrito_uuid}/detalle',           [ComprobanteApiController::class, 'detalleVenta']);
+
+    // Módulo 4 confirma que el ticket fue mostrado al usuario
+    // Responde: { ok, mensaje, ticket_id, folio }
+    Route::post('modulo8/comprobantes/{carrito_uuid}/confirmar',   [ComprobanteApiController::class, 'confirmarMostrado']);
+
+    // Historial de ventas de un usuario
+    // Responde: { ok, usuario_ref, total_ventas, ventas: [...] }
+    Route::get ('modulo8/ventas/usuario/{usuario_ref}',            [ComprobanteApiController::class, 'ventasPorUsuario']);
 
 });
 
