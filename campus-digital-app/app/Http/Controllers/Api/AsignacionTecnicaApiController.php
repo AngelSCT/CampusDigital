@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AsignacionTecnicaResource;
 use App\Models\AsignacionTecnica;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class AsignacionTecnicaApiController extends Controller
     // GET /api/asignaciones-tecnicas
     public function index()
     {
-        return response()->json(
+        return AsignacionTecnicaResource::collection(
             AsignacionTecnica::with(['ticket', 'tecnico'])
                 ->whereNull('deleted_at')
                 ->orderBy('created_at', 'desc')
@@ -22,11 +23,11 @@ class AsignacionTecnicaApiController extends Controller
     // GET /api/asignaciones-tecnicas/{id}
     public function show($id)
     {
-        $asignacion = AsignacionTecnica::with(['ticket', 'tecnico'])
-            ->whereNull('deleted_at')
-            ->findOrFail($id);
-
-        return response()->json($asignacion);
+        return new AsignacionTecnicaResource(
+            AsignacionTecnica::with(['ticket', 'tecnico'])
+                ->whereNull('deleted_at')
+                ->findOrFail($id)
+        );
     }
 
     // POST /api/asignaciones-tecnicas
@@ -41,7 +42,7 @@ class AsignacionTecnicaApiController extends Controller
             $request->only(['id_ticket', 'id_usuario_tecnico'])
         );
 
-        return response()->json($asignacion->load(['ticket', 'tecnico']), 201);
+        return (new AsignacionTecnicaResource($asignacion->load(['ticket', 'tecnico'])))->response()->setStatusCode(201);
     }
 
     // PUT /api/asignaciones-tecnicas/{id}
@@ -58,7 +59,7 @@ class AsignacionTecnicaApiController extends Controller
             $request->only(['id_ticket', 'id_usuario_tecnico'])
         );
 
-        return response()->json($asignacion->fresh()->load(['ticket', 'tecnico']));
+        return new AsignacionTecnicaResource($asignacion->fresh()->load(['ticket', 'tecnico']));
     }
 
     // DELETE /api/asignaciones-tecnicas/{id}

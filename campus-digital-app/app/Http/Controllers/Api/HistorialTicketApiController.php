@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\HistorialTicketResource;
 use App\Models\HistorialTicket;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class HistorialTicketApiController extends Controller
     // GET /api/historial-tickets
     public function index()
     {
-        return response()->json(
+        return HistorialTicketResource::collection(
             HistorialTicket::with(['ticket', 'usuario'])
                 ->whereNull('deleted_at')
                 ->orderBy('created_at', 'desc')
@@ -22,11 +23,9 @@ class HistorialTicketApiController extends Controller
     // GET /api/historial-tickets/{id}
     public function show($id)
     {
-        $registro = HistorialTicket::with(['ticket', 'usuario'])
-            ->whereNull('deleted_at')
-            ->findOrFail($id);
-
-        return response()->json($registro);
+        return new HistorialTicketResource(
+            HistorialTicket::with(['ticket', 'usuario'])->whereNull('deleted_at')->findOrFail($id)
+        );
     }
 
     // POST /api/historial-tickets
@@ -42,7 +41,7 @@ class HistorialTicketApiController extends Controller
             $request->only(['id_ticket', 'id_usuario', 'estado_nuevo'])
         );
 
-        return response()->json($registro->load(['ticket', 'usuario']), 201);
+        return (new HistorialTicketResource($registro->load(['ticket', 'usuario'])))->response()->setStatusCode(201);
     }
 
     // PUT /api/historial-tickets/{id}
@@ -60,7 +59,7 @@ class HistorialTicketApiController extends Controller
             $request->only(['id_ticket', 'id_usuario', 'estado_nuevo'])
         );
 
-        return response()->json($registro->fresh()->load(['ticket', 'usuario']));
+        return new HistorialTicketResource($registro->fresh()->load(['ticket', 'usuario']));
     }
 
     // DELETE /api/historial-tickets/{id}

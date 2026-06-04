@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\InsumoResource;
 use App\Models\Insumo;
 use Illuminate\Http\Request;
 
@@ -11,19 +12,15 @@ class InsumoApiController extends Controller
     // GET /api/insumos
     public function index()
     {
-        return response()->json(
-            Insumo::whereNull('deleted_at')
-                ->orderBy('nombre_insumo')
-                ->get()
+        return InsumoResource::collection(
+            Insumo::whereNull('deleted_at')->orderBy('nombre_insumo')->get()
         );
     }
 
     // GET /api/insumos/{id}
     public function show($id)
     {
-        $insumo = Insumo::whereNull('deleted_at')->findOrFail($id);
-
-        return response()->json($insumo);
+        return new InsumoResource(Insumo::whereNull('deleted_at')->findOrFail($id));
     }
 
     // POST /api/insumos
@@ -36,7 +33,7 @@ class InsumoApiController extends Controller
 
         $insumo = Insumo::create($request->only(['nombre_insumo', 'stock_actual']));
 
-        return response()->json($insumo, 201);
+        return (new InsumoResource($insumo))->response()->setStatusCode(201);
     }
 
     // PUT /api/insumos/{id}
@@ -51,7 +48,7 @@ class InsumoApiController extends Controller
 
         $insumo->update($request->only(['nombre_insumo', 'stock_actual']));
 
-        return response()->json($insumo->fresh());
+        return new InsumoResource($insumo->fresh());
     }
 
     // DELETE /api/insumos/{id}

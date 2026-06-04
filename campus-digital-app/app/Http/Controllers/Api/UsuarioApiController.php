@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UsuarioResource;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -26,7 +27,7 @@ class UsuarioApiController extends Controller
             $query->where('bloqueado', filter_var($request->bloqueado, FILTER_VALIDATE_BOOLEAN));
         }
 
-        return response()->json($query->paginate($request->get('per_page', 15)));
+        return UsuarioResource::collection($query->paginate($request->get('per_page', 15)));
     }
 
     // GET /api/usuarios/{id}
@@ -36,7 +37,7 @@ class UsuarioApiController extends Controller
             ->whereNull('deleted_at')
             ->findOrFail($id);
 
-        return response()->json($usuario);
+        return new UsuarioResource($usuario);
     }
 
     // POST /api/usuarios
@@ -61,7 +62,7 @@ class UsuarioApiController extends Controller
 
         $usuario->perfil()->create([]);
 
-        return response()->json($usuario, 201);
+        return (new UsuarioResource($usuario))->response()->setStatusCode(201);
     }
 
     // PUT /api/usuarios/{id}
@@ -85,7 +86,7 @@ class UsuarioApiController extends Controller
 
         $usuario->update($data);
 
-        return response()->json($usuario->fresh());
+        return new UsuarioResource($usuario->fresh());
     }
 
     // DELETE /api/usuarios/{id}

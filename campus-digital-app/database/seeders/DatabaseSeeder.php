@@ -11,6 +11,17 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesPermisosSeeder::class,
             UsuariosPruebaSeeder::class,
+            ProductSeeder::class,
+            CarritoSeeder::class,
         ]);
+
+        // CategoriasSeeder inserta datos base del módulo Carrito-servicio.
+        // Usa updateOrCreate, por lo que es idempotente y seguro repetirlo.
+        if (!app()->environment('production')) {
+            $this->call([
+                CategoriasSeeder::class,
+                RolesCartSeeder::class,  // crea el rol 'admin_carrito'
+            ]);
+        }
     }
 }

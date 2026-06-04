@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SaldoMovimientoResource;
 use App\Models\SaldoMovimiento;
 use App\Models\SaldoMonedero;
 use Illuminate\Http\Request;
@@ -23,13 +24,13 @@ class SaldoMovimientoApiController extends Controller
         if ($request->filled('desde'))            $query->where('created_at', '>=', $request->desde);
         if ($request->filled('hasta'))            $query->where('created_at', '<=', $request->hasta);
 
-        return response()->json($query->orderByDesc('created_at')->paginate($request->get('per_page', 20)));
+        return SaldoMovimientoResource::collection($query->orderByDesc('created_at')->paginate($request->get('per_page', 20)));
     }
 
     // GET /api/saldo-movimientos/{id}
     public function show($id)
     {
-        return response()->json(
+        return new SaldoMovimientoResource(
             SaldoMovimiento::with(['usuario', 'monedero', 'operador', 'tarjetaLectura'])
                 ->whereNull('deleted_at')
                 ->findOrFail($id)
@@ -85,10 +86,9 @@ class SaldoMovimientoApiController extends Controller
                 'meta_json'           => $request->meta_json ?? [],
             ]);
 
-            return response()->json([
-                'movimiento'       => $movimiento->load('usuario'),
+            return (new SaldoMovimientoResource($movimiento->load('usuario')))->additional([
                 'saldo_disponible' => $monedero->saldo_disponible,
-            ], 201);
+            ])->response()->setStatusCode(201);
         });
     }
 }

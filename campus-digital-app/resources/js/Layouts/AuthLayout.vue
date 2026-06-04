@@ -1,15 +1,15 @@
 <template>
     <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <nav class="bg-gradient-to-r from-slate-900/95 to-slate-800/95 backdrop-blur-xl border-b border-blue-500/20 shadow-lg shadow-blue-500/5">
+        <nav class="relative z-50 bg-gradient-to-r from-slate-900/95 to-slate-800/95 backdrop-blur-xl border-b border-blue-500/20 shadow-lg shadow-blue-500/5">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
-                    <div class="flex">
+                    <div class="flex min-w-0 flex-1">
                         <div class="flex-shrink-0 flex items-center">
                             <a href="/dashboard" class="text-xl font-bold bg-gradient-to-r from-blue-500 to-blue-400 bg-clip-text text-transparent hover:from-blue-400 hover:to-blue-300 transition-all duration-300">
                                 Campus Digital
                             </a>
                         </div>
-                        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <div class="hidden sm:ml-6 sm:flex sm:items-center sm:gap-x-4">
                             <a href="/dashboard" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
                                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -56,10 +56,26 @@
                                 </svg>
                                 Archivos
                             </a>
+
+                            <template v-if="isEstudiante">
+                                <a href="/carrito" class="border-transparent text-white hover:border-blue-500/50 hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    </svg>
+                                    Mi Carrito
+                                </a>
+
+                                <a href="/carrito/mis-regalos" class="border-transparent text-white hover:border-pink-500/50 hover:text-pink-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                                    </svg>
+                                    Mis Regalos
+                                </a>
+                            </template>
                         </div>
                     </div>
                     
-                    <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <div class="hidden sm:ml-4 sm:flex sm:items-center sm:flex-shrink-0">
                         <div class="ml-3 relative">
                             <button @click="toggleUserMenu" type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-slate-900 transition-all duration-300 group">
                                 <img class="h-8 w-8 rounded-full object-cover ring-2 ring-blue-500/30 group-hover:ring-blue-500/60 transition-all duration-300" :src="userAvatar" :alt="userName">
@@ -77,7 +93,7 @@
                                 leave-from-class="transform opacity-100 scale-100"
                                 leave-to-class="transform opacity-0 scale-95"
                             >
-                                <div v-show="showUserMenu" class="origin-top-right absolute right-0 mt-2 w-56 rounded-xl shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900 ring-1 ring-blue-500/30 z-50 overflow-hidden">
+                                <div v-show="showUserMenu" class="origin-top-right absolute right-0 mt-2 w-56 rounded-xl shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900 ring-1 ring-blue-500/30 z-[100] overflow-hidden">
                                     <div class="py-1">
                                         <!-- Usuario Info -->
                                         <div class="px-4 py-3 border-b border-blue-500/20">
@@ -111,6 +127,22 @@
                                             </svg>
                                             Mis Archivos
                                         </a>
+
+                                        <!-- Mi Carrito / Mis Regalos — solo estudiantes -->
+                                        <template v-if="isEstudiante">
+                                            <a href="/carrito" class="block px-4 py-2 text-sm text-white hover:bg-blue-500/10 hover:text-blue-400 flex items-center transition-all duration-200">
+                                                <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                                </svg>
+                                                Mi Carrito
+                                            </a>
+                                            <a href="/carrito/mis-regalos" class="block px-4 py-2 text-sm text-white hover:bg-pink-500/10 hover:text-pink-400 flex items-center transition-all duration-200">
+                                                <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                                                </svg>
+                                                Mis Regalos
+                                            </a>
+                                        </template>
 
                                         <!-- Lector -->
                                         <a href="/lector" class="block px-4 py-2 text-sm text-white hover:bg-blue-500/10 hover:text-blue-400 flex items-center transition-all duration-200">
@@ -159,7 +191,16 @@
                         <a href="/dashboard" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
                             Dashboard
                         </a>
-                        
+
+                        <template v-if="isEstudiante">
+                            <a href="/carrito" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                                Mi Carrito
+                            </a>
+                            <a href="/carrito/mis-regalos" class="border-transparent text-white hover:bg-pink-500/10 hover:border-pink-500 hover:text-pink-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                                Mis Regalos
+                            </a>
+                        </template>
+
                         <template v-if="isAdmin">
                             <a href="/admin/usuarios" class="border-transparent text-white hover:bg-blue-500/10 hover:border-blue-500 hover:text-blue-400 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
                                 Usuarios
@@ -279,6 +320,11 @@ const userRoles = computed(() => {
 
 const isAdmin = computed(() => {
     return userRoles.value.includes('administrador');
+});
+
+
+const isEstudiante = computed(() => {
+    return userRoles.value.includes('estudiante');
 });
 
 function toggleUserMenu() {

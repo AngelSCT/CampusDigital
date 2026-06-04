@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\GastoTicketResource;
 use App\Models\GastoTicket;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class GastoTicketApiController extends Controller
     // GET /api/gastos-ticket
     public function index()
     {
-        return response()->json(
+        return GastoTicketResource::collection(
             GastoTicket::with(['ticket', 'insumo'])
                 ->whereNull('deleted_at')
                 ->orderBy('created_at', 'desc')
@@ -22,11 +23,9 @@ class GastoTicketApiController extends Controller
     // GET /api/gastos-ticket/{id}
     public function show($id)
     {
-        $gasto = GastoTicket::with(['ticket', 'insumo'])
-            ->whereNull('deleted_at')
-            ->findOrFail($id);
-
-        return response()->json($gasto);
+        return new GastoTicketResource(
+            GastoTicket::with(['ticket', 'insumo'])->whereNull('deleted_at')->findOrFail($id)
+        );
     }
 
     // POST /api/gastos-ticket
@@ -42,7 +41,7 @@ class GastoTicketApiController extends Controller
             $request->only(['id_ticket', 'id_insumo', 'cantidad'])
         );
 
-        return response()->json($gasto->load(['ticket', 'insumo']), 201);
+        return (new GastoTicketResource($gasto->load(['ticket', 'insumo'])))->response()->setStatusCode(201);
     }
 
     // PUT /api/gastos-ticket/{id}
@@ -60,7 +59,7 @@ class GastoTicketApiController extends Controller
             $request->only(['id_ticket', 'id_insumo', 'cantidad'])
         );
 
-        return response()->json($gasto->fresh()->load(['ticket', 'insumo']));
+        return new GastoTicketResource($gasto->fresh()->load(['ticket', 'insumo']));
     }
 
     // DELETE /api/gastos-ticket/{id}

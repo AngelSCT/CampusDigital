@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    // Módulo Carrito — URL base del servidor que expone la Cart API.
+    // En local apunta al mismo Laravel. En producción/staging ajustar CART_API_URL.
+    'cart' => [
+        'url'                      => env('CART_API_URL', env('APP_URL', 'http://localhost')),
+        // Tokens del módulo Demo Biblioteca — generados por: php artisan carrito:demo-biblioteca-setup
+        'biblioteca_token'         => env('BIBLIOTECA_CART_TOKEN'),
+        'biblioteca_refresh_token' => env('BIBLIOTECA_REFRESH_TOKEN'),
+    ],
+
 ];

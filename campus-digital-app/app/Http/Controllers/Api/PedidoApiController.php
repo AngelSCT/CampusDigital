@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PedidoResource;
 use App\Models\Pedido;
 use App\Models\PedidoHistorial;
 use App\Models\ActividadBitacora;
@@ -28,13 +29,13 @@ class PedidoApiController extends Controller
         if ($request->filled('desde'))       $query->where('created_at', '>=', $request->desde);
         if ($request->filled('hasta'))       $query->where('created_at', '<=', $request->hasta);
 
-        return response()->json($query->orderByDesc('created_at')->paginate($request->get('per_page', 15)));
+        return PedidoResource::collection($query->orderByDesc('created_at')->paginate($request->get('per_page', 15)));
     }
 
     // GET /api/pedidos/{id}
     public function show($id)
     {
-        return response()->json(
+        return new PedidoResource(
             Pedido::with(['usuario', 'operador', 'tarjetaLectura', 'saldoMovimiento'])
                 ->whereNull('deleted_at')
                 ->findOrFail($id)
@@ -87,7 +88,7 @@ class PedidoApiController extends Controller
             return $pedido;
         });
 
-        return response()->json($pedido->load('usuario'), 201);
+        return (new PedidoResource($pedido->load('usuario')))->response()->setStatusCode(201);
     }
 
     // PUT /api/pedidos/{id}  ← actualizar datos generales
@@ -103,7 +104,7 @@ class PedidoApiController extends Controller
 
         $pedido->update($request->only(['notas', 'descripcion', 'total', 'meta_json']));
 
-        return response()->json($pedido->fresh());
+        return new PedidoResource($pedido->fresh());
     }
 
     // POST /api/pedidos/{id}/estado  ← cambiar estado del pedido
@@ -117,6 +118,7 @@ class PedidoApiController extends Controller
 
         $pedido = Pedido::whereNull('deleted_at')->findOrFail($id);
 
+<<<<<<< HEAD
         // ✅ Validación de transición centralizada
         if (!MaquinaEstadosPedido::puedeTransicionar($pedido->estado, $validated['estado'])) {
             return response()->json([
@@ -163,6 +165,9 @@ class PedidoApiController extends Controller
             'message' => "Pedido actualizado a: {$validated['estado']}.",
             'pedido'  => $pedido->fresh()->load(['usuario', 'operador']),
         ]);
+=======
+        return response()->json(['message' => "Pedido actualizado a: {$request->estado}.", 'pedido' => new PedidoResource($pedido->fresh())]);
+>>>>>>> origin/4.4_Modulo_Carrito_Consumo_Checkout_Final
     }
 
     // POST /api/pedidos/{id}/confirmar-tarjeta  ← confirmar entrega con tarjeta RFID
@@ -174,6 +179,7 @@ class PedidoApiController extends Controller
 
         $pedido = Pedido::whereNull('deleted_at')->findOrFail($id);
 
+<<<<<<< HEAD
         // ✅ Solo se puede confirmar con tarjeta si el pedido está listo para entregarse
         if (!MaquinaEstadosPedido::puedeTransicionar($pedido->estado, 'entregado')) {
             return response()->json([
@@ -215,6 +221,9 @@ class PedidoApiController extends Controller
             'message' => 'Entrega confirmada con tarjeta.',
             'pedido'  => $pedido->fresh()->load(['usuario', 'operador', 'tarjetaLectura']),
         ]);
+=======
+        return response()->json(['message' => 'Entrega confirmada con tarjeta.', 'pedido' => new PedidoResource($pedido->fresh())]);
+>>>>>>> origin/4.4_Modulo_Carrito_Consumo_Checkout_Final
     }
 
     // DELETE /api/pedidos/{id}
