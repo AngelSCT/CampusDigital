@@ -587,6 +587,63 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
+// ── MÓDULO 4.7: RESERVAS Y TURNOS ──────────────────────────────────────────────
+
+// Frontend (usuarios autenticados)
+Route::middleware(['auth'])->group(function () {
+    // Reservas
+    Route::prefix('reservas')->name('reservas.')->group(function () {
+        Route::get('/',                      [App\Http\Controllers\ReservaController::class, 'index'])->name('index');
+        Route::get('/crear/{recurso}',       [App\Http\Controllers\ReservaController::class, 'create'])->name('create');
+        Route::post('/',                     [App\Http\Controllers\ReservaController::class, 'store'])->name('store');
+        Route::get('/{reserva}',             [App\Http\Controllers\ReservaController::class, 'show'])->name('show');
+        Route::delete('/{reserva}',          [App\Http\Controllers\ReservaController::class, 'destroy'])->name('destroy');
+    });
+
+    // Turnos
+    Route::prefix('turnos')->name('turnos.')->group(function () {
+        Route::get('/',            [App\Http\Controllers\TurnoController::class, 'index'])->name('index');
+        Route::post('/',           [App\Http\Controllers\TurnoController::class, 'store'])->name('store');
+        Route::get('/mi-turno',    [App\Http\Controllers\TurnoController::class, 'miTurno'])->name('mi-turno');
+        Route::delete('/{turno}',  [App\Http\Controllers\TurnoController::class, 'destroy'])->name('destroy');
+    });
+});
+
+// Admin (auth + role:administrador)
+Route::middleware(['auth', 'role:administrador'])
+    ->prefix('admin/reservas')
+    ->name('admin.reservas.')
+    ->group(function () {
+        // Recursos
+        Route::resource('recursos', App\Http\Controllers\Admin\RecursoController::class);
+
+        // Reservas
+        Route::get('/',                      [App\Http\Controllers\Admin\ReservaAdminController::class, 'index'])->name('index');
+        Route::post('/',                     [App\Http\Controllers\Admin\ReservaAdminController::class, 'store'])->name('store');
+        Route::get('/{reserva}',             [App\Http\Controllers\Admin\ReservaAdminController::class, 'show'])->name('show');
+        Route::patch('/{reserva}',           [App\Http\Controllers\Admin\ReservaAdminController::class, 'update'])->name('update');
+        Route::delete('/{reserva}',          [App\Http\Controllers\Admin\ReservaAdminController::class, 'destroy'])->name('destroy');
+
+        // Turnos
+        Route::prefix('turnos')->name('turnos.')->group(function () {
+            Route::get('/',                    [App\Http\Controllers\Admin\TurnoAdminController::class, 'index'])->name('index');
+            Route::post('/{turno}/llamar',     [App\Http\Controllers\Admin\TurnoAdminController::class, 'llamar'])->name('llamar');
+            Route::post('/{turno}/atender',    [App\Http\Controllers\Admin\TurnoAdminController::class, 'atender'])->name('atender');
+            Route::post('/{turno}/no-show',    [App\Http\Controllers\Admin\TurnoAdminController::class, 'noShow'])->name('no-show');
+            Route::delete('/{turno}',          [App\Http\Controllers\Admin\TurnoAdminController::class, 'destroy'])->name('destroy');
+        });
+
+        // Dashboard
+        Route::get('/dashboard', [App\Http\Controllers\Admin\ReservaDashboardController::class, 'index'])->name('dashboard');
+
+        // Reportes
+        Route::prefix('reportes')->name('reportes.')->group(function () {
+            Route::get('/por-recurso',     [App\Http\Controllers\Admin\ReservaReporteController::class, 'porRecurso'])->name('por-recurso');
+            Route::get('/por-usuario',     [App\Http\Controllers\Admin\ReservaReporteController::class, 'porUsuario'])->name('por-usuario');
+            Route::get('/infrautilizados', [App\Http\Controllers\Admin\ReservaReporteController::class, 'infrautilizados'])->name('infrautilizados');
+        });
+    });
+
 // ── MÓDULO CARRITO — Panel Admin ──────────────────────────────────────────────
 
 // ── MÓDULO CARRITO — Panel de Administración (requiere auth + rol admin_carrito) ──

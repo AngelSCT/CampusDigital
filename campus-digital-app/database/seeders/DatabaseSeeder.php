@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CategoriasSeeder::class,
             RolesCartSeeder::class,
+            RecursosDemoSeeder::class,
+            ReservasDemoSeeder::class,
         ]);
     }
 }
