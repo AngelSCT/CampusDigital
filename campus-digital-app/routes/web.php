@@ -614,17 +614,13 @@ Route::middleware(['auth', 'role:administrador'])
     ->prefix('admin/reservas')
     ->name('admin.reservas.')
     ->group(function () {
+        // Dashboard (estática, antes de {reserva} para evitar conflicto de routing)
+        Route::get('/dashboard', [App\Http\Controllers\Admin\ReservaDashboardController::class, 'index'])->name('dashboard');
+
         // Recursos
         Route::resource('recursos', App\Http\Controllers\Admin\RecursoController::class);
 
-        // Reservas
-        Route::get('/',                      [App\Http\Controllers\Admin\ReservaAdminController::class, 'index'])->name('index');
-        Route::post('/',                     [App\Http\Controllers\Admin\ReservaAdminController::class, 'store'])->name('store');
-        Route::get('/{reserva}',             [App\Http\Controllers\Admin\ReservaAdminController::class, 'show'])->name('show');
-        Route::patch('/{reserva}',           [App\Http\Controllers\Admin\ReservaAdminController::class, 'update'])->name('update');
-        Route::delete('/{reserva}',          [App\Http\Controllers\Admin\ReservaAdminController::class, 'destroy'])->name('destroy');
-
-        // Turnos
+        // Turnos (prefijo estático, antes de {reserva})
         Route::prefix('turnos')->name('turnos.')->group(function () {
             Route::get('/',                    [App\Http\Controllers\Admin\TurnoAdminController::class, 'index'])->name('index');
             Route::post('/{turno}/llamar',     [App\Http\Controllers\Admin\TurnoAdminController::class, 'llamar'])->name('llamar');
@@ -633,15 +629,23 @@ Route::middleware(['auth', 'role:administrador'])
             Route::delete('/{turno}',          [App\Http\Controllers\Admin\TurnoAdminController::class, 'destroy'])->name('destroy');
         });
 
-        // Dashboard
-        Route::get('/dashboard', [App\Http\Controllers\Admin\ReservaDashboardController::class, 'index'])->name('dashboard');
-
-        // Reportes
+        // Reportes (prefijo estático, antes de {reserva})
         Route::prefix('reportes')->name('reportes.')->group(function () {
             Route::get('/por-recurso',     [App\Http\Controllers\Admin\ReservaReporteController::class, 'porRecurso'])->name('por-recurso');
             Route::get('/por-usuario',     [App\Http\Controllers\Admin\ReservaReporteController::class, 'porUsuario'])->name('por-usuario');
             Route::get('/infrautilizados', [App\Http\Controllers\Admin\ReservaReporteController::class, 'infrautilizados'])->name('infrautilizados');
+
+            // Alias singulares (compatibilidad con documentación previa)
+            Route::get('/recurso',          [App\Http\Controllers\Admin\ReservaReporteController::class, 'porRecurso'])->name('recurso');
+            Route::get('/usuario',          [App\Http\Controllers\Admin\ReservaReporteController::class, 'porUsuario'])->name('usuario');
         });
+
+        // Reservas (rutas con parámetro dinámico {reserva} - siempre al final)
+        Route::get('/',                      [App\Http\Controllers\Admin\ReservaAdminController::class, 'index'])->name('index');
+        Route::post('/',                     [App\Http\Controllers\Admin\ReservaAdminController::class, 'store'])->name('store');
+        Route::get('/{reserva}',             [App\Http\Controllers\Admin\ReservaAdminController::class, 'show'])->name('show');
+        Route::patch('/{reserva}',           [App\Http\Controllers\Admin\ReservaAdminController::class, 'update'])->name('update');
+        Route::delete('/{reserva}',          [App\Http\Controllers\Admin\ReservaAdminController::class, 'destroy'])->name('destroy');
     });
 
 // ── MÓDULO CARRITO — Panel Admin ──────────────────────────────────────────────

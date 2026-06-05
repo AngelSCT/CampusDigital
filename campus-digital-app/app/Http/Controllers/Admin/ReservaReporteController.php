@@ -97,9 +97,9 @@ class ReservaReporteController extends Controller
                 DB::raw('COALESCE(SUM(EXTRACT(EPOCH FROM (reservas.fecha_fin - reservas.fecha_inicio)) / 3600), 0) as horas_uso')
             )
             ->groupBy('recursos.id_recurso', 'recursos.nombre', 'recursos.tipo', 'recursos.estado')
-            ->having('total_reservas', '<', 3)
-            ->orderBy('total_reservas')
-            ->orderBy('horas_uso')
+            ->havingRaw('COUNT(reservas.id_reserva) < ?', [3])
+            ->orderByRaw('COUNT(reservas.id_reserva) ASC')
+            ->orderByRaw('COALESCE(SUM(EXTRACT(EPOCH FROM (reservas.fecha_fin - reservas.fecha_inicio)) / 3600), 0) ASC')
             ->get();
 
         return Inertia::render('Admin/Reservas/Reportes/Infrautilizados', [
