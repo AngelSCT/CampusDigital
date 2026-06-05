@@ -174,24 +174,19 @@ const hayProductos = computed(() => props.productos.length > 0)
                     </div>
 
                     <!-- Botón -->
-                    <a
+                    <Link
                         :id="`btn-ver-${p.id_catalogo}`"
-                        :href="route('catalogo.show', p.id_catalogo)"
+                        :href="`/catalogo/${p.id_catalogo}`"
                         class="mt-auto flex items-center justify-center gap-2 px-4 py-2.5
-                               rounded-xl text-sm font-semibold transition-all duration-200
-                               text-white"
+                            rounded-xl text-sm font-semibold transition-all duration-200
+                            text-white"
                         :class="p.cart_disponible
                             ? 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30'
                             : 'bg-slate-700/50 text-slate-500 cursor-not-allowed pointer-events-none'"
                         :aria-disabled="!p.cart_disponible"
-                        @click.prevent="p.cart_disponible && $inertia.visit(route('catalogo.show', p.id_catalogo))"
                     >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007 17h11M7 13L5.4 5M17 17a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
-                        </svg>
                         Ver y agregar al carrito
-                    </a>
+                    </Link>
                 </article>
 
             </div>

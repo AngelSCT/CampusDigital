@@ -326,29 +326,39 @@ class CatalogoController extends Controller
 
     public function show($id)
     {
-        $catalogo = \App\Models\Catalogo\Catalogo::with(['categoria', 'inventario', 'precios'])
+        $catalogo = \App\Models\Catalogo\Catalogo::with(['categoria', 'inventario'])
             ->where('id_catalogo', $id)
             ->where('activo', true)
             ->firstOrFail();
 
-        $resolver      = app(\App\Services\Catalogo\CatalogoCartResolver::class);
+        $resolver = app(\App\Services\Catalogo\CatalogoCartResolver::class);
         $estadoCarrito = $resolver->estadoCarrito($catalogo);
 
         $saldo = 0;
+
         try {
             $monedero = \App\Models\SaldoMonedero::where('usuario_id', auth()->id())->first();
-            $saldo    = $monedero ? (float) $monedero->saldo_disponible : 0;
-        } catch (\Throwable) {}
+            $saldo = $monedero ? (float) $monedero->saldo_disponible : 0;
+        } catch (\Throwable $e) {
+            $saldo = 0;
+        }
 
         return Inertia::render('Catalogo/Show', [
             'producto' => array_merge($catalogo->only([
-                'id_catalogo', 'nombre', 'descripcion', 'tipo', 'aplica_iva',
+                'id_catalogo',
+                'nombre',
+                'descripcion',
+                'tipo',
+                'aplica_iva',
             ]), $estadoCarrito),
-            'categoria'          => $catalogo->categoria?->nombre,
-            'precio_vigente'     => $catalogo->precioVigenteValor()
+
+            'categoria' => $catalogo->categoria?->nombre,
+
+            'precio_vigente' => $catalogo->precioVigenteValor()
                 ? number_format((float) $catalogo->precioVigenteValor(), 2, '.', '')
                 : null,
-            'saldo_disponible'   => $saldo,
+
+            'saldo_disponible' => $saldo,
         ]);
     }
 }
